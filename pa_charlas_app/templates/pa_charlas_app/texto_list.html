@@ -1,0 +1,10 @@
+<div>
+	<h1><a href="/">PodemosAprender</a></h1>
+</div>
+
+{% for texto in textos %}
+    <div>
+        <p>{{ texto.fh_creado }} <i>por</i> {{ texto.de_quien }}</p>
+        <p>{{ texto.texto|linebreaksbr }}</p>
+    </div>
+{% endfor %}
