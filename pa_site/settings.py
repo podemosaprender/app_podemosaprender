@@ -10,22 +10,24 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+from pa_lib_py.util import * #U: para cargar config via json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+print(f'Reading .env from {str(BASE_DIR)}')
+CFG= json_to_env('.env',str(BASE_DIR))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$5%2abnt1i07h6c7mm%8r9qu(n8kf-48h51b@#cst_fd-c3wow'
+SECRET_KEY = CFG['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']
 
 # Application definition
 
@@ -37,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-		'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
+    'django_extensions', #A: runserver_plus con httpS para Facebook
+
+    'social_django', #A: autenticacion con facebook, google 
+    'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
 ]
 
 MIDDLEWARE = [
@@ -100,6 +105,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.linkedin.LinkedinOAuth2',
+    'social_core.backends.instagram.InstagramOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -119,3 +130,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_URL = 'logout'
+LOGOUT_REDIRECT_URL = 'login'
+
+SOCIAL_AUTH_FACEBOOK_KEY= CFG['SOCIAL_AUTH_FACEBOOK_KEY'] #U: de la consola de desarrollo de facebook, app id
+SOCIAL_AUTH_FACEBOOK_SECRET= CFG['SOCIAL_AUTH_FACEBOOK_SECRET'] #U: consola de fb, en settings, basic

@@ -1,11 +1,14 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 from .models import Texto
 from .forms import TextoForm
 
-
 # Create your views here.
+def login(request):
+  return render(request, 'pa_charlas_app/login.html')
+
 def texto_list(request):
 	textos= Texto.objects.order_by('fh_creado')
 	return render(request, 'pa_charlas_app/texto_list.html', {'textos': textos})
@@ -15,6 +18,7 @@ def texto_detail(request, pk):
 	permalink= request.get_raw_uri() #TODO: buscar una forma mejor, configuracion?
 	return render(request, 'pa_charlas_app/texto_detail.html', {'texto': texto, 'permalink': permalink})
 
+@login_required
 def texto_edit(request, pk=None): #U: sirve para crear Y editar
 	texto= None #DFLT, nuevo
 	if not pk is None:
