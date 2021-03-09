@@ -34,3 +34,28 @@ Despues podes ejecutar un servidor https con
 ~~~
 python manage.py runserver_plus --cert-file tmpcert.crt
 ~~~
+
+### Cuando desplegue en un hosting
+
+Tuve que usar mariadb en vez de sqlite, asi que agregue la configuracion de la db a .env.json que queda asi:
+
+~~~ .env.json
+{
+	"SECRET_KEY": "LaClaveSecretaQueGeneraDjangoEnSettingsVaAca-djahd",
+	"SOCIAL_AUTH_FACEBOOK_KEY": "112233445566778", 
+	"SOCIAL_AUTH_FACEBOOK_SECRET": "112233445566778899aabbccddeeff00",
+	"DB": {
+		"ENGINE": "django.db.backends.mysql",
+		"NAME": "mibase",
+		"USER": "miuser",
+		"PASSWORD": "miclavesecreta",
+		"HOST": "servidorconladb",
+		"PORT": ""
+	}
+}
+~~~
+
+Tuve que agregar la url de autenticacion en la consola de facebook en Settings de Facebook Login (que no son los mismos que para la app, estan mas abajo)
+
+https://si.podemosaprender.org/social-auth/complete/facebook/
+

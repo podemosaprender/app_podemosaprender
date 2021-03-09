@@ -78,12 +78,16 @@ WSGI_APPLICATION = 'pa_site.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+Database={ #DFLT
+  'ENGINE': 'django.db.backends.sqlite3',
+  'NAME': BASE_DIR / 'db.sqlite3',
+}
+
+if not CFG.get('DB') is None:
+	Database= CFG.get('DB')
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': Database
 }
 
 
@@ -130,6 +134,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT= CFG.get('STATIC_PATH',os.path.join(BASE_DIR, 'static'))
+print(f'STATIC FILES AT {STATIC_ROOT}')
+
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'

@@ -5,7 +5,9 @@ chardet==4.0.0
 cryptography==3.4.6
 defusedxml==0.7.1
 Django==3.1.7
+django-extensions==3.1.1
 idna==2.10
+mysqlclient==2.0.3
 oauthlib==3.1.0
 pycparser==2.20
 PyJWT==2.0.1
