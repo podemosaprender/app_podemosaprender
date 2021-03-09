@@ -1,8 +1,22 @@
-<div>
-	<h1><a href="/">PodemosAprender</a></h1>
-</div>
+{% load static %}
 
-{% block content %}
-{% endblock %}
+<html>
+<head>
+	<title>PodemosAprender</title>
+	{% block meta %}
+	{% endblock %}
+</head>
+<body>
+	<div>
+		<h1><a href="/">PodemosAprender</a></h1>
+	</div>
+
+	{% block content %}
+	{% endblock %}
+
+	<!-- scripts al final para mostrar algo mas rapido -->
+	<script src="{% static 'pa_lib/js/lib.js' %}"></script>
+</body>
+</html>
 
 

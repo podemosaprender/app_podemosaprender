@@ -1,15 +1,28 @@
 {% extends 'pa_charlas_app/base.html' %}
 
+{% block meta %}
+	<meta property="fb:app_id" content="741688646199607" />
+	<meta property="og:title" content="{{ texto.fh_creado }} por {{ texto.de_quien }} en PodemosAprender"/>
+	<meta property="og:description" content="{{ texto.texto }}"/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="{{ permalink }}" />
+	<link rel="canonical" href="{{ permalink }}" />
+{% endblock %}
+
 {% block content %}
-<div class="texto">
+<div class="texto_item">
+	<div id="texto">
+		<p>
+			<a href="{% url 'texto_detail' pk=texto.pk %}">{{ texto.fh_creado }}</a>
+			<i>por</i>
+			{{ texto.de_quien }}
+		</p>
+		<p>{{ texto.texto|linebreaksbr }}</p>
+	</div>
 	<p>
-		<a href="{% url 'texto_detail' pk=texto.pk %}">{{ texto.fh_creado }}</a>
-		<i>por</i>
-		{{ texto.de_quien }}
-	</p>
-	<p>{{ texto.texto|linebreaksbr }}</p>
-	<p>
-		Compartir en <a href="https://www.facebook.com/sharer/sharer.php?u={{ permalink }}">facebook</a>
+		Compartir en 
+			<a href="https://www.facebook.com/sharer/sharer.php?u={{ permalink }}" target="_blank">facebook</a>
+			<a href="#" onclick="return copyToClipboardEl('#texto')">portapapeles</a>
 	</p>
 </div>
 {% endblock %}
