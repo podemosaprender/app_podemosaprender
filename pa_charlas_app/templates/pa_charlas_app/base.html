@@ -13,7 +13,10 @@
 
 	{% block content %}
 	{% endblock %}
-
+	
+	<p>
+		<a href="{% url 'texto_new' %}">Nuevo texto</a>
+	</p>
 	<!-- scripts al final para mostrar algo mas rapido -->
 	<script src="{% static 'pa_lib/js/lib.js' %}"></script>
 </body>

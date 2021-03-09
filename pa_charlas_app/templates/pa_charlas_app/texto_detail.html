@@ -24,5 +24,8 @@
 			<a href="https://www.facebook.com/sharer/sharer.php?u={{ permalink }}" target="_blank">facebook</a>
 			<a href="#" onclick="return copyToClipboardEl('#texto')">portapapeles</a>
 	</p>
+	<p>
+		<a href="{% url 'texto_edit' pk=texto.pk %}">editar</a>
+	</p>
 </div>
 {% endblock %}

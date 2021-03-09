@@ -1,10 +1,14 @@
-{% for texto in textos %}
-<div>
-	<p>
-		<a href="{% url 'texto_detail' pk=texto.pk %}">{{ texto.fh_creado }}</a>
-		<i>por</i>
-		{{ texto.de_quien }}
-	</p>
-	<p>{{ texto.texto|linebreaksbr }}</p>
-</div>
-{% endfor %}
+{% extends 'pa_charlas_app/base.html' %}
+
+{% block content %}
+	{% for texto in textos %}
+	<div>
+		<p>
+			<a href="{% url 'texto_detail' pk=texto.pk %}">{{ texto.fh_creado }}</a>
+			<i>por</i>
+			{{ texto.de_quien }}
+		</p>
+		<p>{{ texto.texto|linebreaksbr }}</p>
+	</div>
+	{% endfor %}
+{% endblock %}
