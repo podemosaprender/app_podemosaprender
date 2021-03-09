@@ -1,0 +1,15 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% block content %}
+<div class="texto">
+	<p>
+		<a href="{% url 'texto_detail' pk=texto.pk %}">{{ texto.fh_creado }}</a>
+		<i>por</i>
+		{{ texto.de_quien }}
+	</p>
+	<p>{{ texto.texto|linebreaksbr }}</p>
+	<p>
+		Compartir en <a href="https://www.facebook.com/sharer/sharer.php?u={{ permalink }}">facebook</a>
+	</p>
+</div>
+{% endblock %}
