@@ -10,6 +10,8 @@ El primer paso es que se pueda escribir un post. Seguí los pasos del [tutorial 
 4. Cree un modelo Texto más simple que el Post del tutorial y seguí los otros pasos hasta poder crear uno desde el admin.
 5. Agregue link para compartir en Facebook y copiar al portapapeles
 6. Agregue login con Facebook y runserver_plus de Django extensions
+7. Agregue bootstrap en la plantilla base.html y los [botones de redes sociales](http://lipis.github.io/bootstrap-social/)
+
 
 ### Para usar y seguir desarrollando
 
