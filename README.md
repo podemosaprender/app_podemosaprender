@@ -17,7 +17,7 @@ Despues de extraer localmente este proyecto con git clone
 
 pip -r requirements.dev.txt #A: instala lo que necesitas para desarrollar
 
-### Para usar el login con facebook 
+### Para usar el login con facebook y google
 
 Tenes que crear una app en la consola de facebook, habilitar la funcion Login, y sacar de ahi el AppId=KEY y el Secret. Los pones en un archivo .env.json en la carpeta del proyecto
 
@@ -25,7 +25,9 @@ Tenes que crear una app en la consola de facebook, habilitar la funcion Login, y
 {
 	"SECRET_KEY": "LaClaveSecretaQueGeneraDjangoEnSettingsVaAca-djahd",
 	"SOCIAL_AUTH_FACEBOOK_KEY": "112233445566778", 
-	"SOCIAL_AUTH_FACEBOOK_SECRET": "112233445566778899aabbccddeeff00"
+	"SOCIAL_AUTH_FACEBOOK_SECRET": "112233445566778899aabbccddeeff00",
+	"SOCIAL_AUTH_GOOGLE_KEY": "11223344556-112233445566778899aabbccddeeffgg.apps.googleusercontent.com",
+	"SOCIAL_AUTH_GOOGLE_SECRET": "i2iu7hajhas-Wndkakhh12lm"
 }
 ~~~
 
@@ -59,3 +61,9 @@ Tuve que agregar la url de autenticacion en la consola de facebook en Settings d
 
 https://si.podemosaprender.org/social-auth/complete/facebook/
 
+
+Lo mismo con la de google donde agregue
+
+https://si.podemosaprender.org/social-auth/complete/google-oauth2/
+
+(cuando lo probas local tenes que agregar tambien por ej https://127.0.0.1:8000/social-auth/complete/google-oauth2/ )
