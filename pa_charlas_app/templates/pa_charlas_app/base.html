@@ -1,26 +1,68 @@
 {% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="PodemosAprender">
+    <meta name="author" content="PodemosAprender.org">
+    <link rel="icon" href="{% static 'brand/img/logo.ico' %}">
+    <link rel="stylesheet" href="{% static 'pa_lib/css/bootstrap-social.3p.css' %}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'pa_lib/css/page-footer-sticky.css' %}">
+    <title>PodemosAprender</title>
 
-<html>
-<head>
-	<title>PodemosAprender</title>
 	{% block meta %}
 	{% endblock %}
-</head>
-<body>
-	<div>
-		<h1><a href="/">PodemosAprender</a></h1>
-	</div>
+  </head>
 
-	<h4 class="text-center">Tu usuario es {{ user.username }} </h4>
-	{% block content %}
-	{% endblock %}
-	
-	<p>
-		<a href="{% url 'texto_new' %}">Nuevo texto</a>
-	</p>
-	<!-- scripts al final para mostrar algo mas rapido -->
-	<script src="{% static 'pa_lib/js/lib.js' %}"></script>
-</body>
+  <body>
+    <header>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="/">
+            <img src="{% static 'brand/img/logo.png' %}" height="30" class="d-inline-block align-top" alt="">
+            PodemosAprender
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+          </ul>
+        <ul class="navbar-nav px-3">
+          <li class="nav-item text-nowrap">
+          {% if user.is_authenticated %}
+            <a href="/logout" class="nav-link">logout {{ user.username }}</a>
+          {% else %}
+            <a href="/login" class="nav-link">login</a>
+           {% endif %}
+          </li>
+        </ul>
+      </nav>
+    </header>
+
+    <!-- Begin page content -->
+    <main role="main" class="container">
+      {% block content %}{% endblock %}
+    </main>
+
+		<footer class="footer">
+				<div class="container">
+					<span class="text-muted">All rights reserved. &copy; 
+						<a href="https://www.podemosaprender.org">PodemosAprender</a> | 
+						<a href="{% static 'tos.html' %}">Terms of Service</a> | 
+						<a href="{% static 'privacy.html' %}">Privacy Policy</a> | 
+						<a href="{% static 'contact.html' %}">Contact Us</a>
+					</span>
+				</div>
+		</footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+	 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+   <script src="{% static 'pa_lib/js/lib.js' %}"></script>
+  </body>
 </html>
-
-

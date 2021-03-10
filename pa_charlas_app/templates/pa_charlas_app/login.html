@@ -1,13 +1,16 @@
 {% extends 'pa_charlas_app/base.html' %}
-{% block title %} Sign in {% endblock %}
+{% block title %}Sign in{% endblock %}
+
 {% block content %}
+<p>Para poder escribir y ver más cosas en PodemosAprender necesitás iniciar sesión</p>
 <div class="row">
-     <div class="col-md-8 mx-auto social-container my-2 order-md-1">
-         <button class="btn btn-primary mb-2">
-             <a href="{% url "social:begin" "facebook" %}">Login with Facebook
-             </a>
-         </button>
-     </div>
- </div>
- </div>
- {% endblock %}
+  <div class="col-md-4 social-buttons">
+		<a class="btn btn-block btn-social btn-facebook" href="{% url "social:begin" "facebook" %}">
+			<span class="fa fa-facebook"></span> Sign in with Facebook
+		</a>
+    <a class="btn btn-block btn-social btn-google" href="{% url "social:begin" "google" %}">
+			<span class="fa fa-google"></span> Sign in with Google
+		</a>
+	</div>
+</div>
+{% endblock %}
