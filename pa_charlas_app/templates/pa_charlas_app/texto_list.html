@@ -11,4 +11,8 @@
 		<p>{{ texto.texto|linebreaksbr }}</p>
 	</div>
 	{% endfor %}
+
+	<p>
+		<a href="{% url 'texto_new' %}">Nuevo texto</a>
+	</p>
 {% endblock %}
