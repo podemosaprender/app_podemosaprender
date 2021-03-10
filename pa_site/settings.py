@@ -113,6 +113,7 @@ AUTHENTICATION_BACKENDS = [
     'social_core.backends.linkedin.LinkedinOAuth2',
     'social_core.backends.instagram.InstagramOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 ]
 
@@ -145,3 +146,6 @@ LOGOUT_REDIRECT_URL = 'login'
 
 SOCIAL_AUTH_FACEBOOK_KEY= CFG['SOCIAL_AUTH_FACEBOOK_KEY'] #U: de la consola de desarrollo de facebook, app id
 SOCIAL_AUTH_FACEBOOK_SECRET= CFG['SOCIAL_AUTH_FACEBOOK_SECRET'] #U: consola de fb, en settings, basic
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CFG['SOCIAL_AUTH_GOOGLE_KEY'] #U: de la consola de google
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CFG['SOCIAL_AUTH_GOOGLE_SECRET']
