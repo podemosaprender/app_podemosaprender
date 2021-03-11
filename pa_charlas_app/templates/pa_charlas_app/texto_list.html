@@ -1,18 +1,27 @@
 {% extends 'pa_charlas_app/base.html' %}
 
-{% block content %}
-	{% for texto in textos %}
-	<div>
-		<p>
-			<a href="{% url 'texto_detail' pk=texto.pk %}">{{ texto.fh_creado }}</a>
-			<i>por</i>
-			{{ texto.de_quien }}
-		</p>
-		<p>{{ texto.texto|linebreaksbr }}</p>
-	</div>
-	{% endfor %}
+{% load bootstrap4 %}
 
-	<p>
-		<a href="{% url 'texto_new' %}">Nuevo texto</a>
-	</p>
-{% endblock %}
+{% block content %}
+	<div class="container">
+		{% for texto in textos %}
+			<div class="card">
+				<div class="card-body">
+					<p class="card-title text-muted">
+						<a href="{% url 'texto_detail' pk=texto.pk %}">{{ texto.fh_creado }}</a>
+						<i>por</i>
+						{{ texto.de_quien }}
+					</p>
+					<p class="card-text">
+						{{ texto.texto|linebreaksbr }}
+					</p>
+					<a href="{% url 'texto_detail' pk=texto.pk %}" class="card-link">...</a>
+				</div>
+			</div>
+		{% endfor %}
+		<p>
+		{% url 'texto_new' as texto_new_url %}
+		{% bootstrap_button 'Nuevo texto' href=texto_new_url  %}
+		</p>
+	{% endblock %}
+	</div>

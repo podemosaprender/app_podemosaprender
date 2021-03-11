@@ -1,9 +1,12 @@
 {% extends 'pa_charlas_app/base.html' %}
 
+{% load bootstrap4 %}
+
 {% block content %}
-<h2>Nuevo texto</h2>
-<form method="POST">{% csrf_token %}
-	{{ form.as_p }}
-	<button type="submit" class="save btn btn-default">Guardar</button>
-</form>
+	<h2>Nuevo texto</h2>
+	<form method="POST">{% csrf_token %}
+		{% bootstrap_form form %}
+		{% url 'texto_new' as texto_new_url %}
+		{% bootstrap_button 'Guardar' button_type='submit' %}
+	</form>
 {% endblock %}

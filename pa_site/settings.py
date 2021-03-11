@@ -39,9 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'django_extensions', #A: runserver_plus con httpS para Facebook
+    'django_extensions', #U: runserver_plus con httpS para Facebook
 
-    'social_django', #A: autenticacion con facebook, google 
+    'bootstrap4', #U: tags que generan codigo bootstrap ej para forms
+
+    'social_django', #U: autenticacion con facebook, google 
     'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
 ]
 
