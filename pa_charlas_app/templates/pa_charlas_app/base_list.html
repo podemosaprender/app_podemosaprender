@@ -5,25 +5,51 @@
 {% block content %}
 	<div class="container">
 		<h3>{{ titulo }}</h3>	
-		{% for obj in object_list %}
+
+		{% for item in object_list %}
+
 			<div class="card">
 				<div class="card-body">
 					<p class="card-title text-muted">
-						<a href="{% url vista_detalle pk=obj.pk %}">{{ obj.fh_creado }}</a>
+
+						{% block item_titulo %}
+
+						<a href="{% url vista_detalle pk=item.pk %}">{{ item.fh_creado }}</a>
 						<i>por</i>
-						{{ obj.de_quien }}
+						{{ item.de_quien }}
+
+						{% endblock %}
+
 					</p>
 					<p class="card-text">
-						{{ obj }}
+
+						{% block item_cuerpo %}
+
+						{{ item }}
+
+						{% endblock %}
 					</p>
-					<a href="{% url vista_detalle pk=obj.pk %}" class="card-link">...</a>
+					{% block item_links %}
+
+					<a href="{% url vista_detalle pk=item.pk %}" class="card-link">...</a>
+
+					{% endblock %}
 				</div>
+
 			</div>
 		{% endfor %}
+
 		<p>
-		{% with cartel="Crear "|add:type_name %}
-		{% bootstrap_button cartel  href=create_url  %}
-		{% endwith %}
+
+			{% block acciones_sin_item %}
+
+				{% with cartel="Crear "|add:type_name %}
+				{% bootstrap_button cartel  href=create_url  %}
+				{% endwith %}
+
+			{% endblock %}
+
 		</p>
+
 	{% endblock %}
 	</div>

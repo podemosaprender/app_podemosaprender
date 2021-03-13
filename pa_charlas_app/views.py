@@ -28,7 +28,8 @@ def login(request):
   return render(request, 'pa_charlas_app/login.html')
 
 ############################################################
-def texto_edit(request, pk=None, charla_pk=None): #U: sirve para crear Y editar
+
+def texto_edit(request, pk=None, charla_pk=None): #U: crear Y editar textos, de charlas o para empezar una
 	texto= None #DFLT, nuevo
 	if not pk is None:
 		texto= get_object_or_404(Texto, pk=pk) 
@@ -38,6 +39,7 @@ def texto_edit(request, pk=None, charla_pk=None): #U: sirve para crear Y editar
 		if form.is_valid():
 			extra_data= enc_b64_o_r(request.POST.get('extra_form_data'),{})
 			texto= texto_guardar(form, request.user, extra_data.get('charla'))
+			#A: si no le pase una charla y no existia, crea una "casual"
 			logger.debug(f'VW texto {request.user.username} {extra_data}')
 			return redirect(extra_data.get('volver_a') or '/')
 	else:
@@ -82,7 +84,7 @@ class CharlaUpdateView(UpdateView):
 		return HttpResponseRedirect(self.get_success_url())
 
 class CharlaListView(ListView):
-	template_name= 'pa_charlas_app/base_list.html'
+	template_name= 'pa_charlas_app/charla_list.html'
 	model = Charla
 	paginate_by = 20  
 	extra_context= {
@@ -95,10 +97,9 @@ class CharlaListView(ListView):
 
 # S: Charla vista comoda ##################################
 def charla_texto_list(request, charla_titulo=None, pk=None):
-	logger.info(pk)
 	if not pk is None:
 		charla= get_object_or_404(Charla, pk=pk)
 	else:
 		charla= get_object_or_404(Charla, titulo= '#'+charla_titulo)
 	textos= charla.textos.order_by('fh_creado').all()
-	return render(request, 'pa_charlas_app/texto_list.html', {'textos': textos, 'charla': charla, 'titulo': charla.titulo})
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'charla': charla, 'titulo': charla.titulo})
