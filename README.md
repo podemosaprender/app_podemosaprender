@@ -15,6 +15,7 @@ El primer paso es que se pueda escribir un post. Seguí los pasos del [tutorial 
 8. Hice demasiados cambios en los modelos y no pude migrar!
    agregue un script para borrar todas las migraciones, la base, y empezar de cero en pa_lib_py/bin/migrations_delete.sh
    lo ejecute, borre la base, hice makemigrations y migrate
+9. Cree una migracion par cargar datos con `python manage.py makemigrations --empty pa_charlas_app` y agregue una llamada para crearlos
 
 ### Para usar y seguir desarrollando
 
