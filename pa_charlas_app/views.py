@@ -1,9 +1,10 @@
+#SEC: manejamos login_required en urls.py
+
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 
 from django import forms
@@ -27,7 +28,6 @@ def login(request):
   return render(request, 'pa_charlas_app/login.html')
 
 ############################################################
-@login_required
 def texto_edit(request, pk=None, charla_pk=None): #U: sirve para crear Y editar
 	texto= None #DFLT, nuevo
 	if not pk is None:
@@ -88,7 +88,8 @@ class CharlaListView(ListView):
 	extra_context= {
 		'type_name': 'charla',
 		'type_url_base': 'charla',
-		'create_url': '/charla/new',
+		'create_url': '/charla/nueva',
+		'titulo': 'Charlas',
 		'vista_detalle': 'charla_texto_list_k',
 	}
 
