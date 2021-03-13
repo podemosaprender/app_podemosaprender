@@ -12,6 +12,9 @@ El primer paso es que se pueda escribir un post. Seguí los pasos del [tutorial 
 6. Agregue login con Facebook y runserver_plus de Django extensions
 7. Agregue bootstrap en la plantilla base.html y los [botones de redes sociales](http://lipis.github.io/bootstrap-social/)
 
+8. Hice demasiados cambios en los modelos y no pude migrar!
+   agregue un script para borrar todas las migraciones, la base, y empezar de cero en pa_lib_py/bin/migrations_delete.sh
+   lo ejecute, borre la base, hice makemigrations y migrate
 
 ### Para usar y seguir desarrollando
 
@@ -69,3 +72,8 @@ Lo mismo con la de google donde agregue
 https://si.podemosaprender.org/social-auth/complete/google-oauth2/
 
 (cuando lo probas local tenes que agregar tambien por ej https://127.0.0.1:8000/social-auth/complete/google-oauth2/ )
+
+
+## Para más adelante
+
+Un editor con preview para los textos usando Markdown? https://neutronx.github.io/django-markdownx/
