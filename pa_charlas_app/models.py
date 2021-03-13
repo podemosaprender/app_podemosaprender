@@ -47,11 +47,19 @@ def conUserYFecha_guardar(form, user, commit= True):
 
 def texto_guardar(form, user, charla_pk=None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
+
 	#TODO:SEC no dejar modificar textos de otro user
 	if not charla_pk is None:
 		ch= Charla.objects.get(pk= charla_pk)
-		texto.texto += f'\n{ch.titulo}'
-	#A: si venia de una charla, le agrego el hashtag automaticamente
+		if not ch.titulo in texto.texto:
+			texto.texto += f'\n{ch.titulo}'
+		#A: si venia de una charla, le agrego el hashtag automaticamente
+	else:
+		hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
+		if not hashtag in texto.texto:
+			texto.texto += f'\n{hashtag}'
+		#A: si no venia de una charla, empieza una casual
+
 	hts= hashtags_en(texto.texto)
 	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
 	texto.save()
