@@ -1,0 +1,29 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+	<div class="container">
+		Soy {{ type_url_base }}
+		{% for obj in object_list %}
+			<div class="card">
+				<div class="card-body">
+					<p class="card-title text-muted">
+						<a href="{% url vista_detalle pk=obj.pk %}">{{ obj.fh_creado }}</a>
+						<i>por</i>
+						{{ obj.de_quien }}
+					</p>
+					<p class="card-text">
+						{{ obj }}
+					</p>
+					<a href="{% url vista_detalle pk=obj.pk %}" class="card-link">...</a>
+				</div>
+			</div>
+		{% endfor %}
+		<p>
+		{% with cartel="Crear "|add:type_name %}
+		{% bootstrap_button cartel  href=create_url  %}
+		{% endwith %}
+		</p>
+	{% endblock %}
+	</div>
