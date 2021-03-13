@@ -151,3 +151,20 @@ SOCIAL_AUTH_FACEBOOK_SECRET= CFG['SOCIAL_AUTH_FACEBOOK_SECRET'] #U: consola de f
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = CFG['SOCIAL_AUTH_GOOGLE_KEY'] #U: de la consola de google
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = CFG['SOCIAL_AUTH_GOOGLE_SECRET']
+
+import os
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}
+
