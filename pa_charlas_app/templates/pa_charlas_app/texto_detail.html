@@ -1,6 +1,8 @@
 {% extends 'pa_charlas_app/base.html' %}
 
 {% load bootstrap4 %}
+{% load pa_charlas_app_extras %}
+
 
 {% block meta %}
 	<meta property="fb:app_id" content="741688646199607" />
@@ -12,13 +14,11 @@
 {% endblock %}
 
 {% block content %}
+	{% url_full 'texto_detail' pk=texto.pk as permalink %}
 	<div class="texto_item">
 		<p>
-		Compartir en 
-		<a href="http://www.linkedin.com/shareArticle?mini=true&url={{ permalink }}&title=PodemosAprender&summary={{ texto.texto|slice:":180" }}..." class="btn btn-social-icon btn-linkedin" ><span class="fa fa-linkedin"><span class="sr-only">linkedin</span></span></a>
-		<a href="https://twitter.com/intent/tweet?text={{ permalink }}%0a{{ texto.texto|slice:":180" }}..." class="btn btn-social-icon btn-twitter" ><span class="fa fa-twitter"><span class="sr-only">twitter</span></span></a>
-		<a href="https://www.facebook.com/sharer/sharer.php?u={{ permalink }}" class="btn btn-social-icon btn-facebook" ><span class="fa fa-facebook"><span class="sr-only">facebook</span></span></a>
-		<a href="#" onclick="return copyToClipboardEl('#texto')" class="btn btn-social-icon btn-primary"><span class="fa fa-copy"><span class="sr-only">copiar</span></span></a>
+			Compartir en {{ permalink }}
+			{% include 'pa_charlas_app/p_compartir_botones.html' with permalink=permalink texto=texto.texto texto_element_id="#texto_"|addstr:texto.pk %}
 		</p>
 
 		<div id="texto">
@@ -31,9 +31,7 @@
 		</div>
 		<p>
 
-		{% if user.is_authenticated %}
-			<a href="{% url 'texto_edit' pk=texto.pk %}" class="btn btn-primary "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">copiar</span></a>
-		{% endif %}
 		</p>
 	</div>
 {% endblock %}
+

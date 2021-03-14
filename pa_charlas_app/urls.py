@@ -14,6 +14,8 @@ urlpatterns = [
 	path('charla/<int:charla_pk>/nuevo', login_required(views.texto_edit), name='charla_texto_nuevo'),
 	path('charla/<int:charla_pk>/<int:pk>', login_required(views.texto_edit), name='charla_texto_edit'),
 	#A: las charlas estan hechas de textos
+	path('texto/<int:pk>', views.texto_detail, name='texto_detail'),
+	#A: hay un link para el texto asi lo compartimos en redes
 
 	path('charla/<int:pk>/', views.charla_texto_list, name='charla_texto_list_k'),
 	path('charla/<str:charla_titulo>/', views.charla_texto_list, name='charla_texto_list_t'),

@@ -54,6 +54,9 @@ def texto_edit(request, pk=None, charla_pk=None): #U: crear Y editar textos, de 
 				'extra_form_data': enc_b64_o(extra_data),
 			})
 
+def texto_detail(request, pk=None): #U: ver un texto para compartir en las redes
+	texto= get_object_or_404(Texto, pk=pk) 
+	return render(request, 'pa_charlas_app/texto_detail.html', {'texto': texto})
 
 # S: Charlas ###############################################
 
