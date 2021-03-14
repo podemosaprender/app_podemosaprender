@@ -42,7 +42,7 @@ class CharlaItem(models.Model): #U: conecta un texto con una charla
 from .hashtags import hashtags_en
 def conUserYFecha_guardar(form, user, commit= True):
 	obj= form.save(commit=False)
-	if obj.de_quien is None: #A: es nuevo
+	if not 'de_quien' in obj.__dict__ or obj.de_quien is None: #A: es nuevo
 		obj.de_quien= user
 		obj.fh_creado= timezone.now()
 	elif obj.de_quien != user: #A: no era el autor!
