@@ -1,4 +1,4 @@
-
+from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.utils import timezone
 
@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 class Texto(models.Model): #U: cualquier texto que publiquemos, despues especializamos
 	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
 	fh_creado= models.DateTimeField(default=timezone.now)
+	fh_editado= models.DateTimeField(default=timezone.now)
+
 	titulo= models.CharField(max_length=200)
 	texto= models.TextField()
 
@@ -23,6 +25,7 @@ class TipoCharla(models.Model): #U: casual, curso, etc.
 class Charla(models.Model): #U: una coleccion de textos sobre algun tema
 	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
 	fh_creado= models.DateTimeField(default=timezone.now)
+
 	titulo= models.CharField(max_length=200, unique=True)
 
 	tipo= models.ForeignKey('TipoCharla', on_delete=models.SET_DEFAULT, default=-1)
@@ -39,8 +42,20 @@ class CharlaItem(models.Model): #U: conecta un texto con una charla
 from .hashtags import hashtags_en
 def conUserYFecha_guardar(form, user, commit= True):
 	obj= form.save(commit=False)
-	obj.de_quien= user
-	obj.fh_creado= timezone.now()
+	if obj.de_quien is None: #A: es nuevo
+		obj.de_quien= user
+		obj.fh_creado= timezone.now()
+	elif obj.de_quien != user: #A: no era el autor!
+		raise PermissionDenied	
+	else:
+		pass
+	
+	#A: no debe pasar de aca si no es el duño del objeto	
+	if 'fh_editado' in obj.__dict__: 
+		obj.fh_editado= timezone.now()
+		logger.debug('set fh_editado')	
+	#A: si tiene un field fh_editado lo actualizamos
+
 	if commit:
 		obj.save() #A: guarde el obj actualizado, para poder agregarlo a charlas
 	return obj

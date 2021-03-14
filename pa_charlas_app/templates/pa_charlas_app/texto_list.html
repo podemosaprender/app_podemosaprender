@@ -5,9 +5,13 @@
 
 
 	{% block item_titulo %}
-		{{ item.fh_creado }}
-		<i>por</i>
-		{{ item.de_quien }}
+		{{ item.de_quien }},
+
+		{% ifnotequal item.fh_editado item.fh_creado %}
+			{{ item.fh_editado }} (editado)
+		{% else %}
+			{{ item.fh_creado }}
+		{% endifnotequal %}
 	{% endblock %}
 
 	{% block item_cuerpo %}
