@@ -23,11 +23,11 @@ def enc_b64_o(o): #U: codificar objeto como json base64
 def enc_b64_o_r(s, dflt=None): #U: decodificar json base64
 	return json.loads(base64.b64decode(s)) if not s is None else dflt
 
-# Create your views here.
-def login(request):
+# S: sesion ################################################
+def login(request): #U: pantalla de login con botones de google, facebook, etc
   return render(request, 'pa_charlas_app/login.html')
 
-############################################################
+# S: textos ################################################
 
 def texto_edit(request, pk=None, charla_pk=None): #U: crear Y editar textos, de charlas o para empezar una
 	texto= None #DFLT, nuevo
@@ -57,33 +57,7 @@ def texto_edit(request, pk=None, charla_pk=None): #U: crear Y editar textos, de 
 
 # S: Charlas ###############################################
 
-class CharlaCreateView(CreateView): 
-	template_name= 'pa_charlas_app/base_edit.html'
-	model = Charla
-	fields = ['tipo','titulo'] 
-	success_url= '/charla'
-
-	def form_valid(self, form):
-		self.object= form.save(commit=False)
-		self.object.de_quien= self.request.user
-		self.object.fh_creado= timezone.now()
-		self.object.save()
-		return HttpResponseRedirect(self.get_success_url())
-
-class CharlaUpdateView(UpdateView): 
-	template_name= 'pa_charlas_app/base_edit.html'
-	model = Charla
-	fields = ['tipo','titulo','textos'] 
-	success_url= '/charla'
-
-	def form_valid(self, form):
-		self.object= form.save(commit=False)
-		self.object.de_quien= self.request.user
-		self.object.fh_creado= timezone.now()
-		self.object.save()
-		return HttpResponseRedirect(self.get_success_url())
-
-class CharlaListView(ListView):
+class CharlaListView(ListView): #U: la lista de charlas
 	template_name= 'pa_charlas_app/charla_list.html'
 	model = Charla
 	paginate_by = 20  
@@ -96,7 +70,7 @@ class CharlaListView(ListView):
 	}
 
 # S: Charla vista comoda ##################################
-def charla_texto_list(request, charla_titulo=None, pk=None):
+def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de UNA charla, btn para agregar
 	if not pk is None:
 		charla= get_object_or_404(Charla, pk=pk)
 	else:

@@ -16,6 +16,7 @@ El primer paso es que se pueda escribir un post. Seguí los pasos del [tutorial 
    agregue un script para borrar todas las migraciones, la base, y empezar de cero en pa_lib_py/bin/migrations_delete.sh
    lo ejecute, borre la base, hice makemigrations y migrate
 9. Cree una migracion par cargar datos con `python manage.py makemigrations --empty pa_charlas_app` y agregue una llamada para crearlos
+10. Simplifique plantillas, cree un fragmento con los botones para compartir p_compartir_botons.html que se puede incluir en cualquier lado, y una funcion para usar en las plantillas (se pueden crear mas)
 
 ### Para usar y seguir desarrollando
 
