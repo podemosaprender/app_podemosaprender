@@ -1,0 +1,16 @@
+{% extends 'pa_charlas_app/base_list.html' %}
+
+{% load bootstrap4 %}
+
+{% block item_titulo %}
+	<a href="{% url 'usuario_texto_list_k' item.pk %}">{{ item.username }}</a>
+{% endblock %}
+
+{% block item_cuerpo %}
+{% endblock %}
+
+{% block item_links %}
+{% endblock %}
+
+{% block acciones_sin_item %}
+{% endblock %}
