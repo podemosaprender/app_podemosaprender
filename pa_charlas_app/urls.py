@@ -23,4 +23,7 @@ urlpatterns = [
 
 	#S: la home page es algun tipo de lista de charlas
 	path('', views.CharlaListView.as_view(), name='home'),
+
+	# : lista de usuarios
+	path('usuario/', views.usuario_list, name='usuario_list'),
 ]
