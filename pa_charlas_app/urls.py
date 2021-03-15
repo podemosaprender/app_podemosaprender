@@ -23,4 +23,9 @@ urlpatterns = [
 
 	#S: la home page es algun tipo de lista de charlas
 	path('', views.CharlaListView.as_view(), name='home'),
+
+	# : lista de usuarios
+	path('usuario/', views.usuario_list, name='usuario_list'), #TODO: poner login_required?
+
+	path('usuario/<int:pk>/', views.usuario_texto_list, name='usuario_texto_list_k'), #TODO: poner login_required?
 ]

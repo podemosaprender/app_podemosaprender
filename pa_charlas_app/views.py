@@ -6,6 +6,7 @@ from django.views.generic.list import ListView
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 from django import forms
 
@@ -79,4 +80,19 @@ def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de U
 	else:
 		charla= get_object_or_404(Charla, titulo= '#'+charla_titulo)
 	textos= charla.textos.order_by('fh_creado').all()
-	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'charla': charla, 'titulo': charla.titulo})
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True })
+
+# S: Lista de usuarios ####################################
+
+def usuario_list(request):
+	usuarios = User.objects.all()
+	return render(request, 'pa_charlas_app/usuario_list.html',{'object_list': usuarios, 'titulo':'usuarios' })
+
+
+def usuario_texto_list(request, username=None, pk=None): #U: los textos de UNA charla, btn para agregar
+	if not pk is None:
+		user= get_object_or_404(User, pk=pk)
+	else:
+		user= get_object_or_404(User, username= username)
+	textos= Texto.objects.filter(de_quien=user).order_by('fh_creado').all()
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'titulo': user.username})
