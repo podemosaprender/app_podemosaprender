@@ -1,19 +1,16 @@
-{% extends 'pa_charlas_app/base.html' %}
+{% extends 'pa_charlas_app/base_list.html' %}
 
 {% load bootstrap4 %}
 
-{% block content %}
-	<div class="container">
-		
-		{% for user in usuarios  %}
-
-			<div class="card">
-				<div class="card-body">
-					{{user}}
-				</div>
-
-			</div>
-		{% endfor %}
-	</div>
+{% block item_titulo %}
+	{{item}}
 {% endblock %}
-	
+
+{% block item_cuerpo %}
+{% endblock %}
+
+{% block item_links %}
+{% endblock %}
+
+{% block acciones_sin_item %}
+{% endblock %}

@@ -25,5 +25,5 @@ urlpatterns = [
 	path('', views.CharlaListView.as_view(), name='home'),
 
 	# : lista de usuarios
-	path('usuarios/', views.usuario_list, name='usuario_list'),
+	path('usuario/', views.usuario_list, name='usuario_list'), #TODO: poner login_required?
 ]

@@ -86,4 +86,4 @@ def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de U
 
 def usuario_list(request):
 	usuarios = User.objects.all()
-	return render(request, 'pa_charlas_app/usuario_list.html',{'usuarios': usuarios})
+	return render(request, 'pa_charlas_app/usuario_list.html',{'object_list': usuarios, 'titulo':'usuarios' })
