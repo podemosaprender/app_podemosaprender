@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'bootstrap4', #U: tags que generan codigo bootstrap ej para forms
 
     'social_django', #U: autenticacion con facebook, google 
+
+		'rest_framework', #U: atendemos pedidos REST
+
     'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
 ]
 
@@ -168,3 +171,13 @@ LOGGING = {
     },
 }
 
+
+#S: servicios rest
+REST_FRAMEWORK = {
+	'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+	'PAGE_SIZE': 10,
+	'DEFAULT_AUTHENTICATION_CLASSES': (
+  	'rest_framework_simplejwt.authentication.JWTAuthentication', #A: con token
+		'rest_framework.authentication.SessionAuthentication', #A: si te logueaste en la ui web
+	)
+}

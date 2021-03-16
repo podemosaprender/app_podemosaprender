@@ -1,9 +1,26 @@
 from django.contrib.auth.decorators import login_required
-from django.urls import path
+from django.urls import path, include
+
+from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+
 from . import views
+from . import views_rest
+
+rest_router = routers.DefaultRouter()
+rest_router.register('chara', views_rest.CharlaViewSet)
+rest_router.register('texto', views_rest.TextoViewSet)
+#A: agregamos las vistas rest al router asi las muestra en la UI
 
 urlpatterns = [
+	path('api/', include(rest_router.urls)),
+	path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+	path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+	#A: documentacion y autenticacion de la api REST
+
 	path("login/", views.login, name="login"),
+	#A: login desde la UI web
 
 	path('charla/', views.CharlaListView.as_view(), name='charla_list' ),
 	#A: el alma de la aplicacion son las "charlas"
@@ -21,11 +38,11 @@ urlpatterns = [
 	path('charla/<str:charla_titulo>/', views.charla_texto_list, name='charla_texto_list_t'),
 	#A: en general miramos charlas por id o por titulo
 
-	#S: la home page es algun tipo de lista de charlas
-	path('', views.CharlaListView.as_view(), name='home'),
 
-	# : lista de usuarios
 	path('usuario/', views.usuario_list, name='usuario_list'), #TODO: poner login_required?
-
 	path('usuario/<int:pk>/', views.usuario_texto_list, name='usuario_texto_list_k'), #TODO: poner login_required?
+	#A: lista de usuarios
+
+	path('', views.CharlaListView.as_view(), name='home'),
+	#A: la home page es algun tipo de lista de charlas
 ]

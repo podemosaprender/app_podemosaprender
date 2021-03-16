@@ -17,6 +17,8 @@ El primer paso es que se pueda escribir un post. Seguí los pasos del [tutorial 
    lo ejecute, borre la base, hice makemigrations y migrate
 9. Cree una migracion par cargar datos con `python manage.py makemigrations --empty pa_charlas_app` y agregue una llamada para crearlos
 10. Simplifique plantillas, cree un fragmento con los botones para compartir p_compartir_botons.html que se puede incluir en cualquier lado, y una funcion para usar en las plantillas (se pueden crear mas)
+11. [Braian Martino](https://www.linkedin.com/in/braian-martino-770704198/) agrego la lista y textos de cada usuario (de primera!)
+12. Configure django_restframework y jwt token para que el el futuro se puedan consumir y cargar datos ej. desde una SPA javascript en la web o cordova (mas info abajo).
 
 ### Para usar y seguir desarrollando
 
@@ -74,6 +76,13 @@ Lo mismo con la de google donde agregue
 https://si.podemosaprender.org/social-auth/complete/google-oauth2/
 
 (cuando lo probas local tenes que agregar tambien por ej https://127.0.0.1:8000/social-auth/complete/google-oauth2/ )
+
+### Usando la API REST
+
+Por ahora la podes probar obteniendo un token con
+~~~
+curl -X POST -H "Content-Type: application/json" -d '{"username":"tuusuario", "password": "tuclave"}' http://127.0.0.1:8000/api/token/
+~~~
 
 
 ## Para más adelante
