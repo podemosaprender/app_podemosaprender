@@ -42,7 +42,7 @@ def texto_img(request, pk=None): #U: imagen con texto para og:image que se muest
 		tpl= f.read()
 	#A: leimos un svg como plantilla, tiene marcas TPL1 a TPL6 para lineas de texto
 	
-	W= 38 #U: cuantas letras entran en una linea, TODO: elegir y hacer configurable
+	W= 28 #U: cuantas letras entran en una linea, TODO: elegir y hacer configurable
 	LMAX= 8 #U: cuantas lineas en una og image
 
 	lineas= [] #U: el texto para mostrar separado en lineas
@@ -60,6 +60,8 @@ def texto_img(request, pk=None): #U: imagen con texto para og:image que se muest
 				break
 			if tk!=' ' and tk!='\n':
 				linea= tk
+			else:
+				linea=''
 		else:
 			linea+=tk
 	if not linea_num>LMAX:
