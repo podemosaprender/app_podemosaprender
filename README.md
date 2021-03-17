@@ -19,6 +19,7 @@ El primer paso es que se pueda escribir un post. Seguí los pasos del [tutorial 
 10. Simplifique plantillas, cree un fragmento con los botones para compartir p_compartir_botons.html que se puede incluir en cualquier lado, y una funcion para usar en las plantillas (se pueden crear mas)
 11. [Braian Martino](https://www.linkedin.com/in/braian-martino-770704198/) agrego la lista y textos de cada usuario (de primera!)
 12. Configure django_restframework y jwt token para que el el futuro se puedan consumir y cargar datos ej. desde una SPA javascript en la web o cordova (mas info abajo).
+14. Configure CORS para que se pueda usar la API REST desde cualquier lado (gracias [Braian Martino](https://www.linkedin.com/in/braian-martino-770704198/)!) como dice en [django-cors-headers](https://github.com/adamchainz/django-cors-headers)
 
 ### Para usar y seguir desarrollando
 
