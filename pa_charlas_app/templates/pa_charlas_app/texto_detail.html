@@ -10,6 +10,7 @@
 	<meta property="og:description" content="{{ texto.texto }}"/>
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content="{{ permalink }}" />
+	<meta property="og:image" content="{% url_full 'texto_img' pk=texto.pk %}" />
 	<link rel="canonical" href="{{ permalink }}" />
 {% endblock %}
 
