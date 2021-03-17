@@ -45,7 +45,8 @@ INSTALLED_APPS = [
 
     'social_django', #U: autenticacion con facebook, google 
 
-		'rest_framework', #U: atendemos pedidos REST
+    'rest_framework', #U: atendemos pedidos REST
+    'corsheaders', #U: headers para que la API REST se pueda consumir desde otras paginas
 
     'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
 ]
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',#U: para que la API REST se pueda consumir desde otras paginas
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -181,3 +183,7 @@ REST_FRAMEWORK = {
 		'rest_framework.authentication.SessionAuthentication', #A: si te logueaste en la ui web
 	)
 }
+
+#VER: https://github.com/adamchainz/django-cors-headers
+CORS_URLS_REGEX = r'^/api/.*$' #A: solo enviamos CORS allow para request a la api
+CORS_ALLOW_ALL_ORIGINS= True #A:SEC: OjO! permitimos todos porque estamos filtrando con CORS_URLS_REGEX
