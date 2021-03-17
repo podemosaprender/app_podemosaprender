@@ -4,11 +4,13 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.list import ListView
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.contrib.auth.models import User
 
 from django import forms
+import re
+import os
 
 from .models import Texto, Charla, texto_guardar
 from .forms import TextoForm
@@ -27,6 +29,52 @@ def enc_b64_o_r(s, dflt=None): #U: decodificar json base64
 # S: sesion ################################################
 def login(request): #U: pantalla de login con botones de google, facebook, etc
   return render(request, 'pa_charlas_app/login.html')
+
+# S: texto como imagen ####################################
+
+import cairosvg
+
+def texto_img(request, pk=None): #U: imagen con texto para og:image que se muestra en Facebook
+	texto= get_object_or_404(Texto, pk=pk) 
+
+	tpl_path= os.path.normpath(os.path.abspath(__file__)+'/../templates/pa_charlas_app/og_image1.svg')
+	with open(tpl_path,'r') as f:
+		tpl= f.read()
+	#A: leimos un svg como plantilla, tiene marcas TPL1 a TPL6 para lineas de texto
+	
+	W= 38 #U: cuantas letras entran en una linea, TODO: elegir y hacer configurable
+	LMAX= 8 #U: cuantas lineas en una og image
+
+	lineas= [] #U: el texto para mostrar separado en lineas
+
+	texto_norm= re.sub(r'\s+',' ',texto.texto)
+	tokens= re.split(r'([\s\n])', texto_norm)
+	linea_num= 0 #U: por que linea voy
+	linea= '' #U: esta linea
+	for tk in tokens:
+		#DBG: print(tk, len(linea)+ len(tk)+1)
+		if tk=='\n' or len(linea)+ len(tk)+1> W: #A: aparecio fin de linea o se acabo el espacio
+			lineas.append(' '*((W-len(linea)) // 2)+ linea)	
+			linea_num+=1
+			if linea_num>LMAX:
+				break
+			if tk!=' ' and tk!='\n':
+				linea= tk
+		else:
+			linea+=tk
+	if not linea_num>LMAX:
+		lineas.append(' '*((W-len(linea)) // 2)+ linea)	
+		
+	margen= max(LMAX-len(lineas),0) // 2
+	for linea_num in range(0,LMAX+1):
+			idx= linea_num - margen
+			tpl= tpl.replace(f'TPL{linea_num}', 
+				lineas[linea_num-margen] if 0 <= idx and idx < len(lineas) else ''
+			)
+
+	img_bytes= cairosvg.svg2png(tpl)
+	return HttpResponse( img_bytes, content_type='image/png')
+
 
 # S: textos ################################################
 
