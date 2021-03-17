@@ -8,7 +8,7 @@ from . import views
 from . import views_rest
 
 rest_router = routers.DefaultRouter()
-rest_router.register('chara', views_rest.CharlaViewSet)
+rest_router.register('charla', views_rest.CharlaViewSet, basename='charla')
 rest_router.register('texto', views_rest.TextoViewSet)
 #A: agregamos las vistas rest al router asi las muestra en la UI
 
