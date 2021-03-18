@@ -113,7 +113,7 @@ def texto_detail(request, pk=None): #U: ver un texto para compartir en las redes
 
 class CharlaListView(ListView): #U: la lista de charlas
 	template_name= 'pa_charlas_app/charla_list.html'
-	model = Charla
+	queryset=  Charla.objects.order_by('titulo').all()
 	paginate_by = 20  
 	extra_context= {
 		'type_name': 'charla',
