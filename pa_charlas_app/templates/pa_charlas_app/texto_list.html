@@ -15,8 +15,8 @@
 	{% endblock %}
 
 	{% block item_cuerpo %}
-		<div id="texto_{{ item.pk }}">
-			{{ item.texto|linebreaksbr }}
+		<div id="texto_{{ item.pk }}" class="markdown">
+{{ item.texto }} {% comment %} Mantener esta línea pegada al margen izquierdo {% endcomment %}
 		</div>
 	{% endblock %}
 
