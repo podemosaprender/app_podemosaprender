@@ -19,10 +19,10 @@ function copyToClipboard(texto) { //U: pone texto en el clipboard
 	document.getSelection().removeAllRanges();
 }
 
-function copyToClipboardEl(selector, ev) {
+function copyToClipboardEl(selector, permalink, ev) {
 	var txt= document.querySelector(selector).innerText
-	console.log(ev)
-	var permalink= location.href
+	//DBG: console.log(ev)
+	permalink= permalink || location.href;
 	copyToClipboard('De '+permalink+'\n'+txt)
 	if (ev) { ev.preventDefault(); } //A: no navegar
 	return false; //A: no navegar
