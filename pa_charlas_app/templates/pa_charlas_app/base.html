@@ -15,7 +15,6 @@
 
 	{% block meta %}
 	{% endblock %}
-  </head>
 
   <body>
     <header>
@@ -50,6 +49,17 @@
     <main role="main" class="container">
       {% block content %}{% endblock %}
     </main>
+    <div class="texto">
+      ## Otro Titulo 2
+      
+      **Mas parrafos escritos en __markdown__**
+            
+      * Este item
+      * Esta en una
+      * Lista de tres de el segundo texto
+      
+
+    </div>
 
 		<footer class="footer">
 				<div class="container">
@@ -68,6 +78,27 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-	 <script src="{% static 'pa_lib/js/lib.js' %}"></script>
+	  <script src="{% static 'pa_lib/js/lib.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      function limpiar_indent(src) {
+        indent_min= 999; //A: por defecto un maximo grosero
+        let lineas= src.split('\n'); //A: separamos en lineas
+        lineas.forEach( linea => {
+          let indent= linea.match(/^(\s*)\S/); //A: indent tiene los espacios del principio
+          if (indent && indent_min>indent[1].length) { //A: tenia menos indent q las anteriores
+            indent_min= indent[1].length; //A: nuevo minimo
+          }
+        });
+        //A: tengo el indent minimo
+        return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
+      }
+      
+      md_els= document.querySelectorAll('.markdown')
+      md_els.forEach( el => {
+        el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html    
+        //DBG: console.log(x)
+      })
+    </script>
   </body>
 </html>
