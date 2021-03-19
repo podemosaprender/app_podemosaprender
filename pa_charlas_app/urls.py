@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.urls import path, include
+from django.urls import path, re_path, include
 
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
@@ -43,6 +43,9 @@ urlpatterns = [
 	path('usuario/', views.usuario_list, name='usuario_list'), #TODO: poner login_required?
 	path('usuario/<int:pk>/', views.usuario_texto_list, name='usuario_texto_list_k'), #TODO: poner login_required?
 	#A: lista de usuarios
+
+	re_path(r't/(?P<un_path>.*)/$', views.CharlaComoPathListView.as_view(), name='charla_como_path'),
+	#A: ej. t/sabado/cada_mes para buscar titulos que digan sabado y cada_mes
 
 	path('', views.CharlaListView.as_view(), name='home'),
 	#A: la home page es algun tipo de lista de charlas

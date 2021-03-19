@@ -123,6 +123,21 @@ class CharlaListView(ListView): #U: la lista de charlas
 		'vista_detalle': 'charla_texto_list_k',
 	}
 
+
+class CharlaComoPathListView(CharlaListView): #U: la lista de charlas ej. t/sabado/cada_mes para buscar titulos que digan sabado y cada_mes
+	def get_queryset(self):
+		como_path= self.kwargs["un_path"]
+		if not como_path is None:
+			palabras= como_path.split('/') #A: una lista, separe usando /
+			logger.debug(f'CharlaComoPathListView {palabras}')
+			if len(palabras)>0: #A: al menos una palabra
+				filtro= '%'+'%'.join(palabras)+'%'  #ej. %banda%django% 
+				q= Charla.objects.filter(titulo__like=filtro).all()
+				logger.debug(q.query)
+				return q
+		#A: si llegue aca es porque no habia filtros
+		return Charla.objects.all()
+
 # S: Charla vista comoda ##################################
 def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de UNA charla, btn para agregar
 	if not pk is None:

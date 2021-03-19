@@ -2,6 +2,8 @@ from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.utils import timezone
 
+from .models_extra import * #A: para que agregue otros lookups como like 
+
 import logging
 logger = logging.getLogger(__name__)
 
