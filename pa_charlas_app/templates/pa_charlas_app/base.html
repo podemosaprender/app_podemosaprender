@@ -88,6 +88,11 @@
         el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html    
         //DBG: console.log(x)
       })
+
+      function listarTags(){
+        textArea =  document.querySelector('#id_texto');
+        textArea.insertAdjacentHTML("afterBegin", "#hashtag  ");
+      }
     </script>
   </body>
 </html>
