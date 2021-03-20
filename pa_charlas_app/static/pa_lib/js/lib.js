@@ -2,16 +2,6 @@
 /************************************************************************** */
 //S: Util
 
-$.ajax({
-    type: 'GET',
-    url:'https://si.podemosaprender.org/api/charla/', 
-}).done(function(datos){
-    listarHashtags(datos);
-});
-
-//Variables########################
-var miArray = [];
-
 CopyToClipboardEl= null; //U: el elemento donde ponemos texto para copiar
 function copyToClipboard(texto) { //U: pone texto en el clipboard
 	if (CopyToClipboardEl==null) {
@@ -38,30 +28,57 @@ function copyToClipboardEl(selector, permalink, ev) {
 	return false; //A: no navegar
 }
 
-function listarTags(valor){
-	textArea =  document.querySelector('#id_texto');
-	textArea.insertAdjacentHTML("afterBegin", valor.text + ' ');
+/************************************************************************** */
+//S: Autocompletar tags
+
+
+Tags = []; //U: hashtags disponibles
+
+function traerTags(){
+	$.ajax({
+		type: 'GET',
+		url:'https://si.podemosaprender.org/api/charla/', 
+	}).done(function(datos){
+		filtrarTags(datos);
+	});
 }
 
-function listarHashtags(data){
-
-	let hashtag = "";
-	let casual = "casual";
-    hashtags = data;
-
+function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga en Tags
 	for (let tag of hashtags) {  
-		hashtag = tag.titulo.substr(1,6);
-
-		if (hashtag !== casual) {
-			miArray.push(tag.titulo);
+		if ( ! tag.titulo.startsWith("#casual")) { //A: solo incluir los que no empiezan con casual
+			Tags.push(tag.titulo);
 		}
 	};
 };
 
-function mostrarTags(){
-	menu = document.querySelector(".hashtags");
 
-	for (let el of miArray){
-		menu.innerHTML += '<a class="dropdown-item" onclick="listarTags(this)" data-value= \"' + el + '\"> ' + el + '</a>'
-	}
-  };
+//Autocompletar#############################
+
+
+
+function filterSubstring(Arr, Input) {
+	return Arr.filter(e =>e.toLowerCase().includes(Input.toLowerCase()));
+}
+
+function htmlList(list){
+	var res = '<ul>';
+	list.forEach(e=>{
+	   res += '<li>'+e+'</li>';
+	})
+	res += '</ul>';
+	return res;
+}
+
+function getMatchingTags(pattern){
+    if(!pattern){ //A: No hay nada para buscar
+    	return [];
+    }
+    return filterSubstring(Tags,pattern);
+}
+    
+function showTagsButtons(pattern, dst){
+	var result = document.querySelector(dst || '.result');
+	let matching = getMatchingTags(pattern);
+    result.innerHTML = htmlList(matching);
+ }
+ traerTags();
