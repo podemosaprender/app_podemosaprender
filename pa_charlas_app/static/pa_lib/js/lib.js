@@ -54,18 +54,15 @@ function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga 
 
 //Autocompletar#############################
 
-
-
 function filterSubstring(Arr, Input) {
 	return Arr.filter(e =>e.toLowerCase().includes(Input.toLowerCase()));
 }
 
 function htmlList(list){
-	var res = '<ul>';
+	var res = "";
 	list.forEach(e=>{
-	   res += '<li>'+e+'</li>';
+	res += '<button type="button" onclick="insertaTag(this)" value= \"' + e + '\" class="btn btn-success">'+e+'</button>';
 	})
-	res += '</ul>';
 	return res;
 }
 
@@ -80,5 +77,10 @@ function showTagsButtons(pattern, dst){
 	var result = document.querySelector(dst || '.result');
 	let matching = getMatchingTags(pattern);
     result.innerHTML = htmlList(matching);
- }
- traerTags();
+} 
+
+function insertaTag(valor){
+	textArea =  document.querySelector('#id_texto');
+	textArea.insertAdjacentHTML("afterBegin", valor.value + ' ');
+}
+traerTags();
