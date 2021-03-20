@@ -26,6 +26,9 @@ def enc_b64_o(o): #U: codificar objeto como json base64
 def enc_b64_o_r(s, dflt=None): #U: decodificar json base64
 	return json.loads(base64.b64decode(s)) if not s is None else dflt
 
+def z1_to_hex(zero_to_one_values_list): #U: covierte una lista de valores 0 a 1 en hex 0-255
+	return ''.join(list(map(lambda v: f'{int(v*255):02x}', list(zero_to_one_values_list))))
+
 # S: sesion ################################################
 def login(request): #U: pantalla de login con botones de google, facebook, etc
   return render(request, 'pa_charlas_app/login.html')
@@ -42,6 +45,15 @@ def texto_img(request, pk=None): #U: imagen con texto para og:image que se muest
 		tpl= f.read()
 	#A: leimos un svg como plantilla, tiene marcas TPL1 a TPL6 para lineas de texto
 	
+	import colorsys
+	import random
+	BgColor_cnt = 20 #A: cuantos colores de fondo distintos
+	hue= random.randint(1, BgColor_cnt)*1.0/BgColor_cnt
+	bgColor= z1_to_hex( colorsys.hsv_to_rgb(hue,0.2,1) ) #A: hue al azar, poca saturacion, maximo brillo
+	tpl= tpl.replace('fill:#afdde9',f'fill:#{bgColor}')
+	#A: reemplace el color de fondo por uno al azar
+
+
 	W= 28 #U: cuantas letras entran en una linea, TODO: elegir y hacer configurable
 	LMAX= 8 #U: cuantas lineas en una og image
 
