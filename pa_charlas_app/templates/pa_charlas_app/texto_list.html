@@ -12,6 +12,10 @@
 		{% else %}
 			{{ item.fh_creado }}
 		{% endifnotequal %}
+
+		{% if fh_visita_anterior|date:'c' < item.fh_editado|date:'c' %}
+		<a name="nuevo">(nuevo)</a>
+		{% endif %}
 	{% endblock %}
 
 	{% block item_cuerpo %}

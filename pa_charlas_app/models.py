@@ -40,6 +40,17 @@ class CharlaItem(models.Model): #U: conecta un texto con una charla
 	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
 	texto=  models.ForeignKey('Texto', on_delete=models.CASCADE)
 
+
+class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuaria
+	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
+	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	fh_visita= models.DateTimeField(default=timezone.now)
+
+	#TODO: asegurar que cada par (de_quien, charla) esta UNA sola vez. unique_together?
+
+	def __str__(self):
+		return f'{self.de_quien.username} {self.charla.titulo} {self.fh_visita}'
+
 # S: funciones comodas ######################################
 from .hashtags import hashtags_en
 def conUserYFecha_guardar(form, user, commit= True):

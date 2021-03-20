@@ -11,8 +11,9 @@ from django.contrib.auth.models import User
 from django import forms
 import re
 import os
+import datetime
 
-from .models import Texto, Charla, texto_guardar
+from .models import Texto, Charla, Visita, texto_guardar
 from .forms import TextoForm
 
 import json
@@ -156,8 +157,20 @@ def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de U
 		charla= get_object_or_404(Charla, pk=pk)
 	else:
 		charla= get_object_or_404(Charla, titulo= '#'+charla_titulo)
+
+	fh_visita_anterior= datetime.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
+	if request.user.is_authenticated:
+		anteriores= Visita.objects.filter(de_quien= request.user, charla= charla)
+		if len(anteriores)>0: #A: ya vino antes
+			visita_anterior= anteriores.first()
+			fh_visita_anterior= visita_anterior.fh_visita
+			visita_anterior.delete() #A: quiero solo la ultima
+		v= Visita(de_quien= request.user, charla= charla)
+		v.save()
+		#A: guarde que esta usuaria ya vio esta charlar hasta esta hora
+	
 	textos= charla.textos.order_by('fh_creado').all()
-	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True })
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True, 'fh_visita_anterior': fh_visita_anterior })
 
 # S: Lista de usuarios ####################################
 
