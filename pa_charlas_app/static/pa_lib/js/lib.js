@@ -27,3 +27,60 @@ function copyToClipboardEl(selector, permalink, ev) {
 	if (ev) { ev.preventDefault(); } //A: no navegar
 	return false; //A: no navegar
 }
+
+/************************************************************************** */
+//S: Autocompletar tags
+
+
+Tags = []; //U: hashtags disponibles
+
+function traerTags(){
+	$.ajax({
+		type: 'GET',
+		url:'https://si.podemosaprender.org/api/charla/', 
+	}).done(function(datos){
+		filtrarTags(datos);
+	});
+}
+
+function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga en Tags
+	for (let tag of hashtags) {  
+		if ( ! tag.titulo.startsWith("#casual")) { //A: solo incluir los que no empiezan con casual
+			Tags.push(tag.titulo);
+		}
+	};
+};
+
+
+//Autocompletar#############################
+
+function filterSubstring(Arr, Input) {
+	return Arr.filter(e =>e.toLowerCase().includes(Input.toLowerCase()));
+}
+
+function htmlList(list){
+	var res = "";
+	list.forEach(e=>{
+	res += '<button type="button" onclick="insertaTag(this)" value= \"' + e + '\" class="btn btn-success mr-1">'+e+'</button>';
+	})
+	return res;
+}
+
+function getMatchingTags(pattern){
+    if(!pattern){ //A: No hay nada para buscar
+    	return [];
+    }
+    return filterSubstring(Tags,pattern);
+}
+    
+function showTagsButtons(pattern, dst){
+	var result = document.querySelector(dst || '.result');
+	let matching = getMatchingTags(pattern);
+    result.innerHTML = htmlList(matching);
+} 
+
+function insertaTag(valor){
+	textArea =  document.querySelector('#id_texto');
+	textArea.insertAdjacentHTML("afterBegin", valor.value + ' ');
+}
+traerTags();
