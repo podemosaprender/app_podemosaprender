@@ -2,6 +2,16 @@
 /************************************************************************** */
 //S: Util
 
+$.ajax({
+    type: 'GET',
+    url:'https://si.podemosaprender.org/api/charla/', 
+}).done(function(datos){
+    listarHashtags(datos);
+});
+
+//Variables########################
+var miArray = [];
+
 CopyToClipboardEl= null; //U: el elemento donde ponemos texto para copiar
 function copyToClipboard(texto) { //U: pone texto en el clipboard
 	if (CopyToClipboardEl==null) {
@@ -27,3 +37,31 @@ function copyToClipboardEl(selector, permalink, ev) {
 	if (ev) { ev.preventDefault(); } //A: no navegar
 	return false; //A: no navegar
 }
+
+function listarTags(valor){
+	textArea =  document.querySelector('#id_texto');
+	textArea.insertAdjacentHTML("afterBegin", valor.text + ' ');
+}
+
+function listarHashtags(data){
+
+	let hashtag = "";
+	let casual = "casual";
+    hashtags = data;
+
+	for (let tag of hashtags) {  
+		hashtag = tag.titulo.substr(1,6);
+
+		if (hashtag !== casual) {
+			miArray.push(tag.titulo);
+		}
+	};
+};
+
+function mostrarTags(){
+	menu = document.querySelector(".hashtags");
+
+	for (let el of miArray){
+		menu.innerHTML += '<a class="dropdown-item" onclick="listarTags(this)" data-value= \"' + el + '\"> ' + el + '</a>'
+	}
+  };

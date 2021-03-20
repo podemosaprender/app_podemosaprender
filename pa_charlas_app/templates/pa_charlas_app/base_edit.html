@@ -8,7 +8,12 @@
 		<input type="hidden" name="url_donde_volver" value="{{ url_donde_volver }}">
 		<input type="hidden" name="extra_form_data" value="{{ extra_form_data }}">
 		{% bootstrap_form form %}
-		<button type="button" onclick="listarTags()" class="btn btn-primary">Hashtag</button>
+		<div class="btn-group" >
+			<button type="button" onclick="mostrarTags()" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Hashtags</button>
+			</button>
+			<div class="dropdown-menu hashtags" style="overflow-y:auto; max-height:20vh">
+			</div>
+		  </div>
 		{% bootstrap_button 'Guardar' button_type='submit' %}
 	</form>
 {% endblock %}
