@@ -5,13 +5,15 @@
 
 
 	{% block item_titulo %}
-		{{ item.de_quien }},
+		<a name="{{ item.de_quien }}__{{ item.fh_editado|date:'U' }}">
+			{{ item.de_quien }},
 
-		{% ifnotequal item.fh_editado item.fh_creado %}
-			{{ item.fh_editado }} (editado)
-		{% else %}
-			{{ item.fh_creado }}
-		{% endifnotequal %}
+			{% ifnotequal item.fh_editado item.fh_creado %}
+				{{ item.fh_editado }} (editado)
+			{% else %}
+				{{ item.fh_creado }}
+			{% endifnotequal %}
+		</a>
 
 		{% if fh_visita_anterior|date:'c' < item.fh_editado|date:'c' %}
 		<a name="nuevo">(nuevo)</a>
@@ -42,3 +44,12 @@
 
 {% endblock %}
 
+{% block resumen %}
+	<ul>
+	{% for participacion in participantes %}
+		<li><a href="#{{ participacion.texto__de_quien__username }}__{{ participacion.fh_ultimo|date:'U' }}">
+		{{ participacion.texto__de_quien__username }}: {{ participacion.fh_ultimo }} 
+		</a></li>
+	{% endfor %}
+	</ul>
+{% endblock %}

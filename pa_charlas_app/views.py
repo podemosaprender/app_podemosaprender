@@ -13,7 +13,7 @@ import re
 import os
 import datetime
 
-from .models import Texto, Charla, Visita, texto_guardar
+from .models import Texto, Charla, Visita, charla_participantes, texto_guardar
 from .forms import TextoForm
 
 import json
@@ -169,8 +169,10 @@ def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de U
 		v.save()
 		#A: guarde que esta usuaria ya vio esta charlar hasta esta hora
 	
+	participantes= charla_participantes(charla_titulo= charla_titulo, charla_pk= pk).order_by('-fh_ultimo') #A: con menos adelante es descendiente, mas reciente arriba
+
 	textos= charla.textos.order_by('fh_creado').all()
-	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True, 'fh_visita_anterior': fh_visita_anterior })
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'participantes': participantes, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True, 'fh_visita_anterior': fh_visita_anterior })
 
 # S: Lista de usuarios ####################################
 
