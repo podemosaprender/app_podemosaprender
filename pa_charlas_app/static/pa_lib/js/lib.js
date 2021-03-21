@@ -32,7 +32,8 @@ function copyToClipboardEl(selector, permalink, ev) {
 //S: Autocompletar tags
 
 
-Tags = []; //U: hashtags disponibles
+Tags = []; //U: hashTags disponibles
+TagsYUsuarios = []; //U: hashtags y usuarios disponibles
 
 function traerTags(){
 	$.ajax({
@@ -43,6 +44,15 @@ function traerTags(){
 	});
 }
 
+function traerUsuarios(){
+	$.ajax({
+		type: 'GET',
+		url:'https://si.podemosaprender.org/api/texto/', 
+	}).done(function(datos){
+		filtrarUsuarios(datos)
+	});
+}
+
 function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga en Tags
 	for (let tag of hashtags) {  
 		if ( ! tag.titulo.startsWith("#casual")) { //A: solo incluir los que no empiezan con casual
@@ -50,6 +60,19 @@ function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga 
 		}
 	};
 };
+
+function filtrarUsuarios(usuarios){
+	let users = [];
+	for (let user of usuarios.results) {
+		users.push('@'+user.de_quien.username);
+	}
+	for(var i = users.length -1; i >=0; i--){
+		if(users.indexOf(users[i]) !== i) users.splice(i,1);
+	  }
+	TagsYUsuarios = Tags.concat(users);
+	console.log(TagsYUsuarios);
+}
+
 
 
 //Autocompletar#############################
@@ -70,7 +93,7 @@ function getMatchingTags(pattern){
     if(!pattern){ //A: No hay nada para buscar
     	return [];
     }
-    return filterSubstring(Tags,pattern);
+    return filterSubstring(TagsYUsuarios,pattern);
 }
     
 function showTagsButtons(pattern, dst){
@@ -84,3 +107,4 @@ function insertaTag(valor){
 	textArea.insertAdjacentHTML("afterBegin", valor.value + ' ');
 }
 traerTags();
+traerUsuarios();
