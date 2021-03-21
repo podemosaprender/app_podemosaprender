@@ -4,7 +4,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model 
 
-from .models import Texto, Charla
+from .models import Texto, Charla, CharlaItem
 User= get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
@@ -29,3 +29,11 @@ class CharlaSerializer(serializers.ModelSerializer):
 	class Meta:
 		model= Charla
 		fields= ['titulo', 'pk']
+
+class CharlaParticipanteSerializer(serializers.Serializer):
+	#VER: https://www.django-rest-framework.org/api-guide/serializers/#specifying-fields-explicitly
+	user_pk= serializers.IntegerField(source='texto__de_quien')
+	username= serializers.CharField(source='texto__de_quien__username')
+	fh_ultimo= serializers.DateTimeField()
+
+
