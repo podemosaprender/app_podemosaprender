@@ -1,4 +1,4 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
 
@@ -39,6 +39,9 @@ class Charla(models.Model): #U: una coleccion de textos sobre algun tema
 class CharlaItem(models.Model): #U: conecta un texto con una charla
 	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
 	texto=  models.ForeignKey('Texto', on_delete=models.CASCADE)
+
+	def __str__(self):
+		return f'{self.charla.titulo} {self.texto}'
 
 
 class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuaria
@@ -113,4 +116,29 @@ def texto_guardar(form, user, charla_pk=None):
 		ch.save()
 
 	return texto
+# S: consultas comodas #####################################
+
+def charla_participantes(charla_titulo= None, charla_pk= None): #U: participantes de una charla
+	#VER: https://docs.djangoproject.com/en/3.1/topics/db/aggregation/
+	q= ( #U: puedo ir guardando la consulta de a pasos, para componer o debug
+		CharlaItem.objects #A: empiezo con todos los CharlaItem
+		.select_related('de_quien__username') #A: aviso que voy a querer el username, asi no hace una consulta aparte por cada uno (lentisimo!)
+	)
+
+	if not charla_pk is None: #A: pidio filtrar las charlas por clave
+		q= q.filter(charla__pk= charla_pk) 
+	elif not charla_titulo is None: #A: filtro las charlas por clave
+		q= q.filter(charla__titulo= charla_titulo) 
+	else: #A: no paso ningun parametro para filtrar
+		raise ObjectDoesNotExist #A: si no paso ningun filtro, lanzo una excepcion
+		
+	q= (
+		q
+		.values('texto__de_quien','texto__de_quien__username') #A: quiero agrupar por el id y username
+		.annotate(fh_ultimo= models.Max('texto__fh_editado')) #A: y traer solo la fecha maxima
+	)
+
+	#DBG: print('charla_participantes', q.query) 
+	return q.all()
+	
 
