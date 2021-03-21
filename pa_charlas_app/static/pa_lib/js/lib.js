@@ -39,12 +39,11 @@ function traerTags(){
 	$.ajax({
 		type: 'GET',
 		url:'/api/charla/', 
-	}).done(function(datos){
-		filtrarTags(datos);
-	});
+	})
+	.done( recordarTags );
 }
 
-function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga en Tags
+function recordarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga en Tags
 	for (let tag of hashtags) {  
 		if ( ! tag.titulo.startsWith("#casual")) { //A: solo incluir los que no empiezan con casual
 			Tags.push(tag.titulo);
@@ -55,18 +54,17 @@ function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga 
 function traerUsuarios(){
 	$.ajax({
 		type: 'GET',
-		url:'/api/texto/', //TODO: de aca los queremos sacar o API mas especifica?
-	}).done(function(datos){
-		filtrarUsuarios(datos)
-	});
+		url:'/api/participante/', //TODO: de aca los queremos sacar o API mas especifica?
+	}).done( recordarUsuarios );
 }
 
-function filtrarUsuarios(usuarios) { //TODO: "usuarios" tiene usuarios o textos?
+function recordarUsuarios(usuarios) { 
 	let users = [];
 	for (let user of usuarios.results) {
-		users.push('@'+user.de_quien.username);
+		users.push('@'+user.username);
 	}
-	for(var i = users.length -1; i >=0; i--){
+	for(var i = users.length -1; i >=0; i--) { 
+		//TODO: que hace este codigo? por que es necesario?
 		if(users.indexOf(users[i]) !== i) users.splice(i,1);
   }
 	TagsYUsuarios = Tags.concat(users);

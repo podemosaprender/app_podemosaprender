@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.shortcuts import get_list_or_404, get_object_or_404
 
-from .models import Charla, Texto, charla_participantes
+from .models import Charla, charla_participantes, Texto, User
 from .serializers import *
 
 from rest_framework.decorators import api_view
 
-class TextoViewSet(viewsets.ModelViewSet):
+class TextoViewSet(viewsets.ReadOnlyModelViewSet):
 	queryset = Texto.objects.all()
 	serializer_class = TextoSerializer
 
@@ -38,3 +38,6 @@ class CharlaViewSet(viewsets.ViewSet):
 		serializer= CharlaParticipanteSerializer(queryset, many= True)
 		return Response(serializer.data)		
 
+class ParticipanteViewSet(viewsets.ReadOnlyModelViewSet):
+	queryset= User.objects.all()
+	serializer_class= UserSerializer

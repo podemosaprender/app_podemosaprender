@@ -1,11 +1,14 @@
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 
 from .models_extra import * #A: para que agregue otros lookups como like 
 
 import logging
 logger = logging.getLogger(__name__)
+
+User= get_user_model() #U: la implementacion q este configurada
 
 class Texto(models.Model): #U: cualquier texto que publiquemos, despues especializamos
 	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
@@ -141,4 +144,12 @@ def charla_participantes(charla_titulo= None, charla_pk= None): #U: participante
 	#DBG: print('charla_participantes', q.query) 
 	return q.all()
 	
+def charlas_que_sigo():
+	# qv= Visita.objects.filter(de_quien__id= 2).values('charla_id')
+	# qc= CharlaItem.objects.select_related('charla').filter(charla__id__in= qv)
+	# qcl= qc.values('charla__id','charla__titulo')
+	# qcl= qcl.annotate(fh_ultimo= models.Max('texto__fh_editado'))
+	# qcl.values('charla_id','charla__titulo','fh_ultimo')
+	pass
 
+	
