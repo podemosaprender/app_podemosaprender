@@ -32,12 +32,13 @@ function copyToClipboardEl(selector, permalink, ev) {
 //S: Autocompletar tags
 
 
-Tags = []; //U: hashtags disponibles
+Tags = []; //U: hashTags disponibles
+TagsYUsuarios = []; //U: hashtags y usuarios disponibles
 
 function traerTags(){
 	$.ajax({
 		type: 'GET',
-		url:'https://si.podemosaprender.org/api/charla/', 
+		url:'/api/charla/', 
 	}).done(function(datos){
 		filtrarTags(datos);
 	});
@@ -50,6 +51,28 @@ function filtrarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga 
 		}
 	};
 };
+
+function traerUsuarios(){
+	$.ajax({
+		type: 'GET',
+		url:'/api/texto/', //TODO: de aca los queremos sacar o API mas especifica?
+	}).done(function(datos){
+		filtrarUsuarios(datos)
+	});
+}
+
+function filtrarUsuarios(usuarios) { //TODO: "usuarios" tiene usuarios o textos?
+	let users = [];
+	for (let user of usuarios.results) {
+		users.push('@'+user.de_quien.username);
+	}
+	for(var i = users.length -1; i >=0; i--){
+		if(users.indexOf(users[i]) !== i) users.splice(i,1);
+  }
+	TagsYUsuarios = Tags.concat(users);
+	//DBG: console.log(TagsYUsuarios);
+}
+
 
 
 //Autocompletar#############################
@@ -70,13 +93,13 @@ function getMatchingTags(pattern){
     if(!pattern){ //A: No hay nada para buscar
     	return [];
     }
-    return filterSubstring(Tags,pattern);
+    return filterSubstring(TagsYUsuarios,pattern);
 }
     
 function showTagsButtons(pattern, dst){
 	var result = document.querySelector(dst || '.result');
 	let matching = getMatchingTags(pattern);
-    result.innerHTML = htmlList(matching);
+	result.innerHTML = htmlList(matching);
 } 
 
 function insertaTag(valor){
@@ -84,3 +107,4 @@ function insertaTag(valor){
 	textArea.insertAdjacentHTML("afterBegin", valor.value + ' ');
 }
 traerTags();
+traerUsuarios();
