@@ -1,9 +1,14 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+from .models_extra import * #A: para que agregue otros lookups como like 
 
 import logging
 logger = logging.getLogger(__name__)
+
+User= get_user_model() #U: la implementacion q este configurada
 
 class Texto(models.Model): #U: cualquier texto que publiquemos, despues especializamos
 	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
@@ -37,6 +42,20 @@ class Charla(models.Model): #U: una coleccion de textos sobre algun tema
 class CharlaItem(models.Model): #U: conecta un texto con una charla
 	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
 	texto=  models.ForeignKey('Texto', on_delete=models.CASCADE)
+
+	def __str__(self):
+		return f'{self.charla.titulo} {self.texto}'
+
+
+class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuaria
+	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
+	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	fh_visita= models.DateTimeField(default=timezone.now)
+
+	#TODO: asegurar que cada par (de_quien, charla) esta UNA sola vez. unique_together?
+
+	def __str__(self):
+		return f'{self.de_quien.username} {self.charla.titulo} {self.fh_visita}'
 
 # S: funciones comodas ######################################
 from .hashtags import hashtags_en
@@ -100,4 +119,37 @@ def texto_guardar(form, user, charla_pk=None):
 		ch.save()
 
 	return texto
+# S: consultas comodas #####################################
 
+def charla_participantes(charla_titulo= None, charla_pk= None): #U: participantes de una charla
+	#VER: https://docs.djangoproject.com/en/3.1/topics/db/aggregation/
+	q= ( #U: puedo ir guardando la consulta de a pasos, para componer o debug
+		CharlaItem.objects #A: empiezo con todos los CharlaItem
+		.select_related('de_quien__username') #A: aviso que voy a querer el username, asi no hace una consulta aparte por cada uno (lentisimo!)
+	)
+
+	if not charla_pk is None: #A: pidio filtrar las charlas por clave
+		q= q.filter(charla__pk= charla_pk) 
+	elif not charla_titulo is None: #A: filtro las charlas por clave
+		q= q.filter(charla__titulo= charla_titulo) 
+	else: #A: no paso ningun parametro para filtrar
+		raise ObjectDoesNotExist #A: si no paso ningun filtro, lanzo una excepcion
+		
+	q= (
+		q
+		.values('texto__de_quien','texto__de_quien__username') #A: quiero agrupar por el id y username
+		.annotate(fh_ultimo= models.Max('texto__fh_editado')) #A: y traer solo la fecha maxima
+	)
+
+	#DBG: print('charla_participantes', q.query) 
+	return q.all()
+	
+def charlas_que_sigo():
+	# qv= Visita.objects.filter(de_quien__id= 2).values('charla_id')
+	# qc= CharlaItem.objects.select_related('charla').filter(charla__id__in= qv)
+	# qcl= qc.values('charla__id','charla__titulo')
+	# qcl= qcl.annotate(fh_ultimo= models.Max('texto__fh_editado'))
+	# qcl.values('charla_id','charla__titulo','fh_ultimo')
+	pass
+
+	
