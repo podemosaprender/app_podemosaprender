@@ -23,7 +23,8 @@ urlpatterns = [
 	path("login/", views.login, name="login"),
 	#A: login desde la UI web
 
-	path('charla/', views.CharlaListView.as_view(), name='charla_list' ),
+	path('charla/', views.CharlaQueSigoListView.as_view(), name='charla_quesigo_list' ),
+	path('charla/todas', views.CharlaListView.as_view(), name='charla_list' ),
 	#A: el alma de la aplicacion son las "charlas"
 
 	path('charla/nueva', login_required(views.texto_edit), name='texto_new'),
@@ -48,6 +49,6 @@ urlpatterns = [
 	re_path(r't/(?P<un_path>.*)/$', views.CharlaComoPathListView.as_view(), name='charla_como_path'),
 	#A: ej. t/sabado/cada_mes para buscar titulos que digan sabado y cada_mes
 
-	path('', views.CharlaListView.as_view(), name='home'),
+	path('', views.CharlaQueSigoListView.as_view(), name='home'),
 	#A: la home page es algun tipo de lista de charlas
 ]

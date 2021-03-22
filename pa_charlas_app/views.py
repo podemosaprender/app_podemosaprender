@@ -13,7 +13,10 @@ import re
 import os
 import datetime
 
-from .models import Texto, Charla, Visita, charla_participantes, texto_guardar
+from .models import (
+	Texto, texto_guardar,
+	Charla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo
+)
 from .forms import TextoForm
 
 import json
@@ -150,6 +153,24 @@ class CharlaComoPathListView(CharlaListView): #U: la lista de charlas ej. t/saba
 				return q
 		#A: si llegue aca es porque no habia filtros
 		return Charla.objects.all()
+
+class CharlaQueSigoListView(ListView): #U: la lista de charlas que visite
+	template_name= 'pa_charlas_app/charla_quesigo_list.html'
+	paginate_by = 20  
+	order_by='titulo'
+	extra_context= {
+		'type_name': 'charla',
+		'type_url_base': 'charla',
+		'create_url': '/charla/nueva',
+		'titulo': 'Charlas',
+		'vista_detalle': 'charla_texto_list_k',
+	}
+
+	def get_queryset(self):
+		if self.request.user.is_authenticated:
+			return charlas_que_sigo(self.request.user)	
+		else:
+			return charlas_y_ultimo()	
 
 # S: Charla vista comoda ##################################
 def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de UNA charla, btn para agregar
