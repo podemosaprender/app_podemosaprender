@@ -11,8 +11,9 @@ from django.contrib.auth.models import User
 from django import forms
 import re
 import os
+import datetime
 
-from .models import Texto, Charla, texto_guardar
+from .models import Texto, Charla, Visita, charla_participantes, texto_guardar
 from .forms import TextoForm
 
 import json
@@ -25,6 +26,9 @@ def enc_b64_o(o): #U: codificar objeto como json base64
 	return base64.b64encode(json.dumps(o).encode('utf-8')).decode('ascii')
 def enc_b64_o_r(s, dflt=None): #U: decodificar json base64
 	return json.loads(base64.b64decode(s)) if not s is None else dflt
+
+def z1_to_hex(zero_to_one_values_list): #U: covierte una lista de valores 0 a 1 en hex 0-255
+	return ''.join(list(map(lambda v: f'{int(v*255):02x}', list(zero_to_one_values_list))))
 
 # S: sesion ################################################
 def login(request): #U: pantalla de login con botones de google, facebook, etc
@@ -42,6 +46,15 @@ def texto_img(request, pk=None): #U: imagen con texto para og:image que se muest
 		tpl= f.read()
 	#A: leimos un svg como plantilla, tiene marcas TPL1 a TPL6 para lineas de texto
 	
+	import colorsys
+	import random
+	BgColor_cnt = 20 #A: cuantos colores de fondo distintos
+	hue= random.randint(1, BgColor_cnt)*1.0/BgColor_cnt
+	bgColor= z1_to_hex( colorsys.hsv_to_rgb(hue,0.2,1) ) #A: hue al azar, poca saturacion, maximo brillo
+	tpl= tpl.replace('fill:#afdde9',f'fill:#{bgColor}')
+	#A: reemplace el color de fondo por uno al azar
+
+
 	W= 28 #U: cuantas letras entran en una linea, TODO: elegir y hacer configurable
 	LMAX= 8 #U: cuantas lineas en una og image
 
@@ -113,7 +126,7 @@ def texto_detail(request, pk=None): #U: ver un texto para compartir en las redes
 
 class CharlaListView(ListView): #U: la lista de charlas
 	template_name= 'pa_charlas_app/charla_list.html'
-	model = Charla
+	queryset=  Charla.objects.order_by('titulo').all()
 	paginate_by = 20  
 	extra_context= {
 		'type_name': 'charla',
@@ -123,14 +136,43 @@ class CharlaListView(ListView): #U: la lista de charlas
 		'vista_detalle': 'charla_texto_list_k',
 	}
 
+
+class CharlaComoPathListView(CharlaListView): #U: la lista de charlas ej. t/sabado/cada_mes para buscar titulos que digan sabado y cada_mes
+	def get_queryset(self):
+		como_path= self.kwargs["un_path"]
+		if not como_path is None:
+			palabras= como_path.split('/') #A: una lista, separe usando /
+			logger.debug(f'CharlaComoPathListView {palabras}')
+			if len(palabras)>0: #A: al menos una palabra
+				filtro= '%'+'%'.join(palabras)+'%'  #ej. %banda%django% 
+				q= Charla.objects.filter(titulo__like=filtro).all()
+				logger.debug(q.query)
+				return q
+		#A: si llegue aca es porque no habia filtros
+		return Charla.objects.all()
+
 # S: Charla vista comoda ##################################
 def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de UNA charla, btn para agregar
 	if not pk is None:
 		charla= get_object_or_404(Charla, pk=pk)
 	else:
 		charla= get_object_or_404(Charla, titulo= '#'+charla_titulo)
+
+	fh_visita_anterior= datetime.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
+	if request.user.is_authenticated:
+		anteriores= Visita.objects.filter(de_quien= request.user, charla= charla)
+		if len(anteriores)>0: #A: ya vino antes
+			visita_anterior= anteriores.first()
+			fh_visita_anterior= visita_anterior.fh_visita
+			visita_anterior.delete() #A: quiero solo la ultima
+		v= Visita(de_quien= request.user, charla= charla)
+		v.save()
+		#A: guarde que esta usuaria ya vio esta charlar hasta esta hora
+	
+	participantes= charla_participantes(charla_titulo= charla_titulo, charla_pk= pk).order_by('-fh_ultimo') #A: con menos adelante es descendiente, mas reciente arriba
+
 	textos= charla.textos.order_by('fh_creado').all()
-	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True })
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'participantes': participantes, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True, 'fh_visita_anterior': fh_visita_anterior })
 
 # S: Lista de usuarios ####################################
 

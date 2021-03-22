@@ -3,7 +3,7 @@
 {% load bootstrap4 %}
 
 {% block item_titulo %}
-	<a href="{% url 'charla_texto_list_k' item.pk %}">{{ item.titulo }}</a>
+	<a href="{% url 'charla_texto_list_k' item.pk %}#nuevo">{{ item.titulo }}</a>
 {% endblock %}
 
 {% block item_cuerpo %}
