@@ -8,7 +8,7 @@
 
 {% block item_cuerpo %}
 	{% if "visita__fh_visita" in item %}
-	te falta ver {{ item.fh_ultimo|timesince:item.visita__fh_visita }}<br/>
+	te falta ver {{ item.fh_ultimo|timeuntil:item.visita__fh_visita }}<br/>
 	{% endif %}
 	el último texto se agregó {{ item.fh_ultimo }}<br/>
 	{% if "visita__fh_visita" in item and not item.visita__fh_visita is None %}
