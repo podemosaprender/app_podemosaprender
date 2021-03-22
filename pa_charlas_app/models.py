@@ -143,13 +143,21 @@ def charla_participantes(charla_titulo= None, charla_pk= None): #U: participante
 
 	#DBG: print('charla_participantes', q.query) 
 	return q.all()
-	
-def charlas_que_sigo():
-	# qv= Visita.objects.filter(de_quien__id= 2).values('charla_id')
-	# qc= CharlaItem.objects.select_related('charla').filter(charla__id__in= qv)
-	# qcl= qc.values('charla__id','charla__titulo')
-	# qcl= qcl.annotate(fh_ultimo= models.Max('texto__fh_editado'))
-	# qcl.values('charla_id','charla__titulo','fh_ultimo')
-	pass
 
+def charlas_y_ultimo():
+	qc= (
+		Charla.objects
+		.values('pk','titulo')
+		.annotate(fh_ultimo= models.Max('textos__fh_editado'))
+	)
+	return qc
+
+def charlas_que_sigo(user):
+	qc= (
+		Charla.objects
+		.filter(visita__de_quien= user) 
+		.values('pk','titulo','visita__fh_visita')
+		.annotate(fh_ultimo= models.Max('textos__fh_editado'))
+	)
+	return qc
 	

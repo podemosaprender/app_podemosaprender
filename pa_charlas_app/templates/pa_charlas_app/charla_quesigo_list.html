@@ -1,0 +1,26 @@
+{% extends 'pa_charlas_app/base_list.html' %}
+
+{% load bootstrap4 %}
+
+{% block item_titulo %}
+	<a href="{% url 'charla_texto_list_k' item.pk %}#nuevo">{{ item.titulo }}</a>
+{% endblock %}
+
+{% block item_cuerpo %}
+	{% if "visita__fh_visita" in item %}
+	te falta ver {{ item.fh_ultimo|timesince:item.visita__fh_visita }}<br/>
+	{% endif %}
+	el último texto se agregó {{ item.fh_ultimo }}<br/>
+	{% if "visita__fh_visita" in item and not item.visita__fh_visita is None %}
+		no la lees desde {{ item.visita__fh_visita }}
+	{% else %}
+	{% endif %}
+{% endblock %}
+
+{% block item_links %}
+{% endblock %}
+
+{% block acciones_sin_item %}
+	{% url "charla_list" as charla_list_url %}
+	{% bootstrap_button "Ver todas las charlas"  href=charla_list_url  %}
+{% endblock %}
