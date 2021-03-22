@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'pa_lib/css/page-footer-sticky.css' %}">
+    <link rel="stylesheet" href="{% static 'pa_lib/css/estilos-link-footer.css' %}">
     <title>PodemosAprender</title>
 
 	{% block meta %}
@@ -82,10 +83,10 @@
         //A: tengo el indent minimo
         return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
       }
-      
+
       md_els= document.querySelectorAll('.markdown')
       md_els.forEach( el => {
-        el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html    
+        el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html
         //DBG: console.log(x)
       })
     </script>
