@@ -20,6 +20,8 @@ El primer paso es que se pueda escribir un post. Seguí los pasos del [tutorial 
 11. [Braian Martino](https://www.linkedin.com/in/braian-martino-770704198/) agrego la lista y textos de cada usuario (de primera!)
 12. Configure django_restframework y jwt token para que el el futuro se puedan consumir y cargar datos ej. desde una SPA javascript en la web o cordova (mas info abajo).
 14. Configure CORS para que se pueda usar la API REST desde cualquier lado (gracias [Braian Martino](https://www.linkedin.com/in/braian-martino-770704198/)!) como dice en [django-cors-headers](https://github.com/adamchainz/django-cors-headers)
+15. Con Brian agregamos que los textos se muestran como markdown usando marked en el browser
+16. Agregue las url que buscan palabras en los titulos de las charlas como /t/banda que busca %banda% y /t/sabado/enero que busca %sabado%enero% . Cree un operador de busqueda like para eso
 
 ### Para usar y seguir desarrollando
 

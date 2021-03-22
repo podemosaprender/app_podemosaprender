@@ -8,6 +8,14 @@
 		<input type="hidden" name="url_donde_volver" value="{{ url_donde_volver }}">
 		<input type="hidden" name="extra_form_data" value="{{ extra_form_data }}">
 		{% bootstrap_form form %}
+
 		{% bootstrap_button 'Guardar' button_type='submit' %}
+
+		<input type="text" 
+			placeholder="Tags y Usuarios" 
+			onkeyup="showTagButtons(this.value, '#botonesParaTags', '#id_texto')"
+		>
+
 	</form>
+	<div id="botonesParaTags"></div>
 {% endblock %}
