@@ -28,7 +28,36 @@ function copyToClipboardEl(selector, permalink, ev) {
 	return false; //A: no navegar
 }
 
+
+function insertAtCursor(el_o_selector, textoAInsertar) { //U: inserta texto donde esta el cursor en una textArea
+	const el_destino= typeof(el_o_selector)=="string" 
+		? document.querySelector(el_o_selector) 
+		: el_o_selector;
+	//A: el_destino tiene un elemento
+	
+	if (document.selection) {	//A: es IE
+		el_destino.focus();
+		sel = document.selection.createRange();
+		sel.text = textoAInsertar;
+	}
+	else if (el_destino.selectionStart || el_destino.selectionStart == '0') {//A: MOZILLA y otros
+		var startPos = el_destino.selectionStart;
+		var endPos = el_destino.selectionEnd;
+		el_destino.value = el_destino.value.substring(0, startPos)
+			+ textoAInsertar
+			+ el_destino.value.substring(endPos, el_destino.value.length);
+
+		el_destino.selectionStart= startPos+ textoAInsertar.length;
+		el_destino.selectionEnd= el_destino.selectionStart;
+	} 
+	else {
+		el_destino.value += textoAInsertar;
+	}
+	
+	el_destino.focus(); //A: volver al elemento donde escribimos
+}
 /************************************************************************** */
+
 //S: Autocompletar tags
 
 
@@ -79,30 +108,28 @@ function filterSubstring(Arr, Input) {
 	return Arr.filter(e =>e.toLowerCase().includes(Input.toLowerCase()));
 }
 
-function htmlList(list){
-	var res = "";
-	list.forEach(e=>{
-	res += '<button type="button" onclick="insertaTag(this)" value= \"' + e + '\" class="btn btn-success mr-1">'+e+'</button>';
-	})
+function htmlList(list, texto_dst) {
+	var res = '';
+	list.forEach( valor => {
+		res += `<button type="button" onclick="insertaTag(this,'${texto_dst}')" value="${ valor }" class="btn btn-success mr-1">${ valor }</button>`; //TODO: dejarle el estilo del boton al que llama
+	});
 	return res;
 }
 
-function getMatchingTags(pattern){
-    if(!pattern){ //A: No hay nada para buscar
-    	return [];
-    }
-    return filterSubstring(TagsYUsuarios,pattern);
+function getMatchingTags(pattern) {
+	if(!pattern){ return []; } //A: No hay nada para buscar
+	return filterSubstring(TagsYUsuarios,pattern);
+}
+
+function insertaTag(valor, texto_dst) {
+	insertAtCursor(texto_dst, valor.value);
 }
     
-function showTagsButtons(pattern, dst){
-	var result = document.querySelector(dst || '.result');
+function showTagButtons(pattern, tags_dst, texto_dst) { //U: para conectar con onKeyUp de un input, y pasarle el selector de la div donde aparecen los tags, y el textarea donde insertarlos
+	var result = document.querySelector(tags_dst || '.result');
 	let matching = getMatchingTags(pattern);
-	result.innerHTML = htmlList(matching);
+	result.innerHTML = htmlList(matching, texto_dst);
 } 
 
-function insertaTag(valor){
-	textArea =  document.querySelector('#id_texto');
-	textArea.insertAdjacentHTML("afterBegin", valor.value + ' ');
-}
 traerTags();
 traerUsuarios();
