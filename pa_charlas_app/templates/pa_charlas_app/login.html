@@ -2,15 +2,28 @@
 {% block title %}Sign in{% endblock %}
 
 {% block content %}
+
+{% if request.user.is_authenticated %}
+<p>Agregá todas tus redes para vincularlas al mismo nombre de usuario</p>
+{% else %}
 <p>Para poder escribir y ver más cosas en PodemosAprender necesitás iniciar sesión</p>
+{% endif %}
+
 <div class="row">
-  <div class="col-md-4 social-buttons">
-		<a class="btn btn-block btn-social btn-facebook" href="{% url "social:begin" "facebook" %}">
-			<span class="fa fa-facebook"></span> Sign in with Facebook
-		</a>
-    <a class="btn btn-block btn-social btn-google" href="{% url "social:begin" "google-oauth2" %}">
-			<span class="fa fa-google"></span> Sign in with Google
-		</a>
+  <div class="col-md-12 social-buttons">
+		<div>
+			<a class="btn col-md-4 btn-social btn-facebook" href="{% url "social:begin" "facebook" %}">
+				<span class="fa fa-facebook"></span> Registrarse con Facebook
+			</a>
+			{% if "facebook" in redes %} te registraste como {{ redes.facebook }} {% endif %}
+		</div>
+		
+		<div>
+			<a class="btn col-md-4 btn-social btn-google" href="{% url "social:begin" "google-oauth2" %}">
+				<span class="fa fa-google"></span> Registrarse con Google
+			</a>
+			{% if "google" in redes %} te registraste como {{ redes.google }} {% endif %}
+		</div>
 	</div>
 </div>
 {% endblock %}

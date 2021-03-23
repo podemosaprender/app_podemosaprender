@@ -15,7 +15,8 @@ import datetime
 
 from .models import (
 	Texto, texto_guardar, textos_de_usuario,
-	Charla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo
+	Charla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
+	redes_de_usuario
 )
 from .forms import TextoForm
 
@@ -35,7 +36,9 @@ def z1_to_hex(zero_to_one_values_list): #U: covierte una lista de valores 0 a 1 
 
 # S: sesion ################################################
 def login(request): #U: pantalla de login con botones de google, facebook, etc
-  return render(request, 'pa_charlas_app/login.html')
+	redes = redes_de_usuario(request.user) if request.user.is_authenticated else {}
+	#DBG: redes = {'facebook':12345, 'google':31}
+	return render(request, 'pa_charlas_app/login.html', {'redes': redes})
 
 from social_django.models import UserSocialAuth
 import base64
