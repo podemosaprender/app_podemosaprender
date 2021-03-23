@@ -1,0 +1,13 @@
+/* defino el estilo de los botones para nueva charla, nuevo texto y guardar*/
+
+.btn-primary {
+    color: #fff;
+    background-color: #7100ec;
+    border-color: #7100ec;
+}
+
+/* defino el estilo de los botones para copartir edit y copiar para que no se afecten por la clase anterior*/
+.btn-accesible {
+    border-color: #0069EA;
+    color: #0069EA;
+}

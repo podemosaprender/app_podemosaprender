@@ -28,7 +28,7 @@
 
 	{% block item_links %}
 		{% if item.de_quien == request.user and puede_crear %}
-			<a href="{% url 'charla_texto_edit' charla_pk=charla.pk pk=item.pk %}" class="btn btn-primary "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">editar</span></a>
+			<a href="{% url 'charla_texto_edit' charla_pk=charla.pk pk=item.pk %}" class="btn btn-accesible "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">editar</span></a>
 		{% endif %}
 
 		{% url_full 'texto_detail' pk=item.pk as permalink %}
@@ -48,7 +48,7 @@
 	<ul>
 	{% for participacion in participantes %}
 		<li><a href="#{{ participacion.texto__de_quien__username }}__{{ participacion.fh_ultimo|date:'U' }}">
-		{{ participacion.texto__de_quien__username }}: {{ participacion.fh_ultimo }} 
+		{{ participacion.texto__de_quien__username }}: {{ participacion.fh_ultimo }}
 		</a></li>
 	{% endfor %}
 	</ul>
