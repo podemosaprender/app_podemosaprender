@@ -61,9 +61,9 @@ class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuari
 from .hashtags import hashtags_en
 def conUserYFecha_guardar(form, user, commit= True):
 	obj= form.save(commit=False)
-	if not 'de_quien' in obj.__dict__ or obj.de_quien is None: #A: es nuevo
+	if (not 'de_quien_id' in obj.__dict__) or obj.de_quien is None: #A: Si no tiene autor es nuevo 
 		obj.de_quien= user
-		obj.fh_creado= timezone.now()
+		obj.fh_creado= timezone.now() 
 	elif obj.de_quien != user: #A: no era el autor!
 		raise PermissionDenied	
 	else:
@@ -72,7 +72,6 @@ def conUserYFecha_guardar(form, user, commit= True):
 	#A: no debe pasar de aca si no es el duño del objeto	
 	if 'fh_editado' in obj.__dict__: 
 		obj.fh_editado= timezone.now()
-		logger.debug('set fh_editado')	
 	#A: si tiene un field fh_editado lo actualizamos
 
 	if commit:
@@ -159,5 +158,11 @@ def charlas_que_sigo(user):
 		.values('pk','titulo','visita__fh_visita')
 		.annotate(fh_ultimo= models.Max('textos__fh_editado'))
 	)
-	return qc
-	
+	return qc	
+
+def textos_de_usuario(user): #U: Trae todos los textos hechos por une user
+	q = (
+		Texto.objects
+		.filter(de_quien = user)
+	)
+	return q
