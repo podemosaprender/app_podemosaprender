@@ -37,10 +37,12 @@ def z1_to_hex(zero_to_one_values_list): #U: covierte una lista de valores 0 a 1 
 def login(request): #U: pantalla de login con botones de google, facebook, etc
   return render(request, 'pa_charlas_app/login.html')
 
+from social_django.models import UserSocialAuth
 import base64
 import hashlib
 import hmac
 from django.conf import settings
+from django import urls
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 @method_decorator(csrf_exempt, name='dispatch')
@@ -49,6 +51,7 @@ class FacebookDataDeletionView(View): #U: para eliminar datos como pide Facebook
 	def post(self, request, *args, **kwargs): #U: facbook nos manda un post
 		try:
 			signed_request = request.POST['signed_request']
+			print(f'FACEBOOK delete req {signed_request}')
 			encoded_sig, payload = signed_request.split('.')
 		except (ValueError, KeyError):
 			return HttpResponse(status=400, content='Invalid request')
@@ -74,13 +77,24 @@ class FacebookDataDeletionView(View): #U: para eliminar datos como pide Facebook
 
 		user_id= decoded_payload['user_id'] #A: user_id segun facebook
 
+		print(f'FACEBOOK DELETE user_id={user_id}')
 		try:
-			fb_user_account = FacebookUserModel.objects.filter(fb_userid=user_id) #.delete()
-			logger.info(f'FACEBOOK DELETE {fb_user_account}')
+			fb_user_account = UserSocialAuth.objects.get(uid=user_id, provider='facebook')
+			fb_user_account.delete()
+			logger.info(f'FACEBOOK DELETED {fb_user_account}')
 		except FacebookLoginDetails.DoesNotExist:
 			return HttpResponse(status=200)
 
-		return HttpResponse(status=200)
+		code= f'{timezone.now().toordinal():x}'
+		response_data= {
+			'url': request.build_absolute_uri( urls.reverse('facebook_delete_data_check', kwargs= {'code': code}) ),
+			'confirmation_code': code,
+		}
+		return HttpResponse(json.dumps(response_data), content_type="application/json", status=200)
+
+class FacebookDataDeletionCheckView(View): #U: para eliminar datos como pide Facebook
+	def get(self, request, *args, **kwargs): #U: facbook nos manda un post
+		return HttpResponse('Your data has been deleted', status=200)
 
 # S: texto como imagen ####################################
 
