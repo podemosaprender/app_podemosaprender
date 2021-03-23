@@ -14,7 +14,7 @@ import os
 import datetime
 
 from .models import (
-	Texto, texto_guardar,
+	Texto, texto_guardar, textos_de_usuario,
 	Charla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo
 )
 from .forms import TextoForm
@@ -266,5 +266,5 @@ def usuario_texto_list(request, username=None, pk=None): #U: los textos de UNA c
 		user= get_object_or_404(User, pk=pk)
 	else:
 		user= get_object_or_404(User, username= username)
-	textos= Texto.objects.filter(de_quien=user).order_by('fh_creado').all()
+	textos= textos_de_usuario(user).order_by('fh_creado').all()
 	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'titulo': user.username})
