@@ -10,13 +10,20 @@
 {% endif %}
 
 <div class="row">
-  <div class="col-md-4 social-buttons">
-		<a class="btn btn-block btn-social btn-facebook" href="{% url "social:begin" "facebook" %}">
-			<span class="fa fa-facebook"></span> Registrarse con Facebook
-		</a>
-    <a class="btn btn-block btn-social btn-google" href="{% url "social:begin" "google-oauth2" %}">
-			<span class="fa fa-google"></span> Registrarse con Google
-		</a>
+  <div class="col-md-12 social-buttons">
+		<div>
+			<a class="btn col-md-4 btn-social btn-facebook" href="{% url "social:begin" "facebook" %}">
+				<span class="fa fa-facebook"></span> Registrarse con Facebook
+			</a>
+			{% if "facebook" in redes %} te registraste como {{ redes.facebook }} {% endif %}
+		</div>
+		
+		<div>
+			<a class="btn col-md-4 btn-social btn-google" href="{% url "social:begin" "google-oauth2" %}">
+				<span class="fa fa-google"></span> Registrarse con Google
+			</a>
+			{% if "google" in redes %} te registraste como {{ redes.google }} {% endif %}
+		</div>
 	</div>
 </div>
 {% endblock %}

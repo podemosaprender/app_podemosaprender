@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+import re
 
 from .models_extra import * #A: para que agregue otros lookups como like 
 
@@ -166,3 +167,10 @@ def textos_de_usuario(user): #U: Trae todos los textos hechos por une user
 		.filter(de_quien = user)
 	)
 	return q
+
+def redes_de_usuario(user): #U: Diccionario red -> usr_id
+	r = {}
+	for red in user.social_auth.all():
+		provider = re.sub(r'-.*', '', red.provider) #A: google-oatuh -> google
+		r[provider] = red.uid
+	return r
