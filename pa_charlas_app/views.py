@@ -1,7 +1,7 @@
 #SEC: manejamos login_required en urls.py
 
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.list import ListView
+from django.views.generic.list import View, ListView
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponseRedirect, HttpResponse
@@ -36,6 +36,51 @@ def z1_to_hex(zero_to_one_values_list): #U: covierte una lista de valores 0 a 1 
 # S: sesion ################################################
 def login(request): #U: pantalla de login con botones de google, facebook, etc
   return render(request, 'pa_charlas_app/login.html')
+
+import base64
+import hashlib
+import hmac
+from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+@method_decorator(csrf_exempt, name='dispatch')
+class FacebookDataDeletionView(View): #U: para eliminar datos como pide Facebook
+	#VER: https://developers.facebook.com/docs/development/create-an-app/app-dashboard/data-deletion-callback/#implementing
+	def post(self, request, *args, **kwargs): #U: facbook nos manda un post
+		try:
+			signed_request = request.POST['signed_request']
+			encoded_sig, payload = signed_request.split('.')
+		except (ValueError, KeyError):
+			return HttpResponse(status=400, content='Invalid request')
+
+		try:
+			decoded_payload = base64.urlsafe_b64decode(payload + "==").decode('utf-8')
+			decoded_payload = json.loads(decoded_payload)
+
+			if type(decoded_payload) is not dict or 'user_id' not in decoded_payload.keys():
+				return HttpResponse(status=400, content='Invalid payload data')
+		except (ValueError, json.JSONDecodeError):
+			return HttpResponse(status=400, content='Could not decode payload')
+
+		try:
+			secret= settings.SOCIAL_AUTH_FACEBOOK_SECRET
+			sig= base64.urlsafe_b64decode(encoded_sig + "==")
+			expected_sig= hmac.new(bytes(secret, 'utf-8'), bytes(payload, 'utf-8'), hashlib.sha256)
+		except:
+			return HttpResponse(status=400, content='Could not decode signature')
+
+		if not hmac.compare_digest(expected_sig.digest(), sig):
+			return HttpResponse(status=400, content='Invalid request')
+
+		user_id= decoded_payload['user_id'] #A: user_id segun facebook
+
+		try:
+			fb_user_account = FacebookUserModel.objects.filter(fb_userid=user_id) #.delete()
+			logger.info(f'FACEBOOK DELETE {fb_user_account}')
+		except FacebookLoginDetails.DoesNotExist:
+			return HttpResponse(status=200)
+
+		return HttpResponse(status=200)
 
 # S: texto como imagen ####################################
 

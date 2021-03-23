@@ -21,6 +21,7 @@ urlpatterns = [
 	#A: documentacion y autenticacion de la api REST
 
 	path("login/", views.login, name="login"),
+	path("facebook_delete_data/", views.FacebookDataDeletionView.as_view(), name="facebook_delete_data"),
 	#A: login desde la UI web
 
 	path('charla/', views.CharlaQueSigoListView.as_view(), name='charla_quesigo_list' ),
