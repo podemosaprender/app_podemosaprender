@@ -38,60 +38,75 @@
           <li class="nav-item text-nowrap">
             <a href="/usuario" class="nav-link" >Usuarios</a>
           </li>
-          <li class="nav-item text-nowrap">
-          {% if user.is_authenticated %}
-            <a href="/logout" class="nav-link" >logout {{ user.username }}</a>
-          {% else %}
-            <a href="/login" class="nav-link">login</a>
-           {% endif %}
-          </li>
-        </ul>
-      </nav>
-    </header>
 
-    <!-- Begin page content -->
-    <main role="main" class="container">
-      {% block content %}{% endblock %}
-    </main>
+          {% if user.is_authenticated %}
+						<li class="nav-item dropdown">
+							<a class="nav-link" id="user_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								{{ user.username }}
+
+								<i class="fa fa-user-circle"></i>
+							</a>
+							<div class="dropdown-menu bg-dark" aria-labelledby="user_dropdown">
+								<a href="/login" class="dropdown-item nav-link" >Asociar otra red</a> 
+								<a href="/logout" class="dropdown-item nav-link" >Desconectarme</a> 
+							</div>
+						</li>
+					{% else %}
+						<li class="nav-item text-nowrap">
+							<a href="/login" class="nav-link">
+								registrarme
+								<i class="fa fa-user-circle"></i>
+							</a>
+						</li>
+					{% endif %}
+					</li>
+				</ul>
+			</nav>
+		</header>
+
+		<!-- Begin page content -->
+		<main role="main" class="container">
+			{% block content %}{% endblock %}
+		</main>
 
 		<footer class="footer">
-				<div class="container">
-					<span>All rights reserved. &copy;
-						<a href="https://www.podemosaprender.org">PodemosAprender</a> |
-						<a href="{% static 'tos.html' %}">Terms of Service</a> |
-						<a href="{% static 'privacy.html' %}">Privacy Policy</a> |
-						<a href="{% static 'contact.html' %}">Contact Us</a>
-					</span>
-				</div>
+			<div class="container">
+				<span>All rights reserved. &copy;
+					<a href="https://www.podemosaprender.org">PodemosAprender</a> |
+					<a href="{% static 'tos.html' %}">Terms of Service</a> |
+					<a href="{% static 'privacy.html' %}">Privacy Policy</a> |
+					<a href="{% static 'contact.html' %}">Contact Us</a>
+				</span>
+			</div>
 		</footer>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-		<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-	  <script src="{% static 'pa_lib/js/lib.js' %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-      function limpiar_indent(src) {
-        indent_min= 999; //A: por defecto un maximo grosero
-        let lineas= src.split('\n'); //A: separamos en lineas
-        lineas.forEach( linea => {
-          let indent= linea.match(/^(\s*)\S/); //A: indent tiene los espacios del principio
-          if (indent && indent_min>indent[1].length) { //A: tenia menos indent q las anteriores
-            indent_min= indent[1].length; //A: nuevo minimo
-          }
-        });
-        //A: tengo el indent minimo
-        return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
-      }
+		<!-- Bootstrap core JavaScript
+			================================================== -->
+			<!-- Placed at the end of the document so the pages load faster -->
+			<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+			<script src="{% static 'pa_lib/js/lib.js' %}"></script>
+			<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+			<script>
+				function limpiar_indent(src) {
+									indent_min= 999; //A: por defecto un maximo grosero
+									let lineas= src.split('\n'); //A: separamos en lineas
+									lineas.forEach( linea => {
+														let indent= linea.match(/^(\s*)\S/); //A: indent tiene los espacios del principio
+														if (indent && indent_min>indent[1].length) { //A: tenia menos indent q las anteriores
+																			indent_min= indent[1].length; //A: nuevo minimo
+																		}
+													});
+									//A: tengo el indent minimo
+									return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
+								}
 
-      md_els= document.querySelectorAll('.markdown')
-      md_els.forEach( el => {
-        el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html
-        //DBG: console.log(x)
-      })
-    </script>
-  </body>
+				md_els= document.querySelectorAll('.markdown')
+				md_els.forEach( el => {
+									el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html
+									//DBG: console.log(x)
+								})
+			</script>
+	</body>
 </html>
