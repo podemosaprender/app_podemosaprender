@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="{% static 'pa_lib/css/bootstrap-social.3p.css' %}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.1/build/styles/default.min.css">
+    <link rel="stylesheet" href="{% static '3p/css/highlight_dracula.css' %}">
+
     <link rel="stylesheet" href="{% static 'pa_lib/css/page-footer-sticky.css' %}">
     <link rel="stylesheet" href="{% static 'pa_lib/css/estilos-botones.css' %}">
     <link rel="stylesheet" href="{% static 'pa_lib/css/estilos-link-footer.css' %}">
@@ -88,6 +92,7 @@
 			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 			<script src="{% static 'pa_lib/js/lib.js' %}"></script>
 			<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+			<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.1/build/highlight.min.js"></script>
 			<script>
 				function limpiar_indent(src) {
 									indent_min= 999; //A: por defecto un maximo grosero
@@ -107,6 +112,10 @@
 									el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html
 									//DBG: console.log(x)
 								})
+
+				
+    		hljs.highlightAll();  //A: despues de transformar en pre code, aplicamos highlighting
 			</script>
+
 	</body>
 </html>
