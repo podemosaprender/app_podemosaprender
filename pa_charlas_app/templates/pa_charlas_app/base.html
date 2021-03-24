@@ -95,26 +95,41 @@
 			<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.1/build/highlight.min.js"></script>
 			<script>
 				function limpiar_indent(src) {
-									indent_min= 999; //A: por defecto un maximo grosero
-									let lineas= src.split('\n'); //A: separamos en lineas
-									lineas.forEach( linea => {
-														let indent= linea.match(/^(\s*)\S/); //A: indent tiene los espacios del principio
-														if (indent && indent_min>indent[1].length) { //A: tenia menos indent q las anteriores
-																			indent_min= indent[1].length; //A: nuevo minimo
-																		}
-													});
-									//A: tengo el indent minimo
-									return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
-								}
+					indent_min= 999; //A: por defecto un maximo grosero
+					let lineas= src.split('\n'); //A: separamos en lineas
+					lineas.forEach( linea => {
+						let indent= linea.match(/^(\s*)\S/); //A: indent tiene los espacios del principio
+						if (indent && indent_min>indent[1].length) { //A: tenia menos indent q las anteriores
+											indent_min= indent[1].length; //A: nuevo minimo
+							}
+					});
+					//A: tengo el indent minimo
+					return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
+				}
+
+				function domInsertAfter(newNode, referenceNode) {
+					referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+				}
+
+				marked.setOptions({
+					highlight: function(code, language) { //A: controlo el highlighting de cada bloque
+						const codeClean= code.replace(/&lt;/g,'<').replace(/&gt;/,'>'); //A: revierto el escape de django
+						const highlighted= hljs.highlightAuto(codeClean);
+						//DBG: console.log("code", codeClean, highlighted);
+						return highlighted.value;
+					},
+				});
 
 				md_els= document.querySelectorAll('.markdown')
 				md_els.forEach( el => {
-									el.innerHTML= marked(x= limpiar_indent(el.innerHTML)) //A: convierto markdown a html
-									//DBG: console.log(x)
-								})
+					markedHtml= marked(x= limpiar_indent(el.innerHTML));
+					markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
+					markedEl.insertAfter(el); //A: lo puse a continuacion del original
+					jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original
+					//DBG: console.log(x)
+				})
 
-				
-    		hljs.highlightAll();  //A: despues de transformar en pre code, aplicamos highlighting
+				$('code').addClass('hljs'); //A: le agrego a los elementos code ele stilo de hljs	
 			</script>
 
 	</body>
