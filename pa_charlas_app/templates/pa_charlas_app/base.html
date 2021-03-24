@@ -119,17 +119,25 @@
 						return highlighted.value;
 					},
 				});
+				function elementosMarkdownAHtml() {
 
-				md_els= document.querySelectorAll('.markdown')
-				md_els.forEach( el => {
-					markedHtml= marked(x= limpiar_indent(el.innerHTML));
-					markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
-					markedEl.insertAfter(el); //A: lo puse a continuacion del original
-					jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original
-					//DBG: console.log(x)
-				})
+					md_els= document.querySelectorAll('.markdown')
+					md_els.forEach( el => {
+						//TODO: No reemplazar hash en urls
+						txt_con_tags = el.innerHTML.replace(/#([A-Za-z0-9_]+)/g, hashtagAMarkdownLink)//A: busco y reemplazo hashtags con links markdown
+						txt_con_usuarios = txt_con_tags.replace(/@([A-Za-z0-9_]+)/g, usuarioAMarkdownLink)//A: busco y reemplazo usuarios con links markdown
+						markedHtml= marked(x= limpiar_indent(txt_con_usuarios)); //A: convierto markdown a html
+						markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
+						markedEl.insertAfter(el); //A: lo puse a continuacion del original
+						jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original
+						//DBG: console.log(x)
+					});
+					$('code').addClass('hljs'); //A: le agrego a los elementos code ele stilo de hljs	
+				}
+				
+				traerDatos().done(elementosMarkdownAHtml);
 
-				$('code').addClass('hljs'); //A: le agrego a los elementos code ele stilo de hljs	
+				
 			</script>
 
 	</body>

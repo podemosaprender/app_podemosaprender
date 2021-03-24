@@ -61,11 +61,13 @@ function insertAtCursor(el_o_selector, textoAInsertar) { //U: inserta texto dond
 //S: Autocompletar tags
 
 
-Tags = []; //U: hashTags disponibles
+Tags = []; //U: hashTags disponibles sin casual
+TagsTodos = []; 
 TagsYUsuarios = []; //U: hashtags y usuarios disponibles
+UsuariosPk = {};//U: usuarios con su pk disponibles
 
 function traerTags(){
-	$.ajax({
+	return $.ajax({
 		type: 'GET',
 		url:'/api/charla/', 
 	})
@@ -77,30 +79,34 @@ function recordarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga
 		if ( ! tag.titulo.startsWith("#casual")) { //A: solo incluir los que no empiezan con casual
 			Tags.push(tag.titulo);
 		}
+		TagsTodos.push(tag.titulo);
 	};
+
 };
 
 function traerUsuarios(){
-	$.ajax({
+	return $.ajax({ 
 		type: 'GET',
-		url:'/api/participante/', //TODO: de aca los queremos sacar o API mas especifica?
-	}).done( recordarUsuarios );
+		url:'/api/participante/',
+	}).done( recordarUsuariosPk );
 }
 
-function recordarUsuarios(usuarios) { 
+function recordarUsuariosPk(usuarios) { 
 	let users = [];
 	for (let user of usuarios.results) {
-		users.push('@'+user.username);
+		users.push('@'+user.username+' '); //A: Se carga array con usuarios traidos desde la api
 	}
-	for(var i = users.length -1; i >=0; i--) { 
-		//TODO: que hace este codigo? por que es necesario?
-		if(users.indexOf(users[i]) !== i) users.splice(i,1);
-  }
-	TagsYUsuarios = Tags.concat(users);
+	for (let usuario_pk of usuarios.results) {
+		UsuariosPk[ usuario_pk.username ]= usuario_pk.pk; //A: Se carga array con usuarios y sus pk traidos desde la api
+	}
+	TagsYUsuarios = Tags.concat(users); //A: Se unifican arrays de usuarios y hashtags
 	//DBG: console.log(TagsYUsuarios);
 }
+function traerDatos() {
+	return traerTags().done(traerUsuarios);
+}
 
-
+/************************************************************************** */
 
 //Autocompletar#############################
 
@@ -133,3 +139,27 @@ function showTagButtons(pattern, tags_dst, texto_dst) { //U: para conectar con o
 
 traerTags();
 traerUsuarios();
+
+/************************************************************************** */
+
+//Convertir hashtags y usuarios dentro del texto en links markdown
+
+
+
+function hashtagAMarkdownLink(hashtag) {
+	//TODO: revisar si es una charla que existe, sino devolverlo tal cual
+	if (TagsTodos.indexOf(hashtag) > -1) { //A: el tag está en la lista de charlas
+		return `[${hashtag}](/charla/${hashtag.slice(1)})` //A: con forma de link markdown
+	}
+	else {
+		return hashtag;
+	}
+}		
+
+function usuarioAMarkdownLink(usuario) {
+	const username = usuario.slice(1);//A: sin @
+	const pk = UsuariosPk[username];
+	//DBG:console.log(usuario, JSON.stringify(username), pk, UsuariosPk	)
+
+	return `[${usuario}](/usuario/${pk})` //A: con forma de link markdown
+}	
