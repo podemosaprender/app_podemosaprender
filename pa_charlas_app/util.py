@@ -119,7 +119,7 @@ def fechas_generadores_para(tag, fecha_min, semanas_max):
 	return generadores
 
 def tags_a_schedule(tags, fecha_min, fecha_max):
-	semanas_max = (fecha_max - fecha_min).days / 7 + 8 #A: Por si el primero del mes es el mes siguiente
+	semanas_max = (fecha_max - fecha_min).days // 7 + 8 #A: Por si el primero del mes es el mes siguiente
 
 	fechas_ordenadas = sorted([
 		(fecha[0], fecha[1]['tag'])
@@ -128,7 +128,7 @@ def tags_a_schedule(tags, fecha_min, fecha_max):
 		for fecha in generador
 	])
 
-	schedule = filter(lambda (fecha, tag): fecha_min <= fecha and fecha <= fecha_max, fechas_ordenadas)
+	schedule = filter(lambda fecha: fecha_min <= fecha[0] and fecha[0] <= fecha_max, fechas_ordenadas)
 
 	return schedule
 
