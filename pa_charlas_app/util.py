@@ -123,13 +123,12 @@ def fechas_generadores_para(tag, fecha_min, semanas_max):
 			for mes in d['en_que_meses']:
 				for dia_semana in d['en_que_dias']:
 					if nro_en_mes == 0: #A: Todos del mes
-						for j in range(2): #A: Lo calculo para este anio y el siguiente
-							generadores.append([
-								(fecha, d)
-								for i in range(semanas_max)
-								for fecha in [primero_del_mes(dia_semana, mes, anio_desde + j) + dt.timedelta(days = 7 * i)]
-								if fecha.month == mes #A: No me sali de este mes
-							])
+						generadores.append([
+							(fecha, d)
+							for i in range(semanas_max)
+							for fecha in [primero_del_mes(dia_semana, mes, anio_desde) + dt.timedelta(days = 7 * i)]
+							if fecha.month == mes #A: No me sali de este mes
+						])
 					elif nro_en_mes > 0: #A: Alguno especifico del mes
 						generadores.append([
 							(primero_del_mes(dia_semana, mes, anio_desde + i) + dt.timedelta(days = (nro_en_mes - 1) * 7), d)
