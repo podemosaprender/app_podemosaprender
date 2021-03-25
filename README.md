@@ -87,6 +87,30 @@ Por ahora la podes probar obteniendo un token con
 curl -X POST -H "Content-Type: application/json" -d '{"username":"tuusuario", "password": "tuclave"}' http://127.0.0.1:8000/api/token/
 ~~~
 
+## Calendario y hashtags
+
+Queremos que sea fácil escribir qué día organizás una actividad  
+
+Queremos que sea fácil mostrar un calendario  
+
+Patrones para los titulos de charla  
+
+~~~
+dia_
+dia_sabado_1ro_cada_mes
+dia_sabado_2do_cada_mes
+dia_sabado_1_antes_fin_de_mes
+dia_sabado_antes_fin_de_mes
+dia_sabado_de_enero
+
+dia_23_marzo_2021_13hs
+dia_lunes_a_viernes_19hs
+dia_lunes_miercoles_viernes_19hs
+
+dia_sabado_1ro_marzo
+dia_sabado_1ro_junio_julio
+dia_sabado_1ro_marzo_a_junio
+~~~
 
 ## Para más adelante
 
