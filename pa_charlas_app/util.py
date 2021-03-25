@@ -90,7 +90,10 @@ def fechas_generadores_para(tag, fecha_min, semanas_max):
 	anio_desde = fecha_min.year
 	d = tag_fecha_a_calendario(tag)
 	if d['tipo'] == 'una_vez':
-		fecha = dt.datetime(d['anio'], d['mes'], d['dia'], d['hora'])
+		if 'hora' in d:
+			fecha = dt.datetime(d['anio'], d['mes'], d['dia'], d['hora'])
+		else:
+			fecha = dt.datetime(d['anio'], d['mes'], d['dia'])
 		if (fecha >= fecha_min):
 			generadores.append([(fecha, d)])
 	elif d['tipo'] == 'periodico':
@@ -115,6 +118,23 @@ def fechas_generadores_para(tag, fecha_min, semanas_max):
 						(primero_del_mes(dia_semana, mes_desde + i + 1, anio_desde) + dt.timedelta(days = nro_en_mes * 7), d) #A: nro_en_mes < 0 y pedi primer dia_semana del mes siguiente, => -1 ultimo de este mes
 						for i in range(semanas_max)
 					])
+		elif d['es_cada_mes'] == 0:
+			nro_en_mes = d['nro_en_mes']
+			for mes in d['en_que_meses']:
+				for dia_semana in d['en_que_dias']:
+					if nro_en_mes == 0: #A: Todos del mes
+						for j in range(2): #A: Lo calculo para este anio y el siguiente
+							generadores.append([
+								(fecha, d)
+								for i in range(semanas_max)
+								for fecha in [primero_del_mes(dia_semana, mes, anio_desde + j) + dt.timedelta(days = 7 * i)]
+								if fecha.month == mes #A: No me sali de este mes
+							])
+					elif nro_en_mes > 0: #A: Alguno especifico del mes
+						generadores.append([
+							(primero_del_mes(dia_semana, mes, anio_desde + i) + dt.timedelta(days = (nro_en_mes - 1) * 7), d)
+							for i in range(2) #A: Lo calculo para este anio y el siguiente
+						])
 
 	return generadores
 
