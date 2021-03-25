@@ -1,3 +1,4 @@
+import datetime as dt
 import re
 
 DiasNombre = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'] #A: Para python Lunes = 0
@@ -53,21 +54,81 @@ def tag_fecha_a_calendario(tag): #U: Convierte el texto de un tag fecha a un dic
 				en_que_dias = DiasNombre[idx0:(idx1 + 1)]
 
 			en_que_dias_num = list(map(DiasNombre.index, en_que_dias))
-			en_que_meses_num = list(map(MesesNombre.index, en_que_meses))
+			en_que_meses_num = list(map(lambda m: MesesNombre.index(m) + 1, en_que_meses))
 
 			result = {'tipo': 'periodico', 'tag': tag, 'nro_en_mes':numero, 'en_que_dias': en_que_dias_num, 'en_que_meses': en_que_meses_num, 'es_cada_mes': es_cada_mes}
 		else: #A: dia_23_marzo_2021 
 			m = re.search(r'dia_(\d+)_([a-z]+)_(\d+)', tag)
 			if not m is None and m.group(2) in MesesNombre:
 				dia = int(m.group(1))
-				mes = MesesNombre.index(m.group(2))
+				mes = MesesNombre.index(m.group(2)) + 1
 				anio = int(m.group(3))
 				result = {'tipo': 'una_vez', 'tag': tag, 'dia': dia, 'mes': mes, 'anio': anio}
 		
 		m = re.search(r'(\d+)hs', tag)
 		if not m is None:
-			result['hora'] = m.group(1)
+			result['hora'] = int(m.group(1))
 
 		#A: Si el formato es incorrecto tipo es 'error'
 
 	return result
+
+def primero_del_mes(dia_semana, mes, anio):
+	if mes > 12:
+		anio += mes // 12
+		mes = ((mes - 1) % 12) + 1
+	dia_1 = dt.datetime(anio, mes, 1)
+	dia_semana_1 = dia_1.weekday()
+	delta = dia_semana - dia_semana_1 + (7 if dia_semana_1 > dia_semana else 0)
+	dia = dt.datetime(anio, mes, 1 + delta)
+	return dia
+
+def fechas_generadores_para(tag, fecha_min, semanas_max):
+	generadores = []
+	dia_desde = fecha_min.day
+	mes_desde = fecha_min.month
+	anio_desde = fecha_min.year
+	d = tag_fecha_a_calendario(tag)
+	if d['tipo'] == 'una_vez':
+		fecha = dt.datetime(d['anio'], d['mes'], d['dia'], d['hora'])
+		if (fecha >= fecha_min):
+			generadores.append([(fecha, d)])
+	elif d['tipo'] == 'periodico':
+		if d['es_cada_mes'] != 0:
+			nro_en_mes = d['nro_en_mes']
+			dia_1 = dt.datetime(anio_desde, mes_desde, 1)
+			dia_semana_1 = dia_1.weekday()
+			for dia_semana in d['en_que_dias']:
+				if nro_en_mes == 0: #A: Se repite todas las semanas
+					dia_0 = primero_del_mes(dia_semana, mes_desde, anio_desde)
+					generadores.append([
+						(dia_0 + dt.timedelta(days = i * 7), d)
+						for i in range(semanas_max)
+					])
+				elif nro_en_mes > 0: #A: cada_mes
+					generadores.append([
+						(primero_del_mes(dia_semana, mes_desde + i, anio_desde) + dt.timedelta(days = (nro_en_mes - 1) * 7), d)
+						for i in range(semanas_max)
+					])
+				elif nro_en_mes < 0:
+					generadores.append([
+						(primero_del_mes(dia_semana, mes_desde + i + 1, anio_desde) + dt.timedelta(days = nro_en_mes * 7), d) #A: nro_en_mes < 0 y pedi primer dia_semana del mes siguiente, => -1 ultimo de este mes
+						for i in range(semanas_max)
+					])
+
+	return generadores
+
+def tags_a_schedule(tags, fecha_min, fecha_max):
+	semanas_max = (fecha_max - fecha_min).days / 7 + 8 #A: Por si el primero del mes es el mes siguiente
+
+	fechas_ordenadas = sorted([
+		(fecha[0], fecha[1]['tag'])
+		for l in tags
+		for generador in fechas_generadores_para(l, fecha_min, semanas_max)
+		for fecha in generador
+	])
+
+	schedule = filter(lambda (fecha, tag): fecha_min <= fecha and fecha <= fecha_max, fechas_ordenadas)
+
+	return schedule
+
