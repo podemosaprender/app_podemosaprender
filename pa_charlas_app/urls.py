@@ -43,6 +43,8 @@ urlpatterns = [
 	path('charla/<str:charla_titulo>/', views.charla_texto_list, name='charla_texto_list_t'),
 	#A: en general miramos charlas por id o por titulo
 
+	path('evento/', views.evento_list, name='evento_list'),
+	#A: Agenda de eventos
 
 	path('usuario/', views.usuario_list, name='usuario_list'), #TODO: poner login_required?
 	path('usuario/<int:pk>/', views.usuario_texto_list, name='usuario_texto_list_k'), #TODO: poner login_required?

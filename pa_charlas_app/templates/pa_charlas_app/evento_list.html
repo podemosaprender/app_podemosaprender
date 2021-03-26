@@ -1,0 +1,26 @@
+{% extends 'pa_charlas_app/base_list.html' %}
+{% load pa_charlas_app_extras %}
+
+{% load bootstrap4 %}
+
+{% block item_titulo %}
+	{{ item.0|date:"l j F y" }}
+{% endblock %}
+
+{% block item_cuerpo %}
+	{% with k="#"|add:item.1 %}
+		{% with textos=charla_a_eventos|at_key:k %}
+			{% for texto in textos %}
+				<div class="markdown">
+{{ texto.texto }}
+				</div>
+			{% endfor %}
+		{% endwith %}
+	{% endwith %}
+{% endblock %}
+
+{% block item_links %}
+{% endblock %}
+
+{% block acciones_sin_item %}
+{% endblock %}

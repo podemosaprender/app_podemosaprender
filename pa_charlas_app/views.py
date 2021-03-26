@@ -16,9 +16,11 @@ import datetime
 from .models import (
 	Texto, texto_guardar, textos_de_usuario,
 	Charla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
-	redes_de_usuario
+	redes_de_usuario,
+	charlas_calendario
 )
 from .forms import TextoForm
+from .util import *
 
 import json
 import base64
@@ -271,3 +273,11 @@ def usuario_texto_list(request, username=None, pk=None): #U: los textos de UNA c
 		user= get_object_or_404(User, username= username)
 	textos= textos_de_usuario(user).order_by('fh_creado').all()
 	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'titulo': user.username})
+
+# S: Calendario de eventos #################################
+
+def evento_list(request):
+	schedule, charla_a_eventos = charlas_calendario(31)
+	
+	return render(request, 'pa_charlas_app/evento_list.html', {'object_list': schedule, 'charla_a_eventos': charla_a_eventos, 'titulo': 'Próximos Eventos'})
+
