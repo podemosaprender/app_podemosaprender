@@ -13,9 +13,15 @@ def addstr(arg1, arg2):
 	"""concatenate arg1 & arg2"""
 	return str(arg1) + str(arg2)
 
+@register.filter
+def at_key(a_dict, key):
+	"""Return element at key"""
+	return a_dict[key]
+
 @register.simple_tag(takes_context=True)
 def url_full(context,view,*args,**kwargs): #U: url con protocolo, host, puerto, ... para permalinks
 	logger.debug(f'url_full {view} {kwargs}')
 	uri= context.request.build_absolute_uri( urls.reverse(view, kwargs= kwargs) ) 
 	logger.debug(f'url_full {view} {kwargs} {uri}')
 	return uri
+

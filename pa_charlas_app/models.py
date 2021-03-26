@@ -2,9 +2,12 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-import re
 
 from .models_extra import * #A: para que agregue otros lookups como like 
+from .util import *
+
+import datetime as dt
+import re
 
 import logging
 logger = logging.getLogger(__name__)
@@ -164,6 +167,30 @@ def charlas_que_sigo(user):
 		.annotate(fh_ultimo= models.Max('textos__fh_editado'))
 	)
 	return qc	
+
+def charlas_calendario(dias_max = 1): #U: Todas las charlas programadas entre hoy y hoy+dias_max, devuelve (fecha, tag)
+	fecha_min = dt.datetime.today()
+	fecha_max = fecha_min + dt.timedelta(days = dias_max)
+
+	todas_las_charlas = Charla.objects.filter(titulo__startswith = '#dia_')
+	todos_los_eventos = (
+		Texto.objects
+		.filter(charlaitem__charla__id__in = todas_las_charlas)
+		.values('charlaitem__charla_id', 'charlaitem__charla__titulo', 'id', 'texto')
+		.order_by('charlaitem__charla__titulo')
+	)
+	charla_a_evento = {}
+	for evento in todos_los_eventos:
+		titulo = evento['charlaitem__charla__titulo']
+		a = charla_a_evento.get(titulo, [])
+		a.append(evento)
+		charla_a_evento[titulo] = a
+
+	todos_los_tags = [charla.titulo[1:] for charla in todas_las_charlas] #A: Saco el # del principio
+
+	schedule = tags_a_schedule(todos_los_tags, fecha_min, fecha_max)
+
+	return (schedule, charla_a_evento)
 
 def textos_de_usuario(user): #U: Trae todos los textos hechos por une user
 	q = (
