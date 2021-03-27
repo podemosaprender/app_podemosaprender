@@ -305,7 +305,20 @@ def evento_list_ical(request): #U: idem evento_list pero en formato icalendar pa
 			event['uid'] = f'texto/{evento["id"]}/{when.strftime("%Y%m%d")}'
 			#event['location'] = vText('Odense, Denmark')
 
-			event.add('summary', re.sub(r'#casual\S+','',evento['texto']))
+			txt= re.sub(r'#casual\S+','',evento['texto'])
+			if when.strftime('%H%M')=='0000': #A: no tiene horario
+				hour= 9 #DFLT
+				minute= 0	#DFLT
+				m= re.search('(\d+)(:(\d+))?hs', txt)
+				if not m is None:
+					hour= int(m.group(1))
+					minute= int(m.group(3)) if not m.group(3) is None else 0
+				when= dt.datetime(when.year, when.month, when.day, hour, minute)
+	
+			#FALLA CON GOOGLE #when= pytz.utc.localize( when + dt.timedelta(hours=3) ) #A: pasamos de Arg=GMT-3 a UTC
+			when= when + dt.timedelta(hours=3) #A: pasamos de Arg=GMT-3 a UTC
+
+			event.add('summary', txt)
 			event.add('dtstart', when)
 			event.add('dtend', when)
 			event.add('dtstamp', when_generated)

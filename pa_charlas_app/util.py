@@ -115,7 +115,7 @@ def fechas_generadores_para(tag, fecha_min, semanas_max):
 					])
 				elif nro_en_mes < 0:
 					generadores.append([
-						(primero_del_mes(dia_semana, mes_desde + i + 1, anio_desde) + dt.timedelta(days = nro_en_mes * 7), d) #A: nro_en_mes < 0 y pedi primer dia_semana del mes siguiente, => -1 ultimo de este mes
+						(primero_del_mes(dia_semana, mes_desde + 1 + i, anio_desde) + dt.timedelta(days = nro_en_mes * 7), d) #A: nro_en_mes < 0 y pedi primer dia_semana del mes siguiente, => -1 ultimo de este mes
 						for i in range(semanas_max)
 					])
 		elif d['es_cada_mes'] == 0:
@@ -140,14 +140,14 @@ def fechas_generadores_para(tag, fecha_min, semanas_max):
 def tags_a_schedule(tags, fecha_min, fecha_max):
 	semanas_max = (fecha_max - fecha_min).days // 7 + 8 #A: Por si el primero del mes es el mes siguiente
 
-	fechas_ordenadas = sorted([
+	fechas = [
 		(fecha[0], fecha[1]['tag'])
 		for l in tags
 		for generador in fechas_generadores_para(l, fecha_min, semanas_max)
 		for fecha in generador
-	])
+	]
 
-	schedule = filter(lambda fecha: fecha_min <= fecha[0] and fecha[0] <= fecha_max, fechas_ordenadas)
+	schedule = sorted(filter(lambda fecha: fecha_min <= fecha[0] and fecha[0] <= fecha_max, fechas))
 
 	return schedule
 

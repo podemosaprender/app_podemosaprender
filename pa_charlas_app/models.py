@@ -169,7 +169,8 @@ def charlas_que_sigo(user):
 	return qc	
 
 def charlas_calendario(dias_max = 1): #U: Todas las charlas programadas entre hoy y hoy+dias_max, devuelve (fecha, tag)
-	fecha_min = dt.datetime.today()
+	hoy_local = (dt.datetime.today() - dt.timedelta(hours=3)) #A: en hora de Arg TODO: usar locale compu
+	fecha_min = dt.datetime(hoy_local.year, hoy_local.month, hoy_local.day) #A: desde las 00:00
 	fecha_max = fecha_min + dt.timedelta(days = dias_max)
 
 	todas_las_charlas = Charla.objects.filter(titulo__startswith = '#dia_')
