@@ -14,7 +14,8 @@ django-cors-headers==3.7.0
 django-extensions==3.1.1
 django-restframework==0.0.1
 djangorestframework==3.12.2
-djangorestframework-simplejwt==4.4.0
+djangorestframework-simplejwt==4.6.0
+icalendar==4.0.7
 idna==2.10
 mysqlclient==2.0.3
 oauthlib==3.1.0
