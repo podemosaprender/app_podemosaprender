@@ -44,6 +44,7 @@ urlpatterns = [
 	#A: en general miramos charlas por id o por titulo
 
 	path('evento/', views.evento_list, name='evento_list'),
+	path('evento/ical/', views.evento_list_ical, name='evento_list_ical'),
 	#A: Agenda de eventos
 
 	path('usuario/', views.usuario_list, name='usuario_list'), #TODO: poner login_required?

@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django import forms
 import re
 import os
-import datetime
+import datetime as dt
 
 from .models import (
 	Texto, texto_guardar, textos_de_usuario,
@@ -243,7 +243,7 @@ def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de U
 	else:
 		charla= get_object_or_404(Charla, titulo= '#'+charla_titulo)
 
-	fh_visita_anterior= datetime.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
+	fh_visita_anterior= dt.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
 	if request.user.is_authenticated:
 		anteriores= Visita.objects.filter(de_quien= request.user, charla= charla)
 		if len(anteriores)>0: #A: ya vino antes
@@ -276,8 +276,42 @@ def usuario_texto_list(request, username=None, pk=None): #U: los textos de UNA c
 
 # S: Calendario de eventos #################################
 
-def evento_list(request):
+def evento_list(request): #U: lista de eventos proximos dias
 	schedule, charla_a_eventos = charlas_calendario(31)
 	
 	return render(request, 'pa_charlas_app/evento_list.html', {'object_list': schedule, 'charla_a_eventos': charla_a_eventos, 'titulo': 'Próximos Eventos'})
+
+def evento_list_ical(request): #U: idem evento_list pero en formato icalendar para importar eg en google, outlook
+	from icalendar import Calendar, Event, vCalAddress, vText
+	import pytz
+
+	when_generated= timezone.now()
+
+	cal = Calendar()
+	cal.add('prodid', '-//PodemosAprender//mxm.dk//')
+	cal.add('version', '2.0')
+
+	organizer = vCalAddress('MAILTO:cal@podemosaprender.org')
+	organizer.params['cn'] = vText('PodemosAprender')
+	organizer.params['role'] = vText('APP')
+
+	schedule, charla_a_eventos = charlas_calendario(31)
+
+	for (when, charla) in schedule:
+		print(when, charla)
+		for evento in charla_a_eventos[f'#{charla}']:
+			event = Event()
+			event['organizer'] = organizer
+			event['uid'] = f'texto/{evento["id"]}/{when.strftime("%Y%m%d")}'
+			#event['location'] = vText('Odense, Denmark')
+
+			event.add('summary', re.sub(r'#casual\S+','',evento['texto']))
+			event.add('dtstart', when)
+			event.add('dtend', when)
+			event.add('dtstamp', when_generated)
+			event.add('priority', 5)
+
+			cal.add_component(event)
+
+	return HttpResponse( cal.to_ical(), content_type='text/calendar')
 
