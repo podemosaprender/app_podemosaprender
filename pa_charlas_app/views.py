@@ -320,7 +320,7 @@ def evento_list_ical(request): #U: idem evento_list pero en formato icalendar pa
 
 			event.add('summary', txt)
 			event.add('dtstart', when)
-			event.add('dtend', when)
+			event.add('dtend', when+ dt.timedelta(hours=1))
 			event.add('dtstamp', when_generated)
 			event.add('priority', 5)
 
