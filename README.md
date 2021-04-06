@@ -87,6 +87,14 @@ Por ahora la podes probar obteniendo un token con
 curl -X POST -H "Content-Type: application/json" -d '{"username":"tuusuario", "password": "tuclave"}' http://127.0.0.1:8000/api/token/
 ~~~
 
+OjO! en hostm1 que tiene python 3.6.8 tuve que hacer un _downgrade_ de PyJWT, asi
+~~~
+pip install -r requirements.txt
+pip install PyJWT==1.7.1
+~~~
+
+puso unos carteles avisando que otro paquete necesita la version 2.0 pero no hay que hacerles caso porque esa es la version de PyJWT que no anda en esta de Python
+
 ## Calendario y hashtags
 
 Queremos que sea fácil escribir qué día organizás una actividad  
