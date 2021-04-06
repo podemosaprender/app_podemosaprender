@@ -6,13 +6,23 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from django.shortcuts import get_list_or_404, get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Charla, charla_participantes, Texto, User
 from .serializers import *
 
 from rest_framework.decorators import api_view
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def token_user(request, format=None):
+    content = {
+        'user': str(request.user),  # `django.contrib.auth.User` instance.
+        'auth': str(request.auth),  # None
+    }
+    return Response(content)
 
 class TextoViewSet(viewsets.ReadOnlyModelViewSet):
 	queryset = Texto.objects.all()

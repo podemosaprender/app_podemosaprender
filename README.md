@@ -87,6 +87,8 @@ Por ahora la podes probar obteniendo un token con
 curl -X POST -H "Content-Type: application/json" -d '{"username":"tuusuario", "password": "tuclave"}' http://127.0.0.1:8000/api/token/
 ~~~
 
+Lo podes usar como en [este ejemplo](https://rest-api-token.glitch.me/)
+
 OjO! en hostm1 que tiene python 3.6.8 tuve que hacer un _downgrade_ de PyJWT, asi
 ~~~
 pip install -r requirements.txt

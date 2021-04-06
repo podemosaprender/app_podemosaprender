@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pa_lib_py.util import * #U: para cargar config via json
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -187,3 +188,13 @@ REST_FRAMEWORK = {
 #VER: https://github.com/adamchainz/django-cors-headers
 CORS_URLS_REGEX = r'^/api/.*$' #A: solo enviamos CORS allow para request a la api
 CORS_ALLOW_ALL_ORIGINS= True #A:SEC: OjO! permitimos todos porque estamos filtrando con CORS_URLS_REGEX
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'UPDATE_LAST_LOGIN': False,
+
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html#auth-header-name
+}
+#A: para acceder con token hay que pasarlo en el header Authorization
