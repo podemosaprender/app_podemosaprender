@@ -1,0 +1,12 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+	<h2>Cambiar tu clave</h2>
+	<form method="POST">{% csrf_token %}
+		{% bootstrap_form form %}
+
+		{% bootstrap_button 'Cambiar' button_type='submit' %}
+	</form>
+{% endblock %}

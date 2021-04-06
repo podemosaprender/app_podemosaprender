@@ -8,6 +8,10 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import SetPasswordForm
+
 from django import forms
 import re
 import os
@@ -100,6 +104,20 @@ class FacebookDataDeletionView(View): #U: para eliminar datos como pide Facebook
 class FacebookDataDeletionCheckView(View): #U: para eliminar datos como pide Facebook
 	def get(self, request, *args, **kwargs): #U: facbook nos manda un post
 		return HttpResponse('Your data has been deleted', status=200)
+
+def UserPassCambiar(request):
+	if request.method == 'POST':
+		form = SetPasswordForm(request.user, request.POST)
+		if form.is_valid():
+			user = form.save()
+			update_session_auth_hash(request, user)  # Important!
+			messages.success(request, 'Your password was successfully updated!')
+			return redirect('user_pass_cambiar')
+		else:
+			messages.error(request, 'Please correct the error below.')
+	else:
+		form = SetPasswordForm(request.user)
+	return render(request, 'pa_charlas_app/user_pass_cambiar_form.html', { 'form': form })
 
 # S: texto como imagen ####################################
 
