@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path, include
+from django.contrib.auth import views as auth_views
 
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
@@ -22,7 +23,9 @@ urlpatterns = [
 	#A: documentacion y autenticacion de la api REST
 
 	path("login/", views.login, name="login"),
-	path("clave/", login_required(views.UserPassCambiar), name="user_pass_cambiar"),
+	path('clave/', login_required(views.UserPassCambiar), name="user_pass_cambiar"),
+	path('login/clave/', auth_views.LoginView.as_view(template_name='pa_charlas_app/user_login_form.html'), name="user_login"),
+
 	path("facebook_delete_data/", views.FacebookDataDeletionView.as_view(), name="facebook_delete_data"),
 	path("facebook_delete_data_check/<str:code>/", views.FacebookDataDeletionCheckView.as_view(), name="facebook_delete_data_check"),
 	#A: login desde la UI web

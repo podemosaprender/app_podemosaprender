@@ -10,7 +10,8 @@ from django.contrib.auth.models import User
 
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
+from django.contrib.auth import authenticate, login
 
 from django import forms
 import re
@@ -105,7 +106,7 @@ class FacebookDataDeletionCheckView(View): #U: para eliminar datos como pide Fac
 	def get(self, request, *args, **kwargs): #U: facbook nos manda un post
 		return HttpResponse('Your data has been deleted', status=200)
 
-def UserPassCambiar(request):
+def UserPassCambiar(request): #U: cambiar clave sin poner la anterior, ej. pq creaste cuenta con gmail
 	if request.method == 'POST':
 		form = SetPasswordForm(request.user, request.POST)
 		if form.is_valid():
@@ -118,6 +119,7 @@ def UserPassCambiar(request):
 	else:
 		form = SetPasswordForm(request.user)
 	return render(request, 'pa_charlas_app/user_pass_cambiar_form.html', { 'form': form })
+
 
 # S: texto como imagen ####################################
 
