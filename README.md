@@ -49,6 +49,23 @@ Despues podes ejecutar un servidor https con
 python manage.py runserver_plus --cert-file tmpcert.crt
 ~~~
 
+### Podés usar Docker para luchar menos con las dependencias
+
+La primera vez construis tu contenedor con 
+~~~
+docker build -t pa_app .
+~~~
+
+Después lo ejecutás con
+~~~
+docker run -it --rm -p 8000:8000 pa_app /scripts/docker/docker_start.sh
+~~~
+
+Si necesitás acceder a la línea de comandos del contenedor podás usar
+~~~
+docker run -it --rm -p 8000:8000 pa_app bash
+~~~
+
 ### Cuando desplegue en un hosting
 
 Tuve que usar mariadb en vez de sqlite, asi que agregue la configuracion de la db a .env.json que queda asi:

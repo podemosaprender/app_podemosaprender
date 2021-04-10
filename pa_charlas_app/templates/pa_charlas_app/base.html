@@ -2,146 +2,150 @@
 {% load bootstrap4 %}
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="PodemosAprender">
-    <meta name="author" content="PodemosAprender.org">
-    <link rel="icon" href="{% static 'brand/img/logo.ico' %}">
-    <link rel="stylesheet" href="{% static 'pa_lib/css/bootstrap-social.3p.css' %}">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="description" content="PodemosAprender">
+		<meta name="author" content="PodemosAprender.org">
+		<link rel="icon" href="{% static 'brand/img/logo.ico' %}">
+		<link rel="stylesheet" href="{% static 'pa_lib/css/bootstrap-social.3p.css' %}">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
 		<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.1/build/styles/default.min.css">
-    <link rel="stylesheet" href="{% static '3p/css/highlight_dracula.css' %}">
+		<link rel="stylesheet" href="{% static '3p/css/highlight_dracula.css' %}">
 
-    <link rel="stylesheet" href="{% static 'pa_lib/css/page-footer-sticky.css' %}">
-    <link rel="stylesheet" href="{% static 'pa_lib/css/estilos-botones.css' %}">
-    <link rel="stylesheet" href="{% static 'pa_lib/css/estilos-link-footer.css' %}">
-    <link rel="stylesheet" href="{% static 'pa_lib/css/estilos-nav.css' %}">
+		<link rel="stylesheet" href="{% static 'pa_lib/css/page-footer-sticky.css' %}">
+		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-botones.css' %}">
+		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-link-footer.css' %}">
+		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-nav.css' %}">
 
-    <title>PodemosAprender</title>
+		<title>PodemosAprender</title>
 
-	{% block meta %}
-	{% endblock %}
+		{% block meta %}
+		{% endblock %}
 
-  <body>
-    <header>
-      <!-- Fixed navbar -->
-      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" >
-        <a class="navbar-brand" href="/">
-            <img src="{% static 'brand/img/logo.png' %}" height="30" class="d-inline-block align-top" alt="">
-            PodemosAprender
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
-          <ul class="navbar-nav mr-auto">
-          </ul>
-        <ul class="navbar-nav px-3">
-          <li class="nav-item text-nowrap">
-            <a href="/usuario" class="nav-link" >Usuarios</a>
-          </li>
+		<body>
+			<header>
+				<!-- Fixed navbar -->
+				<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" >
+					<a class="navbar-brand" href="/">
+						<img src="{% static 'brand/img/logo.png' %}" height="30" class="d-inline-block align-top" alt="">
+						PodemosAprender
+					</a>
+					<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarCollapse">
+						<ul class="navbar-nav mr-auto">
+						</ul>
+						<ul class="navbar-nav px-3">
+							<li class="nav-item text-nowrap">
+								<a href="/charla/incubadora_de_carreras" class="nav-link" >Incubadora</a>
+							</li>
 
-          {% if user.is_authenticated %}
-						<li class="nav-item dropdown">
-							<a class="nav-link" id="user_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								{{ user.username }}
+							<li class="nav-item text-nowrap">
+								<a href="/charla/" class="nav-link" >Charlas</a>
+							</li>
 
-								<i class="fa fa-user-circle"></i>
-							</a>
-							<div class="dropdown-menu bg-dark" aria-labelledby="user_dropdown">
-								<a href="/login" class="dropdown-item nav-link" >Asociar otra red</a> 
-								<a href="/clave" class="dropdown-item nav-link" >Clave</a> 
-								<a href="/logout" class="dropdown-item nav-link" >Desconectarme</a> 
-							</div>
-						</li>
-					{% else %}
-						<li class="nav-item text-nowrap">
-							<a href="/login" class="nav-link">
-								registrarme
-								<i class="fa fa-user-circle"></i>
-							</a>
-						</li>
-					{% endif %}
-					</li>
-				</ul>
-			</nav>
-		</header>
+							{% if user.is_authenticated %}
+								<li class="nav-item dropdown">
+									<a class="nav-link" id="user_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										{{ user.username }}
 
-		<!-- Begin page content -->
-		<main role="main" class="container">
-			{% bootstrap_messages %}
-			{% block content %}{% endblock %}
-		</main>
+										<i class="fa fa-user-circle"></i>
+									</a>
+									<div class="dropdown-menu bg-dark" aria-labelledby="user_dropdown">
+										<a href="/login" class="dropdown-item nav-link" >Asociar otra red</a> 
+										<a href="/clave" class="dropdown-item nav-link" >Clave</a> 
+										<a href="/logout" class="dropdown-item nav-link" >Desconectarme</a> 
+									</div>
+								</li>
+							{% else %}
+								<li class="nav-item text-nowrap">
+									<a href="/login" class="nav-link">
+										registrarme
+										<i class="fa fa-user-circle"></i>
+									</a>
+								</li>
+							{% endif %}
+							</li>
+						</ul>
+				</nav>
+			</header>
 
-		<footer class="footer">
-			<div class="container">
-				<span>All rights reserved. &copy;
-					<a href="https://www.podemosaprender.org">PodemosAprender</a> |
-					<a href="{% static 'tos.html' %}">Terms of Service</a> |
-					<a href="{% static 'privacy.html' %}">Privacy Policy</a> |
-					<a href="{% static 'contact.html' %}">Contact Us</a>
-				</span>
-			</div>
-		</footer>
+			<!-- Begin page content -->
+			<main role="main" class="container">
+				{% bootstrap_messages %}
+				{% block content %}{% endblock %}
+			</main>
 
-		<!-- Bootstrap core JavaScript
-			================================================== -->
-			<!-- Placed at the end of the document so the pages load faster -->
-			<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-			<script src="{% static 'pa_lib/js/lib.js' %}"></script>
-			<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-			<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.1/build/highlight.min.js"></script>
-			<script>
-				function limpiar_indent(src) {
-					indent_min= 999; //A: por defecto un maximo grosero
-					let lineas= src.split('\n'); //A: separamos en lineas
-					lineas.forEach( linea => {
-						let indent= linea.match(/^(\s*)\S/); //A: indent tiene los espacios del principio
-						if (indent && indent_min>indent[1].length) { //A: tenia menos indent q las anteriores
-											indent_min= indent[1].length; //A: nuevo minimo
-							}
-					});
-					//A: tengo el indent minimo
-					return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
-				}
+			<footer class="footer">
+				<div class="container">
+					<span>All rights reserved. &copy;
+						<a href="https://www.podemosaprender.org">PodemosAprender</a> |
+						<a href="{% static 'tos.html' %}">Terms of Service</a> |
+						<a href="{% static 'privacy.html' %}">Privacy Policy</a> |
+						<a href="{% static 'contact.html' %}">Contact Us</a>
+					</span>
+				</div>
+			</footer>
 
-				function domInsertAfter(newNode, referenceNode) {
-					referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
-				}
+			<!-- Bootstrap core JavaScript
+				================================================== -->
+				<!-- Placed at the end of the document so the pages load faster -->
+				<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+				<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+				<script src="{% static 'pa_lib/js/lib.js' %}"></script>
+				<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+				<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.1/build/highlight.min.js"></script>
+				<script>
+					function limpiar_indent(src) {
+											indent_min= 999; //A: por defecto un maximo grosero
+											let lineas= src.split('\n'); //A: separamos en lineas
+											lineas.forEach( linea => {
+																	let indent= linea.match(/^(\s*)\S/); //A: indent tiene los espacios del principio
+																	if (indent && indent_min>indent[1].length) { //A: tenia menos indent q las anteriores
+																							indent_min= indent[1].length; //A: nuevo minimo
+																						}
+																});
+											//A: tengo el indent minimo
+											return (indent_min<999 ? lineas.map( linea => linea.slice(indent_min)).join('\n') : src)
+										}
 
-				marked.setOptions({
-					highlight: function(code, language) { //A: controlo el highlighting de cada bloque
-						const codeClean= code.replace(/&lt;/g,'<').replace(/&gt;/,'>'); //A: revierto el escape de django
-						const highlighted= hljs.highlightAuto(codeClean);
-						//DBG: console.log("code", codeClean, highlighted);
-						return highlighted.value;
-					},
-				});
-				function elementosMarkdownAHtml() {
+					function domInsertAfter(newNode, referenceNode) {
+											referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+										}
 
-					md_els= document.querySelectorAll('.markdown')
-					md_els.forEach( el => {
-						//TODO: No reemplazar hash en urls
-						txt_con_tags = el.innerHTML.replace(/#([A-Za-z0-9_]+)/g, hashtagAMarkdownLink)//A: busco y reemplazo hashtags con links markdown
-						txt_con_usuarios = txt_con_tags.replace(/@([A-Za-z0-9_\.]+)/g, usuarioAMarkdownLink)//A: busco y reemplazo usuarios con links markdown
-						markedHtml= marked(x= limpiar_indent(txt_con_usuarios)); //A: convierto markdown a html
-						markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
-						markedEl.insertAfter(el); //A: lo puse a continuacion del original
-						jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original
-						//DBG: console.log(x)
-					});
-					$('code').addClass('hljs'); //A: le agrego a los elementos code ele stilo de hljs	
-				}
-				
-				traerDatos().done(elementosMarkdownAHtml);
+					marked.setOptions({
+											highlight: function(code, language) { //A: controlo el highlighting de cada bloque
+																	const codeClean= code.replace(/&lt;/g,'<').replace(/&gt;/,'>'); //A: revierto el escape de django
+																	const highlighted= hljs.highlightAuto(codeClean);
+																	//DBG: console.log("code", codeClean, highlighted);
+																	return highlighted.value;
+																},
+										});
+					function elementosMarkdownAHtml() {
 
-				
-			</script>
+											md_els= document.querySelectorAll('.markdown')
+											md_els.forEach( el => {
+																	//TODO: No reemplazar hash en urls
+																	txt_con_tags = el.innerHTML.replace(/#([A-Za-z0-9_]+)/g, hashtagAMarkdownLink)//A: busco y reemplazo hashtags con links markdown
+																	txt_con_usuarios = txt_con_tags.replace(/@([A-Za-z0-9_\.]+)/g, usuarioAMarkdownLink)//A: busco y reemplazo usuarios con links markdown
+																	markedHtml= marked(x= limpiar_indent(txt_con_usuarios)); //A: convierto markdown a html
+																	markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
+																	markedEl.insertAfter(el); //A: lo puse a continuacion del original
+																	jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original
+																	//DBG: console.log(x)
+																});
+											$('code').addClass('hljs'); //A: le agrego a los elementos code ele stilo de hljs	
+										}
 
-	</body>
+					traerDatos().done(elementosMarkdownAHtml);
+
+
+				</script>
+
+		</body>
 </html>
