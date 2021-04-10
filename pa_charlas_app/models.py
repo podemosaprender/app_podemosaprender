@@ -50,13 +50,33 @@ class CharlaItem(models.Model): #U: conecta un texto con una charla
 	def __str__(self):
 		return f'{self.charla.titulo} {self.texto}'
 
+class Voto(models.Model): #U: una coleccion de textos sobre algun tema
+	titulo= models.CharField(max_length=200, unique=True)
+
+	def __str__(self):
+		return f'{self.titulo}'
+
+class VotoItem(models.Model): #U: conecta un texto con una charla
+	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	texto=  models.ForeignKey('Texto', on_delete=models.CASCADE)
+	voto= models.ForeignKey('Voto', on_delete=models.CASCADE)
+	fh_creado= models.DateTimeField(default=timezone.now)
+
+	class Meta:
+		unique_together= [["de_quien","texto" ,"voto"]]
+		#A: asegurar que cada terna (de_quien, texto, voto) esta UNA sola vez.
+
+	def __str__(self):
+		return f'{self.voto.titulo} {self.de_quien} {self.texto}'
 
 class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuaria
 	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
 	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
 	fh_visita= models.DateTimeField(default=timezone.now)
 
-	#TODO: asegurar que cada par (de_quien, charla) esta UNA sola vez. unique_together?
+	class Meta:
+		unique_together= [["charla", "de_quien"]]
+		#A: asegurar que cada par (de_quien, charla) esta UNA sola vez.
 
 	def __str__(self):
 		return f'{self.de_quien.username} {self.charla.titulo} {self.fh_visita}'
