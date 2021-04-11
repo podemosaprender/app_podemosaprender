@@ -3,6 +3,12 @@
 
 {% load bootstrap4 %}
 
+{% block resumen %}
+	<div class="alert alert-info">
+	Podés agregar los eventos autmáticamente a tu calendario de Google, Outlook, Apple con <a href="/evento/ical">este link</a>.
+	</div>
+{% endblock %}
+
 {% block item_titulo %}
 	{{ item.0|date:"l j F y" }}
 {% endblock %}
