@@ -20,7 +20,7 @@ from rest_framework.decorators import api_view
 def token_user(request, format=None):
     content = {
         'user': str(request.user),  # `django.contrib.auth.User` instance.
-        'auth': str(request.auth),  # None
+        'auth': (None if request.auth is None else 'yqwuyeuyqhhwhwh11hjhmirasitevoyadarmiclavejajaja'),  # None
     }
     return Response(content)
 
