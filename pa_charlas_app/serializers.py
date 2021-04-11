@@ -4,7 +4,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model 
 
-from .models import Texto, Charla, CharlaItem
+from .models import Texto, Charla, CharlaItem, VotoItem
 User= get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
@@ -36,4 +36,9 @@ class CharlaParticipanteSerializer(serializers.Serializer):
 	username= serializers.CharField(source='texto__de_quien__username')
 	fh_ultimo= serializers.DateTimeField()
 
+class VotoItemSerializer(serializers.ModelSerializer):
+	#de_quien=UserSerializer(read_only=True)
+	class Meta:
+		model= VotoItem
+		fields= ['pk','de_quien','fh_creado','texto' ,'voto']
 

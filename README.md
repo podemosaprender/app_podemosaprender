@@ -58,13 +58,15 @@ docker build -t pa_app .
 
 Después lo ejecutás con
 ~~~
-docker run -it --rm -p 8000:8000 pa_app /scripts/docker/docker_start.sh
+docker run -it --rm -v "$(pwd)":/pa_app/ -p 8000:8000 pa_app bash 
 ~~~
 
-Si necesitás acceder a la línea de comandos del contenedor podás usar
+Para ejecutar el servidor
 ~~~
-docker run -it --rm -p 8000:8000 pa_app bash
+docker run -it --rm -v "$(pwd)":/pa_app/ -p 8000:8000 pa_app /scripts/docker/docker_start.sh
 ~~~
+
+Si tenés linux mint o ubuntu y te da error, tal vez tengas que ejecutar [estos comandos](https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket)
 
 ### Cuando desplegue en un hosting
 

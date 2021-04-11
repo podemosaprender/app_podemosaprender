@@ -10,7 +10,7 @@ from rest_framework.decorators import action, permission_classes
 from django.shortcuts import get_list_or_404, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Charla, charla_participantes, Texto, User
+from .models import Charla, charla_participantes, Texto, User, VotoItem
 from .serializers import *
 
 from rest_framework.decorators import api_view
@@ -47,6 +47,10 @@ class CharlaViewSet(viewsets.ViewSet):
 		queryset= charla_participantes(charla_pk= pk)
 		serializer= CharlaParticipanteSerializer(queryset, many= True)
 		return Response(serializer.data)		
+
+class VotoItemViewSet(viewsets.ModelViewSet):
+	queryset = VotoItem.objects.all()
+	serializer_class = VotoItemSerializer
 
 class ParticipanteViewSet(viewsets.ReadOnlyModelViewSet):
 	queryset= User.objects.all()
