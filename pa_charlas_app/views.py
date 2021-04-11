@@ -21,7 +21,7 @@ import datetime as dt
 from .models import (
 	Texto, texto_guardar, textos_de_usuario,
 	Charla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
-	redes_de_usuario,
+	usuario_para, redes_de_usuario,
 	charlas_calendario
 )
 from .forms import TextoForm
@@ -257,11 +257,11 @@ class CharlaQueSigoListView(ListView): #U: la lista de charlas que visite
 			return charlas_y_ultimo()	
 
 # S: Charla vista comoda ##################################
-def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de UNA charla, btn para agregar
+def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', orden='fh_creado', mostrar_titulo= None): #U: los textos de UNA charla, btn para agregar, prefijo_tag puede ser @ para un usuario
 	if not pk is None:
 		charla= get_object_or_404(Charla, pk=pk)
 	else:
-		charla= get_object_or_404(Charla, titulo= '#'+charla_titulo)
+		charla= get_object_or_404(Charla, titulo= prefijo_tag+charla_titulo)
 
 	fh_visita_anterior= dt.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
 	if request.user.is_authenticated:
@@ -276,10 +276,19 @@ def charla_texto_list(request, charla_titulo=None, pk=None): #U: los textos de U
 	
 	participantes= charla_participantes(charla_titulo= charla_titulo, charla_pk= pk).order_by('-fh_ultimo') #A: con menos adelante es descendiente, mas reciente arriba
 
-	textos= charla.textos.order_by('fh_creado').all()
-	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'participantes': participantes, 'charla': charla, 'titulo': charla.titulo, 'puede_crear': True, 'fh_visita_anterior': fh_visita_anterior })
+	textos= charla.textos.order_by(orden).all()
 
-# S: Lista de usuarios ####################################
+	mostrar_titulo= charla.titulo if mostrar_titulo is None else mostrar_titulo
+	return render(request, 'pa_charlas_app/texto_list.html', {
+		'object_list': textos, 
+		'participantes': participantes, 
+		'charla': charla, 
+		'titulo': mostrar_titulo, 
+		'puede_crear': True, 
+		'fh_visita_anterior': fh_visita_anterior 
+	})
+
+# S: Usuarios ##############################################
 
 def usuario_list(request):
 	usuarios = User.objects.all()
@@ -287,12 +296,21 @@ def usuario_list(request):
 
 
 def usuario_texto_list(request, username=None, pk=None): #U: los textos de UNA charla, btn para agregar
-	if not pk is None:
-		user= get_object_or_404(User, pk=pk)
-	else:
-		user= get_object_or_404(User, username= username)
+	user= usuario_para(request, username, pk)
 	textos= textos_de_usuario(user).order_by('fh_creado').all()
 	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'titulo': user.username})
+
+def usuario_textos_que_nombran(request, username=None, pk=None): #U: como va un usuario respecto a su plan/intereses
+	user= usuario_para(request, username, pk)
+	return charla_texto_list(request, charla_titulo= user.username, prefijo_tag='@', orden='-fh_editado', mostrar_titulo=f'Nombraron a {user.username}')
+
+
+def usuario_plan(request, username=None, pk=None): #U: como va un usuario respecto a su plan/intereses
+	user= usuario_para(request, username, pk)
+
+	textosQueMeNombraron= Texto.objects.filter(charlaitem__charla__titulo='@'+user.username).order_by('-fh_editado').all()
+
+	return render(request, 'pa_charlas_app/usuario_plan.html', {'object_list': textosQueMeNombraron, 'titulo': user.username})
 
 # S: Calendario de eventos #################################
 

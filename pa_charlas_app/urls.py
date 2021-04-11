@@ -57,6 +57,9 @@ urlpatterns = [
 	path('usuario/<int:pk>/', views.usuario_texto_list, name='usuario_texto_list_k'), #TODO: poner login_required?
 	#A: lista de usuarios
 
+	path('donde-nombran-a/<str:username>/', views.usuario_textos_que_nombran, name='usuario_textos_que_nombran'),
+	path('como/', login_required(views.usuario_plan), name='usuario_plan'), 
+
 	re_path(r't/(?P<un_path>.*)/$', views.CharlaComoPathListView.as_view(), name='charla_como_path'),
 	#A: ej. t/sabado/cada_mes para buscar titulos que digan sabado y cada_mes
 

@@ -49,7 +49,15 @@
 							</li>
 
 							<li class="nav-item text-nowrap">
+								<a href="/charla/juntada_virtual/" class="nav-link" >Juntada</a>
+							</li>
+
+							<li class="nav-item text-nowrap">
 								<a href="/charla/" class="nav-link" >Charlas</a>
+							</li>
+
+							<li class="nav-item text-nowrap">
+								<a href="/como/" class="nav-link" >¿Cómo voy?</a>
 							</li>
 
 							{% if user.is_authenticated %}
@@ -135,7 +143,7 @@
 											md_els= document.querySelectorAll('.markdown')
 											md_els.forEach( el => {
 																	//TODO: No reemplazar hash en urls
-																	txt_con_tags = el.innerHTML.replace(/#([A-Za-z0-9_]+)/g, hashtagAMarkdownLink)//A: busco y reemplazo hashtags con links markdown
+																	txt_con_tags = el.innerHTML.replace(/#([A-Za-záéíóúüñÁÉÍÓÚÜÑ0-9_]+)/g, hashtagAMarkdownLink)//A: busco y reemplazo hashtags con links markdown
 																	txt_con_usuarios = txt_con_tags.replace(/@([A-Za-z0-9_\.]+)/g, usuarioAMarkdownLink)//A: busco y reemplazo usuarios con links markdown
 																	markedHtml= marked(x= limpiar_indent(txt_con_usuarios)); //A: convierto markdown a html
 																	markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
