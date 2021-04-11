@@ -1,0 +1,40 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+	<div class="my-3">
+		<h3>¿Cómo va {{ esteUsuario.username }}?</h3>	
+
+		<div>
+		TODO: poner links a las secciones
+		</div>
+
+		<div class="my-3">
+		<h4>Textos que te mencionaron</h4>
+		{% for item in textosQueMeNombraron|slice:":5" %}
+			{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
+		{% endfor %}
+		
+		<p style="text-align: right;"><a href="{% url 'usuario_textos_que_nombran' username=esteUsuario.username %}">ver todas</a></p>
+		</div>
+
+		<div class="my-3">
+		<h4>Tu participación</h4>
+		TODO: una lista
+		TODO: link ver todas
+		</div>
+
+		<div class="my-3">
+		<h4>Tu plan</h4>
+		<p>TODO: un texto</p>
+		<p>TODO: una charla para orientarte</p>
+		</div>
+
+		<div class="my-3">
+		<h4>Cómo te presentás</h4>
+		TODO: un texto
+		</div>
+
+	</div>
+{% endblock %}
