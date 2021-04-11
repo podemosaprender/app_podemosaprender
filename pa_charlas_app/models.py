@@ -2,6 +2,7 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.shortcuts import render, get_object_or_404, redirect
 
 from .models_extra import * #A: para que agregue otros lookups como like 
 from .util import *
@@ -147,6 +148,14 @@ def texto_guardar(form, user, charla_pk=None):
 
 	return texto
 # S: consultas comodas #####################################
+def usuario_para(request, username=None, pk=None): #U: conseguir con username, pk, o request
+	if not pk is None:
+		user= get_object_or_404(User, pk=pk)
+	elif not username is None:
+		user= get_object_or_404(User, username= username)
+	else:
+		user= request.user
+	return user
 
 def charla_participantes(charla_titulo= None, charla_pk= None): #U: participantes de una charla
 	#VER: https://docs.djangoproject.com/en/3.1/topics/db/aggregation/
