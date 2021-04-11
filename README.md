@@ -66,6 +66,8 @@ Si necesitás acceder a la línea de comandos del contenedor podás usar
 docker run -it --rm -p 8000:8000 pa_app bash
 ~~~
 
+Si tenés linux mint o ubuntu y te da error, tal vez tengas que ejecutar [estos comandos](https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket)
+
 ### Cuando desplegue en un hosting
 
 Tuve que usar mariadb en vez de sqlite, asi que agregue la configuracion de la db a .env.json que queda asi:
