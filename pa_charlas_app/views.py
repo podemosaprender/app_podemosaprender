@@ -302,7 +302,7 @@ def usuario_texto_list(request, username=None, pk=None): #U: los textos de UNA c
 
 def usuario_textos_que_nombran(request, username=None, pk=None): #U: como va un usuario respecto a su plan/intereses
 	user= usuario_para(request, username, pk)
-	return charla_texto_list(request, charla_titulo= user.username, prefijo_tag='@', orden='-fh_editado', mostrar_titulo=f'Nombraron a {user.username}')
+	return charla_texto_list(request, charla_titulo= user.username, prefijo_tag='@', orden='-fh_editado', mostrar_titulo=f'Textos que nombran a {user.username}')
 
 
 def usuario_plan(request, username=None, pk=None): #U: como va un usuario respecto a su plan/intereses
@@ -310,7 +310,7 @@ def usuario_plan(request, username=None, pk=None): #U: como va un usuario respec
 
 	textosQueMeNombraron= Texto.objects.filter(charlaitem__charla__titulo='@'+user.username).order_by('-fh_editado').all()
 
-	return render(request, 'pa_charlas_app/usuario_plan.html', {'object_list': textosQueMeNombraron, 'titulo': user.username})
+	return render(request, 'pa_charlas_app/usuario_plan.html', {'textosQueMeNombraron': textosQueMeNombraron, 'esteUsuario': user})
 
 # S: Calendario de eventos #################################
 

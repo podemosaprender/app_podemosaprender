@@ -1,0 +1,25 @@
+<div class="card">
+	<div class="card-body">
+		<p class="card-title text-muted">
+
+		{% block item_titulo %}
+
+		<a href="{% url 'texto_detail' pk=item.pk %}">{{ item.fh_creado }}
+			<i>por</i>
+			{{ item.de_quien }}
+		</a>
+		{% endblock %}
+
+		</p>
+		<p class="card-text">
+		{% block item_cuerpo %}
+		<div id="texto_{{ item.pk }}" class="markdown">
+{{ item.texto }} {% comment %} Mantener esta línea pegada al margen izquierdo {% endcomment %}
+		</div>
+		{% endblock %}
+		</p>
+		{% block item_links %}
+		{% endblock %}
+	</div>
+</div>
+
