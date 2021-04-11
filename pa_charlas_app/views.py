@@ -315,9 +315,38 @@ def usuario_textos_que_nombran(request, username=None, pk=None): #U: como va un 
 def usuario_plan(request, username=None, pk=None): #U: como va un usuario respecto a su plan/intereses
 	user= usuario_para(request, username, pk)
 
+	charla_perfil= f'perfil_{user.username}_presentacion' #U: solo escribe la dueña
+	charla_plan= f'perfil_{user.username}_plan' #U: solo escribe la dueña
+
+	charla_perfil_ideas= f'carrera_presentacion_{user.username}_ideas' #U: le aportamos ideas
+	charla_plan_ideas= f'carrera_plan_{user.username}_ideas' #U: le aportamos ideas
+
 	textosQueMeNombraron= Texto.objects.filter(charlaitem__charla__titulo='@'+user.username).order_by('-fh_editado').all()
 
-	return render(request, 'pa_charlas_app/usuario_plan.html', {'textosQueMeNombraron': textosQueMeNombraron, 'esteUsuario': user})
+	textosQueEscribi= textos_de_usuario(user).order_by('-fh_editado').all()
+
+	textosPerfil= Texto.objects.filter(charlaitem__charla__titulo='#'+charla_perfil).order_by('fh_creado').all()
+	textosPlan= Texto.objects.filter(charlaitem__charla__titulo='#'+charla_plan).order_by('fh_creado').all()
+
+	textosPerfilIdeas= Texto.objects.filter(charlaitem__charla__titulo='#'+charla_perfil_ideas).order_by('-fh_editado').all()
+
+	textosPlanIdeas= Texto.objects.filter(charlaitem__charla__titulo='#'+charla_plan_ideas).order_by('-fh_editado').all()
+
+	return render(request, 'pa_charlas_app/usuario_plan.html', {
+		'esteUsuario': user,
+		'textosQueMeNombraron': textosQueMeNombraron,
+		'textosQueEscribi': textosQueEscribi,
+
+		'textosPerfil': textosPerfil,
+		'charla_perfil': charla_perfil,
+		'textosPerfilIdeas': textosPerfilIdeas,
+		'charla_perfil_ideas': charla_perfil_ideas,
+
+		'textosPlan': textosPlan,
+		'charla_plan': charla_plan,
+		'textosPlanIdeas': textosPlanIdeas,
+		'charla_plan_ideas': charla_plan_ideas,
+	})
 
 # S: Calendario de eventos #################################
 
