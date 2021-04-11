@@ -121,7 +121,7 @@ def texto_guardar(form, user, charla_pk=None):
 			texto.texto += f'\n{hashtag}'
 		#A: si no venia de una charla, empieza una casual
 
-	hts= hashtags_en(texto.texto)
+	hts= hashtags_en(texto.texto, quiere_sin_tildes= False) #A: nuestras urls y db soportan tildes
 	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
 	texto.save()
 
