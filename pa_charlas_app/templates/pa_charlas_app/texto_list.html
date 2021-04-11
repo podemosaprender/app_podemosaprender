@@ -38,7 +38,7 @@
 
 {% block acciones_sin_item %}
 	{% if user.is_authenticated and puede_crear %}
-		{% url 'charla_texto_nuevo' charla_pk=charla.pk as texto_new_url %}
+		{% url 'charla_texto_nuevo_s' charla_titulo=charla.titulo as texto_new_url %}
 		{% bootstrap_button 'Nuevo texto' href=texto_new_url  %}
 	{% endif %}
 

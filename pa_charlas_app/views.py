@@ -20,7 +20,7 @@ import datetime as dt
 
 from .models import (
 	Texto, texto_guardar, textos_de_usuario,
-	Charla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
+	Charla, TipoCharla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
 	usuario_para, redes_de_usuario,
 	charlas_calendario
 )
@@ -180,7 +180,7 @@ def texto_img(request, pk=None): #U: imagen con texto para og:image que se muest
 
 # S: textos ################################################
 
-def texto_edit(request, pk=None, charla_pk=None): #U: crear Y editar textos, de charlas o para empezar una
+def texto_edit(request, pk=None, charla_pk=None, charla_titulo=None): #U: crear Y editar textos, de charlas o para empezar una
 	texto= None #DFLT, nuevo
 	if not pk is None:
 		texto= get_object_or_404(Texto, pk=pk) 
@@ -189,14 +189,14 @@ def texto_edit(request, pk=None, charla_pk=None): #U: crear Y editar textos, de 
 		form= TextoForm(request.POST, instance= texto)
 		if form.is_valid():
 			extra_data= enc_b64_o_r(request.POST.get('extra_form_data'),{})
-			texto= texto_guardar(form, request.user, extra_data.get('charla'))
+			texto= texto_guardar(form, request.user, charla_pk= extra_data.get('charla_pk'), charla_titulo= extra_data.get('charla_titulo'))
 			#A: si no le pase una charla y no existia, crea una "casual"
 			logger.debug(f'VW texto {request.user.username} {extra_data}')
 			return redirect(extra_data.get('volver_a') or '/')
 	else:
 		viene_de= request.META.get('HTTP_REFERER')
 		form = TextoForm(instance= texto, initial={'viene_de': 'que_pasa'})
-		extra_data= {'charla': charla_pk, 'volver_a': viene_de}
+		extra_data= {'charla_pk': charla_pk, 'charla_titulo': charla_titulo, 'volver_a': viene_de}
 		return render(
 			request, 
 			'pa_charlas_app/base_edit.html', 
@@ -259,12 +259,19 @@ class CharlaQueSigoListView(ListView): #U: la lista de charlas que visite
 # S: Charla vista comoda ##################################
 def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', orden='fh_creado', mostrar_titulo= None): #U: los textos de UNA charla, btn para agregar, prefijo_tag puede ser @ para un usuario
 	if not pk is None:
-		charla= get_object_or_404(Charla, pk=pk)
+		charla_qs= Charla.objects.filter(pk=pk)
 	else:
-		charla= get_object_or_404(Charla, titulo= prefijo_tag+charla_titulo)
+		charla_qs= Charla.objects.filter(titulo= prefijo_tag+charla_titulo)
+
+	if charla_qs.exists():
+		charla = charla_qs.first() 
+	else:
+		tch_tema= TipoCharla.objects.get(titulo='Tema')
+		charla= Charla(titulo= prefijo_tag+charla_titulo, tipo= tch_tema, de_quien=request.user)
+	#A: si la charla no existia, seguimos adelante con una temporal que NO queremos guardar
 
 	fh_visita_anterior= dt.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
-	if request.user.is_authenticated:
+	if request.user.is_authenticated and not charla.pk is None:
 		anteriores= Visita.objects.filter(de_quien= request.user, charla= charla)
 		if len(anteriores)>0: #A: ya vino antes
 			visita_anterior= anteriores.first()
@@ -276,7 +283,7 @@ def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', ord
 	
 	participantes= charla_participantes(charla_titulo= charla_titulo, charla_pk= pk).order_by('-fh_ultimo') #A: con menos adelante es descendiente, mas reciente arriba
 
-	textos= charla.textos.order_by(orden).all()
+	textos= charla.textos.order_by(orden).all() if not charla.pk is None else []
 
 	mostrar_titulo= charla.titulo if mostrar_titulo is None else mostrar_titulo
 	return render(request, 'pa_charlas_app/texto_list.html', {

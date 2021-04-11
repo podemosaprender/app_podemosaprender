@@ -85,6 +85,7 @@ class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuari
 # S: funciones comodas ######################################
 from .hashtags import hashtags_en
 def conUserYFecha_guardar(form, user, commit= True):
+	ahora= timezone.now() 
 	obj= form.save(commit=False)
 	try:
 		de_quien_vacio= (texto.de_quien is None) #A: si no es none, no lanza excepcion y guarda false
@@ -92,7 +93,7 @@ def conUserYFecha_guardar(form, user, commit= True):
 		de_quien_vacio= True
 	if de_quien_vacio: #A: Si no tiene autor es nuevo 
 		obj.de_quien= user
-		obj.fh_creado= timezone.now() 
+		obj.fh_creado= ahora
 	elif obj.de_quien != user: #A: no era el autor!
 		raise PermissionDenied	
 	else:
@@ -100,21 +101,24 @@ def conUserYFecha_guardar(form, user, commit= True):
 	
 	#A: no debe pasar de aca si no es el duño del objeto	
 	if 'fh_editado' in obj.__dict__: 
-		obj.fh_editado= timezone.now()
+		obj.fh_editado= ahora
 	#A: si tiene un field fh_editado lo actualizamos
 
 	if commit:
 		obj.save() #A: guarde el obj actualizado, para poder agregarlo a charlas
 	return obj
 
-def texto_guardar(form, user, charla_pk=None):
+def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
 
 	#TODO:SEC no dejar modificar textos de otro user
-	if not charla_pk is None:
+	if charla_titulo is None and not charla_pk is None:
 		ch= Charla.objects.get(pk= charla_pk)
-		if not ch.titulo in texto.texto:
-			texto.texto += f'\n{ch.titulo}'
+		charla_titulo= ch.titulo
+
+	if not charla_titulo is None:	
+		if not charla_titulo in texto.texto:
+			texto.texto += f'\n\n{charla_titulo}'
 		#A: si venia de una charla, le agrego el hashtag automaticamente
 	else:
 		hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
@@ -147,6 +151,7 @@ def texto_guardar(form, user, charla_pk=None):
 		ch.save()
 
 	return texto
+
 # S: consultas comodas #####################################
 def usuario_para(request, username=None, pk=None): #U: conseguir con username, pk, o request
 	if not pk is None:

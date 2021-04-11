@@ -39,6 +39,7 @@ urlpatterns = [
 	#A: crear una charla es simplemente escribir un texto con hashtags, hay uno automatico para casuales
 
 	path('charla/<int:charla_pk>/nuevo', login_required(views.texto_edit), name='charla_texto_nuevo'),
+	path('charla/<str:charla_titulo>/nuevo', login_required(views.texto_edit), name='charla_texto_nuevo_s'),
 	path('charla/<int:charla_pk>/<int:pk>', login_required(views.texto_edit), name='charla_texto_edit'),
 	#A: las charlas estan hechas de textos
 	path('texto/<int:pk>', views.texto_detail, name='texto_detail'),
