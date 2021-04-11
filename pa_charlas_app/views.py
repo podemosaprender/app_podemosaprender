@@ -315,11 +315,11 @@ def usuario_textos_que_nombran(request, username=None, pk=None): #U: como va un 
 def usuario_plan(request, username=None, pk=None): #U: como va un usuario respecto a su plan/intereses
 	user= usuario_para(request, username, pk)
 
-	charla_perfil= f'perfil_{user.username}_presentacion' #U: solo escribe la dueña
-	charla_plan= f'perfil_{user.username}_plan' #U: solo escribe la dueña
+	charla_perfil= f'presentacion_de_participante_{user.username}' #U: si termina en de_participante_... solo escribe la dueña
+	charla_plan= f'plan_de_participante_{user.username}' #U:  si termina en de_participante_... solo escribe la dueña
 
-	charla_perfil_ideas= f'carrera_presentacion_{user.username}_ideas' #U: le aportamos ideas
-	charla_plan_ideas= f'carrera_plan_{user.username}_ideas' #U: le aportamos ideas
+	charla_perfil_ideas= f'ayuda_presentacion_de_{user.username}' #U: le aportamos ideas
+	charla_plan_ideas= f'ayuda_carrera_plan_{user.username}' #U: le aportamos ideas
 
 	textosQueMeNombraron= Texto.objects.filter(charlaitem__charla__titulo='@'+user.username).order_by('-fh_editado').all()
 

@@ -138,17 +138,24 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	#TODO: borrar las charlas que se hayan quedado sin items
 
 	for ht in hts:
-		chs= Charla.objects.filter(titulo= ht) 
-		if chs.exists(): #A: la charla ya existia
-			ch= chs.first() 
-		else:
-			ch= Charla(de_quien= user, titulo= ht, tipo= tch_tema)
-			ch.de_quien= user
-			ch.fh_creado= timezone.now()
-			ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
+		puedeModificarEstaCharla= True #DFLT
 
-		ch.textos.add(texto)
-		ch.save()
+		m= re.match(r'.*?de_participante_(.*)$',ht)
+		if not m is None: #A: es una charla que solo puede modificar una participante
+			puedeModificarEstaCharla= (m.groups(1)[0]	== user.username)
+
+		if puedeModificarEstaCharla:
+			chs= Charla.objects.filter(titulo= ht) 
+			if chs.exists(): #A: la charla ya existia
+				ch= chs.first() 
+			else:
+				ch= Charla(de_quien= user, titulo= ht, tipo= tch_tema)
+				ch.de_quien= user
+				ch.fh_creado= timezone.now()
+				ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
+
+			ch.textos.add(texto)
+			ch.save()
 
 	return texto
 
