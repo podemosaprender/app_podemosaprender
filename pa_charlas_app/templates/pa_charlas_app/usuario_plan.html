@@ -1,39 +1,88 @@
 {% extends 'pa_charlas_app/base.html' %}
 
 {% load bootstrap4 %}
+{% load pa_charlas_app_extras %}
 
 {% block content %}
-	<div class="my-3">
-		<h3>¿Cómo va {{ esteUsuario.username }}?</h3>	
+	<div class="containter">
+		<a name="arriba"></a>
+		<h3>¿Cómo va {{ esteUsuario.get_full_name }} (@{{ esteUsuario.username }})?</h3>	
 
-		<div>
-		TODO: poner links a las secciones
+		<div style="text-align: right; font-size: 90%;">
+			| <a href="#presentacion">Presentacion</a> | <a href="#plan">Plan</a> | <a href="#menciones">Menciones</a> | <a href="#participacion">Participación</a> | <a href="#arriba">Arriba</a> | 
 		</div>
 
 		<div class="my-3">
-		<h4>Textos que te mencionaron</h4>
-		{% for item in textosQueMeNombraron|slice:":5" %}
-			{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
-		{% endfor %}
-		
-		<p style="text-align: right;"><a href="{% url 'usuario_textos_que_nombran' username=esteUsuario.username %}">ver todas</a></p>
+			<a name="presentacion"></a>
+			<h4>Cómo te presentás</h4>
+			<div class="px-3 py-3">
+				{% for item in textosPerfil %}
+					{% include 'pa_charlas_app/p_texto_simple.html' with item=item limpiar='#.*_de_participante_\\S+' %}
+				{% endfor %}
+			</div>
+			<p style="text-align: right; font-size: 90%;"><a href="{% url 'charla_texto_list_t' charla_titulo=charla_perfil %}">Más</a></p>
+
+			<h5>Ideas</h5>
+			{% for item in textosPerfilIdeas|slice:":5" %}
+				{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
+			{% endfor %}
+			<p style="text-align: right; font-size: 90%;"><a href="{% url 'charla_texto_list_t' charla_titulo=charla_perfil_ideas %}">Más ideas</a></p>
+
 		</div>
 
-		<div class="my-3">
-		<h4>Tu participación</h4>
-		TODO: una lista
-		TODO: link ver todas
+		<div style="text-align: right; font-size: 90%;">
+			| <a href="#presentacion">Presentacion</a> | <a href="#plan">Plan</a> | <a href="#menciones">Menciones</a> | <a href="#participacion">Participación</a> | <a href="#arriba">Arriba</a> | 
 		</div>
 
-		<div class="my-3">
-		<h4>Tu plan</h4>
-		<p>TODO: un texto</p>
-		<p>TODO: una charla para orientarte</p>
+		<div class="my-5 py-2 border-top">
+			<a name="plan"></a>
+			<h4>Tu plan</h4>
+			<div class="px-3 py-3">
+			{% for item in textosPlan %}
+				{% include 'pa_charlas_app/p_texto_simple.html' with item=item %}
+			{% endfor %}
+			</div>
+			<p style="text-align: right; font-size: 90%;"><a href="{% url 'charla_texto_list_t' charla_titulo=charla_plan %}">Más</a></p>
+
+
+			<h5>Ideas</h5>
+			{% for item in textosPlanIdeas|slice:":5" %}
+				{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
+			{% endfor %}
+			<p style="text-align: right; font-size: 90%;"><a href="{% url 'charla_texto_list_t' charla_titulo=charla_plan_ideas %}">Más ideas</a></p>
+
 		</div>
 
-		<div class="my-3">
-		<h4>Cómo te presentás</h4>
-		TODO: un texto
+		<div style="text-align: right; font-size: 90%;">
+			| <a href="#presentacion">Presentacion</a> | <a href="#plan">Plan</a> | <a href="#menciones">Menciones</a> | <a href="#participacion">Participación</a> | <a href="#arriba">Arriba</a> | 
+		</div>
+
+
+		<div class="my-5 py-2 border-top">
+			<a name="menciones"></a>
+			<h4>Textos que te mencionaron</h4>
+
+			{% for item in textosQueMeNombraron|slice:":5" %}
+				{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
+			{% endfor %}
+			<p style="text-align: right; font-size: 90%;"><a href="{% url 'usuario_textos_que_nombran' username=esteUsuario.username %}">Ver Todas</a></p>
+		</div>
+
+		<div style="text-align: right; font-size: 90%;">
+			| <a href="#presentacion">Presentacion</a> | <a href="#plan">Plan</a> | <a href="#menciones">Menciones</a> | <a href="#participacion">Participación</a> | <a href="#arriba">Arriba</a> | 
+		</div>
+
+		<div class="my-5 py-2 border-top">
+			<a name="participacion"></a>
+			<h4>Tu participación</h4>
+			{% for item in textosQueEscribi|slice:":5" %}
+				{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
+			{% endfor %}
+			<p style="text-align: right; font-size: 90%;"><a href="{% url 'usuario_texto_list_k' pk=esteUsuario.pk %}">Ver Todas</a></p>
+		</div>
+
+		<div style="text-align: right; font-size: 90%;">
+			| <a href="#presentacion">Presentacion</a> | <a href="#plan">Plan</a> | <a href="#menciones">Menciones</a> | <a href="#participacion">Participación</a> | <a href="#arriba">Arriba</a> | 
 		</div>
 
 	</div>

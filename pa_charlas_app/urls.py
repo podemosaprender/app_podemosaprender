@@ -39,6 +39,7 @@ urlpatterns = [
 	#A: crear una charla es simplemente escribir un texto con hashtags, hay uno automatico para casuales
 
 	path('charla/<int:charla_pk>/nuevo', login_required(views.texto_edit), name='charla_texto_nuevo'),
+	path('charla/<str:charla_titulo>/nuevo', login_required(views.texto_edit), name='charla_texto_nuevo_s'),
 	path('charla/<int:charla_pk>/<int:pk>', login_required(views.texto_edit), name='charla_texto_edit'),
 	#A: las charlas estan hechas de textos
 	path('texto/<int:pk>', views.texto_detail, name='texto_detail'),
@@ -59,6 +60,7 @@ urlpatterns = [
 
 	path('donde-nombran-a/<str:username>/', views.usuario_textos_que_nombran, name='usuario_textos_que_nombran'),
 	path('como/', login_required(views.usuario_plan), name='usuario_plan'), 
+	path('como/<str:username>/', login_required(views.usuario_plan), name='usuario_plan'), 
 
 	re_path(r't/(?P<un_path>.*)/$', views.CharlaComoPathListView.as_view(), name='charla_como_path'),
 	#A: ej. t/sabado/cada_mes para buscar titulos que digan sabado y cada_mes

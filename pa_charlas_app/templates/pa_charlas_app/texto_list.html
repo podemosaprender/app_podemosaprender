@@ -5,19 +5,21 @@
 
 
 	{% block item_titulo %}
-		<a name="{{ item.de_quien }}__{{ item.fh_editado|date:'U' }}">
-			{{ item.de_quien }},
-
+		<div style="text-align: right; font-size: 90%">
+			<a name="{{ item.de_quien }}__{{ item.fh_editado|date:'U' }}"></a>
+			<a href="{% url "usuario_plan" username=item.de_quien.username %}">
+				{{ item.de_quien }},
+			</a>
 			{% ifnotequal item.fh_editado item.fh_creado %}
 				{{ item.fh_editado }} (editado)
 			{% else %}
 				{{ item.fh_creado }}
 			{% endifnotequal %}
-		</a>
 
-		{% if fh_visita_anterior|date:'c' < item.fh_editado|date:'c' %}
-		<a name="nuevo">(nuevo)</a>
-		{% endif %}
+			{% if fh_visita_anterior|date:'c' < item.fh_editado|date:'c' %}
+			<a name="nuevo">(nuevo)</a>
+			{% endif %}
+		</div>
 	{% endblock %}
 
 	{% block item_cuerpo %}
@@ -27,18 +29,19 @@
 	{% endblock %}
 
 	{% block item_links %}
-		{% if item.de_quien == request.user and puede_crear %}
-			<a href="{% url 'charla_texto_edit' charla_pk=charla.pk pk=item.pk %}" class="btn btn-accesible "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">editar</span></a>
-		{% endif %}
+		<div style="text-align: right;">
+			{% if item.de_quien == request.user and puede_crear %}
+				<a href="{% url 'charla_texto_edit' charla_pk=charla.pk pk=item.pk %}" class="btn btn-accesible "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">editar</span></a>
+			{% endif %}
 
-		{% url_full 'texto_detail' pk=item.pk as permalink %}
-		{% include 'pa_charlas_app/p_compartir_botones.html' with permalink=permalink texto=item.texto texto_element_id="#texto_"|addstr:item.pk %}
-
+			{% url_full 'texto_detail' pk=item.pk as permalink %}
+			{% include 'pa_charlas_app/p_compartir_botones.html' with permalink=permalink texto=item.texto texto_element_id="#texto_"|addstr:item.pk %}
+		</div>
 	{% endblock %}
 
 {% block acciones_sin_item %}
 	{% if user.is_authenticated and puede_crear %}
-		{% url 'charla_texto_nuevo' charla_pk=charla.pk as texto_new_url %}
+		{% url 'charla_texto_nuevo_s' charla_titulo=charla.titulo as texto_new_url %}
 		{% bootstrap_button 'Nuevo texto' href=texto_new_url  %}
 	{% endif %}
 
