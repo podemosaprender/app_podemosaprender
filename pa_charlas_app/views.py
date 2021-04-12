@@ -270,6 +270,11 @@ def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', ord
 		charla= Charla(titulo= prefijo_tag+charla_titulo, tipo= tch_tema, de_quien=request.user)
 	#A: si la charla no existia, seguimos adelante con una temporal que NO queremos guardar
 
+
+	if request.GET.get('o')=='reciente':
+		orden='-fh_editado'
+	print(request.GET.get('o'), orden)
+
 	fh_visita_anterior= dt.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
 	if request.user.is_authenticated and not charla.pk is None:
 		anteriores= Visita.objects.filter(de_quien= request.user, charla= charla)
