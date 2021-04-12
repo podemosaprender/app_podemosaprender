@@ -4,8 +4,9 @@
 
 		{% block item_titulo %}
 
-		<a href="{% url 'texto_detail' pk=item.pk %}">{{ item.fh_creado }}
+		<a href="{% url 'texto_detail' pk=item.pk %}">{{ item.fh_creado }}</a>
 			<i>por</i>
+		<a href="{% url 'usuario_plan' username=item.de_quien.username %}">
 			{{ item.de_quien }}
 		</a>
 		{% endblock %}
