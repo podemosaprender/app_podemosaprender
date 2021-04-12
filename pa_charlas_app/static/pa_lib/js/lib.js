@@ -87,7 +87,7 @@ function recordarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga
 function traerUsuarios(){
 	return $.ajax({ 
 		type: 'GET',
-		url:'/api/participante/',
+		url:'/api/participante/?limit=4000',
 	}).done( recordarUsuariosPk );
 }
 

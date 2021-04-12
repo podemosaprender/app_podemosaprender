@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 
     'rest_framework', #U: atendemos pedidos REST
     'corsheaders', #U: headers para que la API REST se pueda consumir desde otras paginas
+		'rest_framework_simplejwt.token_blacklist', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/blacklist_app.html
 
     'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
 ]
@@ -177,7 +178,8 @@ LOGGING = {
 
 #S: servicios rest
 REST_FRAMEWORK = {
-	'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+	'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+	#VER: https://www.django-rest-framework.org/api-guide/pagination/
 	'PAGE_SIZE': 10,
 	'DEFAULT_AUTHENTICATION_CLASSES': (
   	'rest_framework_simplejwt.authentication.JWTAuthentication', #A: con token
