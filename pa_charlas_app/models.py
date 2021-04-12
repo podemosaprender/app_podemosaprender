@@ -9,6 +9,7 @@ from .util import *
 
 import datetime as dt
 import re
+import hashlib
 
 import logging
 logger = logging.getLogger(__name__)
@@ -123,10 +124,19 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	else:
 		hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
 		if not hashtag in texto.texto:
-			texto.texto += f'\n{hashtag}'
+			texto.texto += f'\n\n{hashtag}'
 		#A: si no venia de una charla, empieza una casual
 
 	hts= hashtags_en(texto.texto, quiere_sin_tildes= False) #A: nuestras urls y db soportan tildes
+	if '#juntada_virtual' in hts:
+		if 'meet' in texto.texto or 'zoom' in texto.texto or 'jit' in texto.texto:
+			pass #A: ya habla de algun servicio de conferencias
+		else:
+			mhash= hashlib.md5(f'{texto.pk} {texto.de_quien.username} {texto.fh_creado}'.encode('utf-8')).hexdigest()
+			#A: un hash para que no se nos metan en la call adivinando PERO que no cambie despues que cree el texto
+			tt= charla_titulo[1:] if not charla_titulo is None else texto.de_quien.username
+			jitsi_link= f'https://meet.jit.si/pa_{tt}_{mhash}'
+			texto.texto= texto.texto.replace('#juntada_virtual', f'#juntada_virtual [en este link]({jitsi_link})')
 	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
 	texto.save()
 
