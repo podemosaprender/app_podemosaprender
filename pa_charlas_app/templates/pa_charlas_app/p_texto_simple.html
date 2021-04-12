@@ -1,0 +1,13 @@
+{% load pa_charlas_app_extras %}
+
+{% define '#.*?_de_participante_'|addstr:item.de_quien.username as ht %}
+{% define item.texto|re_match:ht|then_sub:'' as texto %}
+
+<div>
+	<div id="texto_{{ item.pk }}" class="markdown border-bottom">
+{{ texto }} {% comment %} Mantener esta línea pegada al margen izquierdo {% endcomment %}
+	</div>
+	<div style="text-align: right; font-size: 80%; color: #555;">
+		{{ item.fh_editado }}
+	</div>
+</div>

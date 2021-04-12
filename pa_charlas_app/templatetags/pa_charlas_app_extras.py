@@ -3,6 +3,8 @@
 
 from django import template
 from django import urls
+import re
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -12,6 +14,16 @@ register = template.Library()
 def addstr(arg1, arg2):
 	"""concatenate arg1 & arg2"""
 	return str(arg1) + str(arg2)
+
+@register.filter
+def re_match(arg1, arg2):
+	"""return data for other filter then_..."""
+	return ['match',arg1,arg2] #A: devuelvo un array que va a usar el filtro que sigue
+
+@register.filter
+def then_sub(arg1, arg2):
+	"""mistrvar|re_match:'#(.*)'|then_sub:''"""
+	return re.sub(str(arg1[2]), str(arg2), str(arg1[1])) 
 
 @register.filter
 def at_key(a_dict, key):
