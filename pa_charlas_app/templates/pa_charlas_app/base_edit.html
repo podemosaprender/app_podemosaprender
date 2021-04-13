@@ -19,3 +19,19 @@
 	</form>
 	<div id="botonesParaTags"></div>
 {% endblock %}
+
+{% block extra_js%}
+	<script>
+		/*
+		if(TODO: campturar el input y preguntar si tiene text){ //U: el formulario tiene texto
+			//A:le pregunto antes de cerrar la ventana
+			
+			window.onbeforeunload = preguntarAntesDeSalir;
+			
+			function preguntarAntesDeSalir(){
+				return "¿Seguro que quieres salir?";
+			}
+		}
+		*/
+	</script>
+{% endblock extra_js%}
