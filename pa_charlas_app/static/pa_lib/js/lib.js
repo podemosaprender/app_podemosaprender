@@ -185,17 +185,11 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function apiVotoGuardar() {
-	const voto= {
-    "de_quien": 1,
-    "texto": 7,
-    "voto": 1
-	};
-
+async function apiVotoGuardar(voto,quiere_borrar) {
 	//VER: https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
 	const csrftoken = getCookie('csrftoken');
-	const res= await fetch("/api/votoitem/", {
-    method: "POST",
+	const res= await fetch("/api/votoitem/" + (quiere_borrar ? voto.pk : ''), {
+    method: quiere_borrar ? "DELETE" : "POST",
     headers: {
 				'X-CSRFToken': csrftoken,
         "Accept": "application/json",
@@ -205,16 +199,20 @@ async function apiVotoGuardar() {
     mode: "cors",
     body: JSON.stringify(voto),
 	});
-	const res_data= await res.json();
+	const res_data= quiere_borrar ? '' : await res.json();
 	return res_data;	
 }
 
-function votoClick(btn,tipo_voto,pk) { //U: cuando indico que algo me gusta
-	console.log(btn.style.background,tipo_voto,pk); 
-	if (btn.style.background.startsWith('red')) { 
+async function votoClick(btn,texto_pk) { //U: cuando indico que algo me gusta
+	console.log('votoClick', btn, texto_pk); 
+	if (btn.voto_pk) { //A: tiene un voto y lo quiere borrar
+		const r= await apiVotoGuardar({pk: btn.voto_pk},'quieroBorrar');
+		btn.voto_pk= null; //A: ya no tiene un voto
 		btn.style.background='';
 	}
-	else { 
+	else { //A: quiere poner un voto 
+		const r= await apiVotoGuardar({voto: 1, texto: texto_pk});
+		btn.voto_pk= r.pk; //A: lo guardamos para cuando quiera borrar
 		btn.style.background='red'
 	} 
 }
