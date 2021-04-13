@@ -167,3 +167,54 @@ function usuarioAMarkdownLink(usuario) {
 		return usuario; //A: no cambiamos nada
 	}
 }	
+
+// S: votos ***************************************************
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+async function apiVotoGuardar() {
+	const voto= {
+    "de_quien": 1,
+    "texto": 7,
+    "voto": 1
+	};
+
+	//VER: https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
+	const csrftoken = getCookie('csrftoken');
+	const res= await fetch("/api/votoitem/", {
+    method: "POST",
+    headers: {
+				'X-CSRFToken': csrftoken,
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    },
+		credentials: 'same-origin', 
+    mode: "cors",
+    body: JSON.stringify(voto),
+	});
+	const res_data= await res.json();
+	return res_data;	
+}
+
+function votoClick(btn,tipo_voto,pk) { //U: cuando indico que algo me gusta
+	console.log(btn.style.background,tipo_voto,pk); 
+	if (btn.style.background.startsWith('red')) { 
+		btn.style.background='';
+	}
+	else { 
+		btn.style.background='red'
+	} 
+}
