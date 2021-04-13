@@ -37,8 +37,10 @@ class CharlaParticipanteSerializer(serializers.Serializer):
 	fh_ultimo= serializers.DateTimeField()
 
 class VotoItemSerializer(serializers.ModelSerializer):
-	#de_quien=UserSerializer(read_only=True)
+	de_quien=UserSerializer(read_only=True)
+
 	class Meta:
 		model= VotoItem
 		fields= ['pk','de_quien','fh_creado','texto' ,'voto']
+		read_only_fields= ['pk','de_quien','fh_creado']
 
