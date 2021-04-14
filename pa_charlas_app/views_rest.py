@@ -2,15 +2,19 @@
 #VER: https://www.django-rest-framework.org/api-guide/views/
 #VER: https://www.django-rest-framework.org/api-guide/generic-views/#examples
 
-from rest_framework import viewsets
+from rest_framework import viewsets, mixins, permissions, generics, exceptions
 from rest_framework.views import APIView
-from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
 from django.shortcuts import get_list_or_404, get_object_or_404
+import django
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Charla, charla_participantes, Texto, User, VotoItem
+from .models import (
+	Charla, CharlaItem, charla_tipo_tema, charla_participantes, charla_agregar_texto,
+	Texto, 
+	User
+)
 from .serializers import *
 
 from rest_framework.decorators import api_view
@@ -48,9 +52,33 @@ class CharlaViewSet(viewsets.ViewSet):
 		serializer= CharlaParticipanteSerializer(queryset, many= True)
 		return Response(serializer.data)		
 
-class VotoItemViewSet(viewsets.ModelViewSet):
-	queryset = VotoItem.objects.all()
-	serializer_class = VotoItemSerializer
+#VER: alternativa con permisions https://stackoverflow.com/a/54772675
+class CharlaItemViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
+                      viewsets.GenericViewSet):
+	#A: solo permito las acciones de los mixins que liste Create, Destroy
+	queryset = CharlaItem.objects.all()
+	serializer_class = CharlaItemSerializer
+	permission_classes = [IsAuthenticated] #A: solo si puso usario y clave
+
+	#VER: https://www.django-rest-framework.org/api-guide/generic-views/
+	def perform_create(self, serializer):
+		#DBG: print(serializer.validated_data)
+
+		charla_titulo= serializer.validated_data.get('charla__titulo')
+		texto_id= serializer.validated_data.get('texto__pk')
+		#DBG: print(charla_titulo, texto_id)
+		if not charla_agregar_texto(charla_titulo, texto_id, self.request.user):
+			raise exceptions.ValidationError({'charla__titulo': f'"{charla_titulo} no es un título de charla valido'})
+		
+		#A: si salio todo bien, ya esta.
+		
+
+	def perform_delete(self, serializer):
+		CharlaItem.objects.filter(	
+			charla__titulo= serializer.charla,
+			texto= serializer.texto
+		).delete() #A: si existe para ese dueño lo borra, sino no dice nada
+			
 
 class ParticipanteViewSet(viewsets.ReadOnlyModelViewSet):
 	queryset= User.objects.all()
