@@ -36,9 +36,13 @@ def define(val=None):
 	return val
 
 @register.simple_tag(takes_context=True)
-def url_full(context,view,*args,**kwargs): #U: url con protocolo, host, puerto, ... para permalinks
-	logger.debug(f'url_full {view} {kwargs}')
-	uri= context.request.build_absolute_uri( urls.reverse(view, kwargs= kwargs) ) 
-	logger.debug(f'url_full {view} {kwargs} {uri}')
-	return uri
+def url_full(context,view=None,*args,**kwargs): #U: url con protocolo, host, puerto, ... para permalinks
+	if view is None:
+		return context.request.build_absolute_uri('?')
+	else:
+		logger.debug(f'url_full {view} {kwargs}')
+		uri= context.request.build_absolute_uri( urls.reverse(view, kwargs= kwargs) ) 
+		logger.debug(f'url_full {view} {kwargs} {uri}')
+		return uri
+
 

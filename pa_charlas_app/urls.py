@@ -12,7 +12,7 @@ rest_router = routers.DefaultRouter()
 rest_router.register('participante', views_rest.ParticipanteViewSet, basename='user')
 rest_router.register('charla', views_rest.CharlaViewSet, basename='charla')
 rest_router.register('texto', views_rest.TextoViewSet)
-rest_router.register('votoitem', views_rest.VotoItemViewSet)
+rest_router.register('charlaitem', views_rest.CharlaItemViewSet)
 #A: agregamos las vistas rest al router asi las muestra en la UI
 
 urlpatterns = [

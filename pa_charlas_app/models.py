@@ -85,6 +85,9 @@ class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuari
 
 # S: funciones comodas ######################################
 from .hashtags import hashtags_en
+def charla_tipo_tema(): #U: por comodidad
+	return TipoCharla.objects.get(titulo='Tema')
+
 def conUserYFecha_guardar(form, user, commit= True):
 	ahora= timezone.now() 
 	obj= form.save(commit=False)
@@ -108,6 +111,43 @@ def conUserYFecha_guardar(form, user, commit= True):
 	if commit:
 		obj.save() #A: guarde el obj actualizado, para poder agregarlo a charlas
 	return obj
+
+def charla_titulo_valido(un_string): #U: devuelve un titulo de charla aceptado O None si no tiene arreglo
+	if not un_string[0] in '@#':
+		un_string= '#'+un_string
+	hts= list(hashtags_en(un_string, quiere_sin_tildes= False)) #A: nuestras urls y db soportan tildes
+	if hts[0] == un_string:
+		return un_string
+	else:
+		return None
+
+def charla_agregar_texto(charla_titulo, texto, user, charla_tipo= None): #U: agrega el texto a la charla, q crea si es necesario
+	puedeModificarEstaCharla= True #DFLT
+
+	charla_titulo= charla_titulo_valido(charla_titulo)
+	if charla_titulo is None:
+		return False
+
+	m= re.match(r'.*?de_participante_(.*)$',charla_titulo)
+	if not m is None: #A: es una charla que solo puede modificar una participante
+		puedeModificarEstaCharla= (m.groups(1)[0]	== user.username)
+
+	if puedeModificarEstaCharla:
+		chs= Charla.objects.filter(titulo= charla_titulo) 
+		if chs.exists(): #A: la charla ya existia
+			ch= chs.first() 
+		else:
+			charla_tipo= charla_tipo_tema() if charla_tipo is None else charla_tipo
+			ch= Charla(de_quien= user, titulo= charla_titulo, tipo= charla_tipo)
+			ch.de_quien= user
+			ch.fh_creado= timezone.now()
+			ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
+
+		ch.textos.add(texto)
+		ch.save()
+		return True
+
+	return False
 
 def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
@@ -142,30 +182,13 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 
 
 	#TODO:SEC: limitar quien y cuantas charlas puede crear, es facil crear muuchas
-	tch_tema= TipoCharla.objects.get(titulo='Tema')
+	tch_tema= charla_tipo_tema()
 
 	CharlaItem.objects.filter(texto= texto.pk).delete() #A: borramos y volvemos a crear los tags
 	#TODO: borrar las charlas que se hayan quedado sin items
 
 	for ht in hts:
-		puedeModificarEstaCharla= True #DFLT
-
-		m= re.match(r'.*?de_participante_(.*)$',ht)
-		if not m is None: #A: es una charla que solo puede modificar una participante
-			puedeModificarEstaCharla= (m.groups(1)[0]	== user.username)
-
-		if puedeModificarEstaCharla:
-			chs= Charla.objects.filter(titulo= ht) 
-			if chs.exists(): #A: la charla ya existia
-				ch= chs.first() 
-			else:
-				ch= Charla(de_quien= user, titulo= ht, tipo= tch_tema)
-				ch.de_quien= user
-				ch.fh_creado= timezone.now()
-				ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
-
-			ch.textos.add(texto)
-			ch.save()
+		charla_agregar_texto(ht, texto, user, tch_tema)
 
 	return texto
 
