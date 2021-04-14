@@ -22,16 +22,13 @@
 
 {% block extra_js%}
 	<script>
-		/*
-		if(TODO: campturar el input y preguntar si tiene text){ //U: el formulario tiene texto
-			//A:le pregunto antes de cerrar la ventana
+		window.addEventListener('beforeunload', function (e) {//U: captura el evento 'cerrar la ventana'
+			const element = document.getElementById('id_texto'); //U: me guardo el textArea
 			
-			window.onbeforeunload = preguntarAntesDeSalir;
-			
-			function preguntarAntesDeSalir(){
-				return "¿Seguro que quieres salir?";
+			if(element && element.value !=''){ //U: el formulario exite y tiene texto
+				e.preventDefault(); //U: evito que se cierre la ventana
+				e.returnValue = '¿Desea salir y perder los cambios?';	
 			}
-		}
-		*/
+		});
 	</script>
 {% endblock extra_js%}
