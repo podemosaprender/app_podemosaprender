@@ -161,7 +161,7 @@ function usuarioAMarkdownLink(usuario) {
 	const pk = UsuariosPk[username];
 	//DBG:console.log(usuario, JSON.stringify(username), pk, UsuariosPk	)
 	if (pk!=null) { //A: el usuario existe
-		return `[${usuario}](/usuario/${pk})`; //A: con forma de link markdown si existia
+		return `[${usuario}](/como/${username})`; //A: con forma de link markdown si existia
 	}
 	else {
 		return usuario; //A: no cambiamos nada
