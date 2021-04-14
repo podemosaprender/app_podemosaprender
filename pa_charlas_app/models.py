@@ -85,6 +85,9 @@ class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuari
 
 # S: funciones comodas ######################################
 from .hashtags import hashtags_en
+def charla_tipo_tema(): #U: por comodidad
+	return TipoCharla.objects.get(titulo='Tema')
+
 def conUserYFecha_guardar(form, user, commit= True):
 	ahora= timezone.now() 
 	obj= form.save(commit=False)
@@ -142,7 +145,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 
 
 	#TODO:SEC: limitar quien y cuantas charlas puede crear, es facil crear muuchas
-	tch_tema= TipoCharla.objects.get(titulo='Tema')
+	tch_tema= charla_tipo_tema()
 
 	CharlaItem.objects.filter(texto= texto.pk).delete() #A: borramos y volvemos a crear los tags
 	#TODO: borrar las charlas que se hayan quedado sin items

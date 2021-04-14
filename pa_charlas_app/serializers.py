@@ -36,6 +36,10 @@ class CharlaParticipanteSerializer(serializers.Serializer):
 	username= serializers.CharField(source='texto__de_quien__username')
 	fh_ultimo= serializers.DateTimeField()
 
+class CharlaItemSerializer(serializers.Serializer):
+	charla_titulo= serializers.CharField(source='charla__titulo')
+	texto_pk= serializers.CharField(source='texto__pk')	
+
 class VotoItemSerializer(serializers.ModelSerializer):
 	de_quien=UserSerializer(read_only=True)
 

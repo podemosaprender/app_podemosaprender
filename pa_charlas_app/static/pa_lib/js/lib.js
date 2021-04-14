@@ -185,10 +185,10 @@ function getCookie(name) {
     return cookieValue;
 }
 
-async function apiVotoGuardar(voto,quiere_borrar) {
+async function apiTextoACharlaGuardar(charlaitem, quiere_borrar) { //U: agrega un texto a una charla por su titulo, si no existe la crea
 	//VER: https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
 	const csrftoken = getCookie('csrftoken');
-	const res= await fetch("/api/votoitem/" + (quiere_borrar ? voto.pk : ''), {
+	const res= await fetch("/api/charlaitem/" + (quiere_borrar ? charlaitem.pk : ''), {
     method: quiere_borrar ? "DELETE" : "POST",
     headers: {
 				'X-CSRFToken': csrftoken,
@@ -197,22 +197,14 @@ async function apiVotoGuardar(voto,quiere_borrar) {
     },
 		credentials: 'same-origin', 
     mode: "cors",
-    body: JSON.stringify(voto),
+    body: JSON.stringify(charlaitem),
 	});
 	const res_data= quiere_borrar ? '' : await res.json();
 	return res_data;	
 }
 
-async function votoClick(btn,texto_pk) { //U: cuando indico que algo me gusta
+async function agregarAOtraCharlaClick(btn,texto_pk) { //U: cuando indico que algo me gusta
 	console.log('votoClick', btn, texto_pk); 
-	if (btn.voto_pk) { //A: tiene un voto y lo quiere borrar
-		const r= await apiVotoGuardar({pk: btn.voto_pk},'quieroBorrar');
-		btn.voto_pk= null; //A: ya no tiene un voto
-		btn.style.background='';
-	}
-	else { //A: quiere poner un voto 
-		const r= await apiVotoGuardar({voto: 1, texto: texto_pk});
-		btn.voto_pk= r.pk; //A: lo guardamos para cuando quiera borrar
-		btn.style.background='red'
-	} 
+	const charla= prompt('Nombre de la charla')
+	const r= await apiTextoACharlaGuardar({charla_titulo: charla, texto_pk: texto_pk});
 }
