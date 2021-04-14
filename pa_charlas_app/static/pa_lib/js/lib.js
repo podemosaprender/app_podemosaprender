@@ -75,13 +75,13 @@ function traerTags(){
 }
 
 function recordarTags(hashtags){ //U: filtra lo que manda el servidor y lo carga en Tags
+	Tags= []; TagsTodos= []; //A: volver a inicializar, sino se van duplicando
 	for (let tag of hashtags) {  
 		if ( ! tag.titulo.startsWith("#casual")) { //A: solo incluir los que no empiezan con casual
 			Tags.push(tag.titulo);
 		}
 		TagsTodos.push(tag.titulo);
 	};
-
 };
 
 function traerUsuarios(){
@@ -128,7 +128,17 @@ function getMatchingTags(pattern) {
 }
 
 function insertaTag(valor, texto_dst) {
-	insertAtCursor(texto_dst, valor.value);
+	const el_destino= typeof(texto_dst)=="string" 
+	? document.querySelector(texto_dst) 
+	: texto_dst;
+	//A: el_destino tiene un elemento
+	
+	if ('value' in el_destino) { //A: es input o textarea
+		insertAtCursor(texto_dst, valor.value+' ');
+	}
+	else { //A: es otro elemento
+		el_destino.innerHTML += valor.value + ' ';	
+	}
 }
     
 function showTagButtons(pattern, tags_dst, texto_dst) { //U: para conectar con onKeyUp de un input, y pasarle el selector de la div donde aparecen los tags, y el textarea donde insertarlos
@@ -187,24 +197,49 @@ function getCookie(name) {
 
 async function apiTextoACharlaGuardar(charlaitem, quiere_borrar) { //U: agrega un texto a una charla por su titulo, si no existe la crea
 	//VER: https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
-	const csrftoken = getCookie('csrftoken');
-	const res= await fetch("/api/charlaitem/" + (quiere_borrar ? charlaitem.pk : ''), {
-    method: quiere_borrar ? "DELETE" : "POST",
-    headers: {
-				'X-CSRFToken': csrftoken,
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-    },
-		credentials: 'same-origin', 
-    mode: "cors",
-    body: JSON.stringify(charlaitem),
-	});
-	const res_data= quiere_borrar ? '' : await res.json();
+	try {
+		const csrftoken = getCookie('csrftoken');
+		const res= await fetch("/api/charlaitem/" + (quiere_borrar ? charlaitem.pk : ''), {
+			method: quiere_borrar ? "DELETE" : "POST",
+			headers: {
+					'X-CSRFToken': csrftoken,
+					"Accept": "application/json",
+					"Content-Type": "application/json",
+			},
+			credentials: 'same-origin', 
+			mode: "cors",
+			body: JSON.stringify(charlaitem),
+		});
+		const res_data= quiere_borrar ? '' : await res.json();
+		if (res_data==null || typeof(res_data)!='object') { res_data= {} }
+		res_data.ok= res.ok;
+	}
+	catch (ex) {
+		res_data= {ok: false};
+	}
+	console.log('apiTextoACharlaGuardar',charlaitem,res_data);
 	return res_data;	
 }
 
 async function agregarAOtraCharlaClick(btn,texto_pk) { //U: cuando indico que algo me gusta
-	console.log('votoClick', btn, texto_pk); 
-	const charla= prompt('Nombre de la charla')
-	const r= await apiTextoACharlaGuardar({charla_titulo: charla, texto_pk: texto_pk});
+	//DBG: 
+	console.log('agregarAOtraCharlaClick', btn, texto_pk); 
+	ModalElegirCharlaOnOk_= async (charlasElegidasStr) => { //U: la llama el modal si apreto aceptar
+		const charlas= charlasElegidasStr.split(/\s+/);	
+		const promesas= charlas.map(charla => 
+			apiTextoACharlaGuardar({charla_titulo: charla, texto_pk: texto_pk})
+		);
+
+		let hayErrores= false;
+		try {
+			const res= await Promise.all(promesas);
+			hayErrores= ! res.every(r => r.texto_pk) //A: si se pudo guardar, todos los resultados tienen texto_pk	
+		}
+		catch (ex) {
+			
+		}
+		if (hayErrores) { alert('No se pudo guardar.'); }
+		else { $('#ModalElegirCharla').modal('hide'); }
+	};
+	$('#ModalElegirCharla').modal();	
 }

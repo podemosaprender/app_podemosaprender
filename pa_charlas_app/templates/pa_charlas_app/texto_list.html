@@ -3,9 +3,40 @@
 {% load bootstrap4 %}
 {% load pa_charlas_app_extras %}
 
+	{% block antes_de_content %}
+<div id="ModalElegirCharla" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Agregar a otra charla</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿A qué charlas querés agregar el texto?</p>
+				<textarea id="charlas_elegidas" style="width: 100%" rows=2></textarea></br>
+				<p>Buscar <input type="text" 
+					placeholder="Tags y Usuarios" 
+					onkeyup="showTagButtons(this.value, '#botonesParaTags', '#charlas_elegidas')"
+				></p>
+				<div id="botonesParaTags"></div>
+      </div>
+      <div class="modal-footer">
+				<button type="button" class="btn btn-primary" 
+					onclick="ModalElegirCharlaOnOk_(document.getElementById('charlas_elegidas').value)"
+				>Aceptar
+				</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+	{% endblock %}
 
 	{% block item_titulo %}
 		<div style="text-align: right; font-size: 90%">
+			<a name="texto_{{ item.pk }}"></a>
 			<a name="{{ item.de_quien }}__{{ item.fh_editado|date:'U' }}"></a>
 			<a href="{% url "usuario_plan" username=item.de_quien.username %}">
 				{{ item.de_quien }},
@@ -34,10 +65,13 @@
 				<a href="{% url 'charla_texto_edit' charla_pk=charla.pk pk=item.pk %}" class="btn btn-accesible "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">editar</span></a>
 			{% endif %}
 
-			<button type="button" class="btn btn-primary" onClick="agregarAOtraCharlaClick(this,{{item.pk }})">Agregar a otra charla</button>
+			{% if request.user.is_authenticated %}
+				<button type="button" class="btn btn-primary" onClick="agregarAOtraCharlaClick(this,{{item.pk }})"><span class="fa fa-plus"><span class="sr-only">Agregar a otra charla</span></span></button>
+			{% endif %}
 
 			{% url_full 'texto_detail' pk=item.pk as permalink %}
 			{% include 'pa_charlas_app/p_compartir_botones.html' with permalink=permalink texto=item.texto texto_element_id="#texto_"|addstr:item.pk %}
+			<a href="#" onclick="copyToClipboard('{% url_full %}#texto_{{ item.pk }}'); return false" class="btn btn-social-icon btn-accesible"><span class="fa fa-link"><span class="sr-only">sólo link</span></span></a>
 		</div>
 	{% endblock %}
 

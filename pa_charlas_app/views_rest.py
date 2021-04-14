@@ -2,7 +2,7 @@
 #VER: https://www.django-rest-framework.org/api-guide/views/
 #VER: https://www.django-rest-framework.org/api-guide/generic-views/#examples
 
-from rest_framework import viewsets, mixins, permissions, generics
+from rest_framework import viewsets, mixins, permissions, generics, exceptions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action, permission_classes
@@ -11,7 +11,7 @@ import django
 from rest_framework.permissions import IsAuthenticated
 
 from .models import (
-	Charla, CharlaItem, charla_tipo_tema, charla_participantes, 
+	Charla, CharlaItem, charla_tipo_tema, charla_participantes, charla_agregar_texto,
 	Texto, 
 	User
 )
@@ -58,6 +58,7 @@ class CharlaItemViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
 	#A: solo permito las acciones de los mixins que liste Create, Destroy
 	queryset = CharlaItem.objects.all()
 	serializer_class = CharlaItemSerializer
+	permission_classes = [IsAuthenticated] #A: solo si puso usario y clave
 
 	#VER: https://www.django-rest-framework.org/api-guide/generic-views/
 	def perform_create(self, serializer):
@@ -65,28 +66,12 @@ class CharlaItemViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
 
 		charla_titulo= serializer.validated_data.get('charla__titulo')
 		texto_id= serializer.validated_data.get('texto__pk')
-		#DBG: print(charla_titulo)
-		#TODO: validar que sea un titulo aceptable
-
-		charla_q= Charla.objects.filter(
-			titulo= charla_titulo
-		)
-		if charla_q.exists():
-			charla= charla_q.first() #A: existia, uso esa
-		else: #A: no existia ninguna con ese titulo
-			charla= Charla(
-				titulo= charla_titulo,
-				tipo= charla_tipo_tema(),
-				de_quien= self.request.user
-			)
-			charla.save() #A: la cree y la guarde
-			#TODO:SEC:no dejarme agregar textos a charlas de otro participante
-
-		(item, loCreoP)= CharlaItem.objects.get_or_create(  #A: si estaba O crea me consigue el pk
-			texto_id= texto_id,
-			charla= charla
-		)
-		serializer.validated_data['pk']= item.pk #A: le paso el pk a la respuesta q va al navegador
+		#DBG: print(charla_titulo, texto_id)
+		if not charla_agregar_texto(charla_titulo, texto_id, self.request.user):
+			raise exceptions.ValidationError({'charla__titulo': f'"{charla_titulo} no es un título de charla valido'})
+		
+		#A: si salio todo bien, ya esta.
+		
 
 	def perform_delete(self, serializer):
 		CharlaItem.objects.filter(	
