@@ -48,6 +48,9 @@ class Charla(models.Model): #U: una coleccion de textos sobre algun tema
 class CharlaItem(models.Model): #U: conecta un texto con una charla
 	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
 	texto=  models.ForeignKey('Texto', on_delete=models.CASCADE)
+	orden= models.CharField(max_length=50, default='') #U: ordenamos 1ro por esto, despues por fecha
+	nivel= models.IntegerField(default=0) #U: 0 es el de siempre, 1 es mas adentro ej. respuesta, 2 es comentario en la respuesta como un hilo en FB, etc.
+	
 
 	def __str__(self):
 		return f'{self.charla.titulo} {self.texto}'
