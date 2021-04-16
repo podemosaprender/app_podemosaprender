@@ -124,7 +124,7 @@ def charla_titulo_valido(un_string): #U: devuelve un titulo de charla aceptado O
 	else:
 		return None
 
-def charla_agregar_texto(charla_titulo, texto, user, charla_tipo= None): #U: agrega el texto a la charla, q crea si es necesario
+def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= None): #U: agrega el texto a la charla, q crea si es necesario
 	puedeModificarEstaCharla= True #DFLT
 
 	charla_titulo= charla_titulo_valido(charla_titulo)
@@ -146,14 +146,21 @@ def charla_agregar_texto(charla_titulo, texto, user, charla_tipo= None): #U: agr
 			ch.fh_creado= timezone.now()
 			ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
 
-		ch.textos.add(texto)
-		ch.save()
+		(chit, loCreoP)= CharlaItem.objects.get_or_create(
+			charla= ch,
+			texto= texto
+		)
+		if not orden is None:
+			chit.orden= orden
+
+		chit.save()
 		return True
 
 	return False
 
 def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
+	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
 
 	#TODO:SEC no dejar modificar textos de otro user
 	if charla_titulo is None and not charla_pk is None:
@@ -191,7 +198,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	#TODO: borrar las charlas que se hayan quedado sin items
 
 	for ht in hts:
-		charla_agregar_texto(ht, texto, user, tch_tema)
+		charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
 
 	return texto
 

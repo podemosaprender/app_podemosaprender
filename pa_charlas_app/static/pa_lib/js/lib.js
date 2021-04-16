@@ -208,6 +208,7 @@ function getCookie(name) {
 
 async function apiTextoACharlaGuardar(charlaitem, quiere_borrar) { //U: agrega un texto a una charla por su titulo, si no existe la crea
 	//VER: https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
+	var res_data= {}; //DFLT
 	try {
 		const csrftoken = getCookie('csrftoken');
 		const res= await fetch("/api/charlaitem/" + (quiere_borrar ? charlaitem.pk : ''), {
@@ -221,7 +222,7 @@ async function apiTextoACharlaGuardar(charlaitem, quiere_borrar) { //U: agrega u
 			mode: "cors",
 			body: JSON.stringify(charlaitem),
 		});
-		const res_data= quiere_borrar ? '' : await res.json();
+		res_data= quiere_borrar ? '' : await res.json();
 		if (res_data==null || typeof(res_data)!='object') { res_data= {} }
 		res_data.ok= res.ok;
 	}
@@ -253,4 +254,12 @@ async function agregarAOtraCharlaClick(btn,texto_pk) { //U: cuando indico que al
 		else { $('#ModalElegirCharla').modal('hide'); }
 	};
 	$('#ModalElegirCharla').modal();	
+}
+
+async function guardarOrdenEnCharlaClick(el, input_id, texto_pk, charla) { //U: cambiar orden texto en una charla
+	const orden= document.getElementById( input_id ).value; //A: el orden es un string que escribo en la UI
+	const res= await apiTextoACharlaGuardar({charla_titulo: charla, texto_pk: texto_pk, orden: orden});
+	if (! (res && res.ok)) {
+		alert("No se pudo guardar");
+	}
 }
