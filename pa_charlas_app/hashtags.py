@@ -14,7 +14,7 @@ def string_sin_tilde(s): #U: devuelve s con las letras con tilde reempazadas por
 
 
 def hashtags_en(texto, quiere_sin_tildes= True):
-	tags= set(re.findall(r'\B[@#][a-zA-Z'+LETRAS_CON_TILDE+'0-9_]+', texto))
+	tags= set(re.findall(r'[\s\n]([@#][a-zA-Z'+LETRAS_CON_TILDE+'0-9\._-]+)', texto))
 	result= list(map(string_sin_tilde, tags)) if quiere_sin_tildes else tags
 	return result
 	

@@ -237,7 +237,7 @@ async function agregarAOtraCharlaClick(btn,texto_pk) { //U: cuando indico que al
 	//DBG: 
 	console.log('agregarAOtraCharlaClick', btn, texto_pk); 
 	ModalElegirCharlaOnOk_= async (charlasElegidasStr) => { //U: la llama el modal si apreto aceptar
-		const charlas= charlasElegidasStr.split(/\s+/);	
+		const charlas= charlasElegidasStr.trim().split(/\s+/);	
 		const promesas= charlas.map(charla => 
 			apiTextoACharlaGuardar({charla_titulo: charla, texto_pk: texto_pk})
 		);
