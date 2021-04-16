@@ -118,8 +118,10 @@ def conUserYFecha_guardar(form, user, commit= True):
 def charla_titulo_valido(un_string): #U: devuelve un titulo de charla aceptado O None si no tiene arreglo
 	if not un_string[0] in '@#':
 		un_string= '#'+un_string
-	hts= list(hashtags_en(un_string, quiere_sin_tildes= False)) #A: nuestras urls y db soportan tildes
-	if hts[0] == un_string:
+	hts= list(hashtags_en(f' {un_string} ', quiere_sin_tildes= False)) #A: nuestras urls y db soportan tildes
+	#TODO: mover a hashtags_en , pq por ej. ahora requiere espacios alrededor del titulo y hay que hacer esta chanchada
+	print(f'charla_titulo_valido "{un_string}" {hts}')
+	if len(hts)>0 and hts[0] == un_string:
 		return un_string
 	else:
 		return None
@@ -146,8 +148,9 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 			ch.fh_creado= timezone.now()
 			ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
 
-		#DBG: texto_id= texto if type(texto)==int else texto.pk
-		print(f'TEXTO_ID {texto_id}')
+	
+		texto_id= texto if type(texto)==int else texto.pk
+		#DBG: print(f'TEXTO_ID {texto_id} CHARLA {ch}')
 		(chit, loCreoP)= CharlaItem.objects.get_or_create(
 			charla= ch,
 			texto_id= texto_id
@@ -156,6 +159,7 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 			chit.orden= orden
 
 		chit.save()
+
 		return True
 
 	return False
@@ -180,6 +184,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 		#A: si no venia de una charla, empieza una casual, espacio para q no sea titulo markdown
 
 	hts= hashtags_en(texto.texto, quiere_sin_tildes= False) #A: nuestras urls y db soportan tildes
+	#DBG: print(f'hashtags {hts} en {texto.texto}')
 	if '#juntada_virtual' in hts:
 		if 'meet' in texto.texto or 'zoom' in texto.texto or 'jit' in texto.texto:
 			pass #A: ya habla de algun servicio de conferencias
