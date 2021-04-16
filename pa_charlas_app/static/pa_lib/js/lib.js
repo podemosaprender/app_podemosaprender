@@ -56,8 +56,66 @@ function insertAtCursor(el_o_selector, textoAInsertar) { //U: inserta texto dond
 	
 	el_destino.focus(); //A: volver al elemento donde escribimos
 }
-/************************************************************************** */
 
+//INFO: generar url de img para un diagrama usando el servicio de plantuml
+
+//S: lib, encode ************************************************************
+function encode64(data) {
+  r = "";
+  for (i=0; i<data.length; i+=3) {
+    if (i+2==data.length) {
+      r +=append3bytes(data.charCodeAt(i), data.charCodeAt(i+1), 0);
+    } else if (i+1==data.length) {
+      r += append3bytes(data.charCodeAt(i), 0, 0);
+    } else {
+      r += append3bytes(data.charCodeAt(i), data.charCodeAt(i+1),
+      data.charCodeAt(i+2));
+    }
+  }
+  return r;
+}
+
+function append3bytes(b1, b2, b3) {
+  c1 = b1 >> 2;
+  c2 = ((b1 & 0x3) << 4) | (b2 >> 4);
+  c3 = ((b2 & 0xF) << 2) | (b3 >> 6);
+  c4 = b3 & 0x3F;
+  r = "";
+  r += encode6bit(c1 & 0x3F);
+  r += encode6bit(c2 & 0x3F);
+  r += encode6bit(c3 & 0x3F);
+  r += encode6bit(c4 & 0x3F);
+  return r;
+}
+
+function encode6bit(b) {
+  if (b < 10) { return String.fromCharCode(48 + b); }
+  b -= 10;
+  if (b < 26) { return String.fromCharCode(65 + b); }
+  b -= 26;
+  if (b < 26) { return String.fromCharCode(97 + b); }
+  b -= 26;
+  if (b == 0) { return '-'; }
+  if (b == 1) { return '_'; }
+  return '?';
+}
+
+//S: lib: plantuml **********************************************************
+//VER: https://plantuml.com/
+function plantumlImgUrlPara(texto_diagrama) { //U: una url que se puede usar en img src=...
+	texto_diagrama= texto_diagrama.replace(/&gt;/g,'>').replace(/&lt;/g,'<'); //A: los corchetes que reemplaza django
+  const s= unescape(encodeURIComponent(texto_diagrama));
+  const url= "http://www.plantuml.com/plantuml/img/"+encode64(deflate(s, 9));
+  return url;
+}
+
+function plantumlImgHtmlPara(texto_diagrama) { //U: un tag img con la url del diagrama
+	return `<div class="diagrama"><img src="${plantumlImgUrlPara(texto_diagrama)}" alt="diagrama"></div>`
+}
+
+PLANTUML_REGEX= /(^|\n)\s*@start(uml|salt|gantt|mindmap|wbs)[^]+?@end\2.*\n/g; //U: cualquier diagrama de pantuml
+
+/************************************************************************** */
 //S: Autocompletar tags
 
 
@@ -107,7 +165,6 @@ function traerDatos() {
 }
 
 /************************************************************************** */
-
 //Autocompletar#############################
 
 function filterSubstring(Arr, Input) {
@@ -151,10 +208,7 @@ traerTags();
 traerUsuarios();
 
 /************************************************************************** */
-
-//Convertir hashtags y usuarios dentro del texto en links markdown
-
-
+//S: Convertir hashtags y usuarios dentro del texto en links markdown
 
 function hashtagAMarkdownLink(hashtag) {
 	//TODO: revisar si es una charla que existe, sino devolverlo tal cual
