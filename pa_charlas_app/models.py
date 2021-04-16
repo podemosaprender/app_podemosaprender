@@ -148,7 +148,7 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 
 		(chit, loCreoP)= CharlaItem.objects.get_or_create(
 			charla= ch,
-			texto= texto
+			texto_id= texto if type(texto)==int else texto.pk
 		)
 		if not orden is None:
 			chit.orden= orden
