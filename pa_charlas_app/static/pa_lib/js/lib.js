@@ -178,6 +178,17 @@ function usuarioAMarkdownLink(usuario) {
 	}
 }	
 
+function youtubeUrlAEmbed(yturl) { //U: html con video embebido para la url de youtube yturl
+  const m= yturl.match(/[?&]v=([a-zA-Z0-9-_]+)/);
+	//VER: https://getbootstrap.com/docs/4.0/utilities/embed/
+	const html= `
+ <div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${m[1]}?rel=0" allowfullscreen></iframe>
+</div>
+`;
+	return html;
+}
+
 // S: votos ***************************************************
 function getCookie(name) {
     let cookieValue = null;
