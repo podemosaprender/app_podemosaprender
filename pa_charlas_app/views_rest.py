@@ -66,8 +66,10 @@ class CharlaItemViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
 
 		charla_titulo= serializer.validated_data.get('charla__titulo')
 		texto_id= serializer.validated_data.get('texto__pk')
+		orden= serializer.validated_data.get('orden') #A: es opcional
+
 		#DBG: print(charla_titulo, texto_id)
-		if not charla_agregar_texto(charla_titulo, texto_id, self.request.user):
+		if not charla_agregar_texto(charla_titulo, texto_id, self.request.user, orden=orden):
 			raise exceptions.ValidationError({'charla__titulo': f'"{charla_titulo} no es un título de charla valido'})
 		
 		#A: si salio todo bien, ya esta.
