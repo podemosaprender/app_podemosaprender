@@ -146,9 +146,11 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 			ch.fh_creado= timezone.now()
 			ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
 
+		#DBG: texto_id= texto if type(texto)==int else texto.pk
+		print(f'TEXTO_ID {texto_id}')
 		(chit, loCreoP)= CharlaItem.objects.get_or_create(
 			charla= ch,
-			texto_id= texto if type(texto)==int else texto.pk
+			texto_id= texto_id
 		)
 		if not orden is None:
 			chit.orden= orden
@@ -169,13 +171,13 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 
 	if not charla_titulo is None:	
 		if not charla_titulo in texto.texto:
-			texto.texto += f'\n\n{charla_titulo}'
-		#A: si venia de una charla, le agrego el hashtag automaticamente
+			texto.texto += f'\n\n {charla_titulo}'
+		#A: si venia de una charla, le agrego el hashtag automaticamente, espacio para q no sea titulo markdown
 	else:
 		hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
 		if not hashtag in texto.texto:
-			texto.texto += f'\n\n{hashtag}'
-		#A: si no venia de una charla, empieza una casual
+			texto.texto += f'\n\n {hashtag}' 
+		#A: si no venia de una charla, empieza una casual, espacio para q no sea titulo markdown
 
 	hts= hashtags_en(texto.texto, quiere_sin_tildes= False) #A: nuestras urls y db soportan tildes
 	if '#juntada_virtual' in hts:
