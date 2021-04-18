@@ -288,11 +288,11 @@ def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', ord
 	
 	participantes= charla_participantes(charla_titulo= charla_titulo, charla_pk= pk).order_by('-fh_ultimo') #A: con menos adelante es descendiente, mas reciente arriba
 
-	textos= charla.textos.order_by(orden).all() if not charla.pk is None else []
+	charlaitems= charla.charlaitem_set.order_by('orden',f'texto__{orden}').all() if not charla.pk is None else []
 
 	mostrar_titulo= charla.titulo if mostrar_titulo is None else mostrar_titulo
-	return render(request, 'pa_charlas_app/texto_list.html', {
-		'object_list': textos, 
+	return render(request, 'pa_charlas_app/charla_texto_list.html', {
+		'object_list': charlaitems, 
 		'participantes': participantes, 
 		'charla': charla, 
 		'titulo': mostrar_titulo, 

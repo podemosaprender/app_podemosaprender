@@ -55,10 +55,14 @@
 							<li class="nav-item text-nowrap">
 								<a href="/charla/" class="nav-link" >Charlas</a>
 							</li>
-
 							<li class="nav-item text-nowrap">
 								<a href="/como/" class="nav-link" >¿Cómo voy?</a>
 							</li>
+
+							<li class="nav-item text-nowrap">
+								<a href="/charla/necesito_ayuda/" class="nav-link" >Necesito Ayuda</a>
+							</li>
+
 
 							<li class="nav-item text-nowrap">
 								<a href="/charla/sugerencias" class="nav-link" >Sugerencias</a>
@@ -151,7 +155,8 @@
 																	//TODO: No reemplazar hash en urls
 																	txt_con_tags = el.innerHTML.replace(/(^|\s)#([A-Za-záéíóúüñÁÉÍÓÚÜÑ0-9_]+)/g, (m,m1,m2) => (m1+hashtagAMarkdownLink('#'+m2))) //A: busco y reemplazo hashtags con links markdown
 																	txt_con_usuarios = txt_con_tags.replace(/(^|\s)@([A-Za-z0-9_\.-]+)/g, (m,m1,m2) => (m1+usuarioAMarkdownLink('@'+m2))) //A: busco y reemplazo usuarios con links markdown
-																	markedHtml= marked(x= limpiar_indent(txt_con_usuarios)); //A: convierto markdown a html
+																	txt_con_video = txt_con_usuarios.replace(/https:\/\/www.youtube.com\/watch\S+/g, youtubeUrlAEmbed);
+																	markedHtml= marked(x= limpiar_indent(txt_con_video)); //A: convierto markdown a html
 																	markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
 																	markedEl.insertAfter(el); //A: lo puse a continuacion del original
 																	jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original

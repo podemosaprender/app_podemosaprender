@@ -48,6 +48,9 @@ class Charla(models.Model): #U: una coleccion de textos sobre algun tema
 class CharlaItem(models.Model): #U: conecta un texto con una charla
 	charla= models.ForeignKey('Charla', on_delete=models.CASCADE)
 	texto=  models.ForeignKey('Texto', on_delete=models.CASCADE)
+	orden= models.CharField(max_length=50, default='') #U: ordenamos 1ro por esto, despues por fecha
+	nivel= models.IntegerField(default=0) #U: 0 es el de siempre, 1 es mas adentro ej. respuesta, 2 es comentario en la respuesta como un hilo en FB, etc.
+	
 
 	def __str__(self):
 		return f'{self.charla.titulo} {self.texto}'
@@ -115,13 +118,15 @@ def conUserYFecha_guardar(form, user, commit= True):
 def charla_titulo_valido(un_string): #U: devuelve un titulo de charla aceptado O None si no tiene arreglo
 	if not un_string[0] in '@#':
 		un_string= '#'+un_string
-	hts= list(hashtags_en(un_string, quiere_sin_tildes= False)) #A: nuestras urls y db soportan tildes
-	if hts[0] == un_string:
+	hts= list(hashtags_en(f' {un_string} ', quiere_sin_tildes= False)) #A: nuestras urls y db soportan tildes
+	#TODO: mover a hashtags_en , pq por ej. ahora requiere espacios alrededor del titulo y hay que hacer esta chanchada
+	print(f'charla_titulo_valido "{un_string}" {hts}')
+	if len(hts)>0 and hts[0] == un_string:
 		return un_string
 	else:
 		return None
 
-def charla_agregar_texto(charla_titulo, texto, user, charla_tipo= None): #U: agrega el texto a la charla, q crea si es necesario
+def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= None): #U: agrega el texto a la charla, q crea si es necesario
 	puedeModificarEstaCharla= True #DFLT
 
 	charla_titulo= charla_titulo_valido(charla_titulo)
@@ -143,14 +148,25 @@ def charla_agregar_texto(charla_titulo, texto, user, charla_tipo= None): #U: agr
 			ch.fh_creado= timezone.now()
 			ch.save()	#A: cree una charla nueva, la guardo para poder agregar el texto
 
-		ch.textos.add(texto)
-		ch.save()
+	
+		texto_id= texto if type(texto)==int else texto.pk
+		#DBG: print(f'TEXTO_ID {texto_id} CHARLA {ch}')
+		(chit, loCreoP)= CharlaItem.objects.get_or_create(
+			charla= ch,
+			texto_id= texto_id
+		)
+		if not orden is None:
+			chit.orden= orden
+
+		chit.save()
+
 		return True
 
 	return False
 
 def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
+	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
 
 	#TODO:SEC no dejar modificar textos de otro user
 	if charla_titulo is None and not charla_pk is None:
@@ -159,15 +175,16 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 
 	if not charla_titulo is None:	
 		if not charla_titulo in texto.texto:
-			texto.texto += f'\n\n{charla_titulo}'
-		#A: si venia de una charla, le agrego el hashtag automaticamente
+			texto.texto += f'\n\n {charla_titulo}'
+		#A: si venia de una charla, le agrego el hashtag automaticamente, espacio para q no sea titulo markdown
 	else:
 		hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
 		if not hashtag in texto.texto:
-			texto.texto += f'\n\n{hashtag}'
-		#A: si no venia de una charla, empieza una casual
+			texto.texto += f'\n\n {hashtag}' 
+		#A: si no venia de una charla, empieza una casual, espacio para q no sea titulo markdown
 
 	hts= hashtags_en(texto.texto, quiere_sin_tildes= False) #A: nuestras urls y db soportan tildes
+	#DBG: print(f'hashtags {hts} en {texto.texto}')
 	if '#juntada_virtual' in hts:
 		if 'meet' in texto.texto or 'zoom' in texto.texto or 'jit' in texto.texto:
 			pass #A: ya habla de algun servicio de conferencias
@@ -188,7 +205,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	#TODO: borrar las charlas que se hayan quedado sin items
 
 	for ht in hts:
-		charla_agregar_texto(ht, texto, user, tch_tema)
+		charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
 
 	return texto
 

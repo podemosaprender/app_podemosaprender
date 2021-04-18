@@ -178,6 +178,17 @@ function usuarioAMarkdownLink(usuario) {
 	}
 }	
 
+function youtubeUrlAEmbed(yturl) { //U: html con video embebido para la url de youtube yturl
+  const m= yturl.match(/[?&]v=([a-zA-Z0-9-_]+)/);
+	//VER: https://getbootstrap.com/docs/4.0/utilities/embed/
+	const html= `
+ <div class="embed-responsive embed-responsive-16by9">
+  <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/${m[1]}?rel=0" allowfullscreen></iframe>
+</div>
+`;
+	return html;
+}
+
 // S: votos ***************************************************
 function getCookie(name) {
     let cookieValue = null;
@@ -197,6 +208,7 @@ function getCookie(name) {
 
 async function apiTextoACharlaGuardar(charlaitem, quiere_borrar) { //U: agrega un texto a una charla por su titulo, si no existe la crea
 	//VER: https://docs.djangoproject.com/en/3.2/ref/csrf/#ajax
+	var res_data= {}; //DFLT
 	try {
 		const csrftoken = getCookie('csrftoken');
 		const res= await fetch("/api/charlaitem/" + (quiere_borrar ? charlaitem.pk : ''), {
@@ -210,7 +222,7 @@ async function apiTextoACharlaGuardar(charlaitem, quiere_borrar) { //U: agrega u
 			mode: "cors",
 			body: JSON.stringify(charlaitem),
 		});
-		const res_data= quiere_borrar ? '' : await res.json();
+		res_data= quiere_borrar ? '' : await res.json();
 		if (res_data==null || typeof(res_data)!='object') { res_data= {} }
 		res_data.ok= res.ok;
 	}
@@ -225,7 +237,7 @@ async function agregarAOtraCharlaClick(btn,texto_pk) { //U: cuando indico que al
 	//DBG: 
 	console.log('agregarAOtraCharlaClick', btn, texto_pk); 
 	ModalElegirCharlaOnOk_= async (charlasElegidasStr) => { //U: la llama el modal si apreto aceptar
-		const charlas= charlasElegidasStr.split(/\s+/);	
+		const charlas= charlasElegidasStr.trim().split(/\s+/);	
 		const promesas= charlas.map(charla => 
 			apiTextoACharlaGuardar({charla_titulo: charla, texto_pk: texto_pk})
 		);
@@ -242,4 +254,12 @@ async function agregarAOtraCharlaClick(btn,texto_pk) { //U: cuando indico que al
 		else { $('#ModalElegirCharla').modal('hide'); }
 	};
 	$('#ModalElegirCharla').modal();	
+}
+
+async function guardarOrdenEnCharlaClick(el, input_id, texto_pk, charla) { //U: cambiar orden texto en una charla
+	const orden= document.getElementById( input_id ).value; //A: el orden es un string que escribo en la UI
+	const res= await apiTextoACharlaGuardar({charla_titulo: charla, texto_pk: texto_pk, orden: orden});
+	if (! (res && res.ok)) {
+		alert("No se pudo guardar");
+	}
 }
