@@ -9,7 +9,7 @@
 		<input type="hidden" name="extra_form_data" value="{{ extra_form_data }}">
 		{% bootstrap_form form %}
 
-		{% bootstrap_button 'Guardar' button_type='submit' %}
+		{% bootstrap_button 'Guardar'  id='btnGuardar' button_type='submit' %}
 
 		<input type="text" 
 			placeholder="Tags y Usuarios" 
@@ -21,29 +21,25 @@
 {% endblock %}
 
 {% block extra_js%}
-	<script>
+<script>
 		// este script manda un mensaje de alerta 
 		// si estas escribiendo un texto y cerras la ventana sin guardarlo
+
+		const btnGuardar = document.getElementById('btnGuardar');
+		const elTexto = document.getElementById('id_texto'); //A: me guardo el textArea
+		let ultimoTextoGuardado = elTexto.value;//A: me guardo el texto que se cargo al incio
+
+		btnGuardar.addEventListener('click',function() {//A: apreto guardar texto
+			ultimoTextoGuardado = elTexto.value; //A: actualizo el texto por si el usuario lo modifico
+		});
+		
 		window.addEventListener('beforeunload', function (e) {//U: captura el evento 'cerrar la ventana'
-		// DBG: console.log(boton);
-			const element = document.getElementById('id_texto'); //U: me guardo el textArea
-			if(element.value !='' && !post){ 
-				//A: el textarea tiene texto y no se apreto guardar
-				//A: le mando la alerta
+			if(elTexto.value != ultimoTextoGuardado){ 
+				//A: se modifico el texto y el usuario no le dio guardar
 				e.preventDefault(); //U: evito que se cierre la ventana
 				e.returnValue = '¿Desea salir y perder los cambios?';	
 			}
 		});
 
-		// quiero una funcion que me diferencia cuando recarga la ventana porque guardo el texto
-		// y cuando simplemente la esta cerrando sin guardar
-		let post = false;
-		const boton = document.getElementsByClassName('btn')[0];//U: le pido el primer elemento con la clase 'btn'
-		//esto tuve que hacerlo asi porque el button no tiene id
-		
-		boton.addEventListener('click',function() {
-			//A: apreto guardar texto
-			post = true
-		});
 	</script>
 {% endblock extra_js%}
