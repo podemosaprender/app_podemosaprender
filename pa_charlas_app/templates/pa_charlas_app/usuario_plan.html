@@ -14,7 +14,39 @@
 
 		<div class="my-3">
 			<a name="presentacion"></a>
-			<h4>Cómo te presentás</h4>
+			<h4>Cómo te presentás</h4> 
+			<!-- ayuda presentacion -->
+			<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#ModalAyudaPresentacion">
+				ayuda
+			</button>
+			<!-- para saber como manejar modals (ventanas emergentes): https://blog.gtoeurope.es/crear-modal-en-bootstrap/ -->
+			<div id="ModalAyudaPresentacion" class="modal fade" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title">Sobre la presentacion</h5>
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					  </button>
+					</div>
+					<div class="modal-body">
+					<p>La presentacion es una charla personal donde nos podes contar quien sos, donde vivis, 
+						que estudiaste, que cosas te gustan, que cosas queres lograr. 
+						Tiene el mismo funcionamiento que cualquier charla, 
+						vas agregando textos haciendo click en el link "mas". 
+						Es muy importante que la llenes asi todos te conocemos y sabemos como ayudarte.
+						<br>
+						<br>
+						Para mas ayuda <a href="https://youtu.be/62sPzFcH6CY" target="_blank" rel="noopener noreferrer">mira este video</a></p>
+					
+					</div>
+					<div class="modal-footer">
+
+					  <button type="button" class="btn btn-secondary" data-dismiss="modal">Salir</button>
+					</div>
+				  </div>
+				</div>
+			</div>
 			<div class="px-3 py-3">
 				{% for item in textosPerfil %}
 					{% include 'pa_charlas_app/p_texto_simple.html' with item=item limpiar='#.*_de_participante_\\S+' %}
@@ -22,7 +54,43 @@
 			</div>
 			<p style="text-align: right; font-size: 90%;"><a href="{% url 'charla_texto_list_t' charla_titulo=charla_perfil %}">Más</a></p>
 
+			<!-- ayuda ideas -->
 			<h5>Ideas</h5>
+			<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#ModalAyudaIdeas">
+				ayuda
+			</button>
+			<div id="ModalAyudaIdeas" class="modal fade" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title">Sobre las ideas</h5>
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					  </button>
+					</div>
+					<div class="modal-body">
+					<p>
+						Las ideas son comentarios de otros sobre tu presentacion o tu plan. 
+						Para agregar una idea clickea sobre el el link "mas ideas".
+						<br>
+						<br>
+						Por ejemplo, si el plan de juan es: 'adelgazar 2 kilos antes de fin de mes', 
+						Martin le puede escribir en ideas:  
+						'para bajar de peso te recomiendo este masajeador (link) yo lo use durante un mes. 
+						No baje ni un kilo, pero ahora estoy todo descontracturado!'
+						<br>
+						<br>
+						Para mas ayuda <a href="https://youtu.be/62sPzFcH6CY" target="_blank" rel="noopener noreferrer">mira este video</a>
+					</p>
+					
+					</div>
+					<div class="modal-footer">
+
+					  <button type="button" class="btn btn-secondary" data-dismiss="modal">Salir</button>
+					</div>
+				  </div>
+				</div>
+			</div>
 			{% for item in textosPerfilIdeas|slice:":5" %}
 				{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
 			{% endfor %}
@@ -37,6 +105,38 @@
 		<div class="my-5 py-2 border-top">
 			<a name="plan"></a>
 			<h4>Tu plan</h4>
+			<!-- ayuda tu plan -->
+			<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#ModalAyudaTuPlan">
+				ayuda
+			</button>
+			<div id="ModalAyudaTuPlan" class="modal fade" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title">Sobre tu plan</h5>
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					  </button>
+					</div>
+					<div class="modal-body">
+					<p>
+						Es el detalle de que cosas queres lograr, de que manera y en que momento. 
+						Para agregar un plan clickea sobre 'Mas'.
+						<br>
+						Por ejemplo: 'Quiero terminar mi primera novela para el 1 de Octubre. Para ello me propongo escribir media carilla por dia'
+						<br>
+						<br>
+						Para mas ayuda <a href="https://youtu.be/62sPzFcH6CY" target="_blank" rel="noopener noreferrer">mira este video</a>
+					</p>
+					
+					</div>
+					<div class="modal-footer">
+
+					  <button type="button" class="btn btn-secondary" data-dismiss="modal">Salir</button>
+					</div>
+				  </div>
+				</div>
+			</div>
 			<div class="px-3 py-3">
 			{% for item in textosPlan %}
 				{% include 'pa_charlas_app/p_texto_simple.html' with item=item %}
@@ -46,6 +146,10 @@
 
 
 			<h5>Ideas</h5>
+			<!-- ayuda ideas -->
+			<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#ModalAyudaIdeas">
+				ayuda
+			</button>
 			{% for item in textosPlanIdeas|slice:":5" %}
 				{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
 			{% endfor %}

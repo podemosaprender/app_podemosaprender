@@ -9,7 +9,7 @@
 		<input type="hidden" name="extra_form_data" value="{{ extra_form_data }}">
 		{% bootstrap_form form %}
 
-		{% bootstrap_button 'Guardar' button_type='submit' %}
+		{% bootstrap_button 'Guardar'  id='btnGuardar' button_type='submit' %}
 
 		<input type="text" 
 			placeholder="Tags y Usuarios" 
@@ -19,3 +19,27 @@
 	</form>
 	<div id="botonesParaTags"></div>
 {% endblock %}
+
+{% block extra_js%}
+<script>
+		// este script manda un mensaje de alerta 
+		// si estas escribiendo un texto y cerras la ventana sin guardarlo
+
+		const btnGuardar = document.getElementById('btnGuardar');
+		const elTexto = document.getElementById('id_texto'); //A: me guardo el textArea
+		let ultimoTextoGuardado = elTexto.value;//A: me guardo el texto que se cargo al incio
+
+		btnGuardar.addEventListener('click',function() {//A: apreto guardar texto
+			ultimoTextoGuardado = elTexto.value; //A: actualizo el texto por si el usuario lo modifico
+		});
+		
+		window.addEventListener('beforeunload', function (e) {//U: captura el evento 'cerrar la ventana'
+			if(elTexto.value != ultimoTextoGuardado){ 
+				//A: se modifico el texto y el usuario no le dio guardar
+				e.preventDefault(); //U: evito que se cierre la ventana
+				e.returnValue = '¿Desea salir y perder los cambios?';	
+			}
+		});
+
+	</script>
+{% endblock extra_js%}
