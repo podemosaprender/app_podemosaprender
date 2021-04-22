@@ -209,6 +209,10 @@ def texto_detail(request, pk=None): #U: ver un texto para compartir en las redes
 	texto= get_object_or_404(Texto, pk=pk) 
 	return render(request, 'pa_charlas_app/texto_detail.html', {'texto': texto})
 
+def texto_list(request): #U: los textos de UNA charla, btn para agregar
+	textos= Texto.objects.order_by('-fh_editado').all()
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'titulo': 'Textos recientes'})
+
 # S: Charlas ###############################################
 
 class CharlaListView(ListView): #U: la lista de charlas

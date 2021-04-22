@@ -42,6 +42,9 @@ urlpatterns = [
 	path('charla/<str:charla_titulo>/nuevo', login_required(views.texto_edit), name='charla_texto_nuevo_s'),
 	path('charla/<int:charla_pk>/<int:pk>', login_required(views.texto_edit), name='charla_texto_edit'),
 	#A: las charlas estan hechas de textos
+
+	path('texto/', views.texto_list, name='texto_list'),
+
 	path('texto/<int:pk>', views.texto_detail, name='texto_detail'),
 	path('texto/<int:pk>/img.png', views.texto_img, name='texto_img'),
 	#A: hay un link para el texto asi lo compartimos en redes
