@@ -263,3 +263,50 @@ async function guardarOrdenEnCharlaClick(el, input_id, texto_pk, charla) { //U: 
 		alert("No se pudo guardar");
 	}
 }
+
+async function ayuda(charla,texto_orden){ //U: carga la charla de ayuda en el modal
+	const mensajeAyuda = await apiTextoByCharlaYOrden(charla,texto_orden);  
+	// DBG: console.log('mensaje',mensajeAyuda);
+	
+	$('#ModalAyudaBody').html(mensajeAyuda[0].texto); //A: actualizamos el texto del modal
+	$('#ModalAyudaPresentacion').modal('show');
+	var res_data= {};
+
+	try {
+		const res= await fetch(
+			"/api/texto/con_charla_orden/?charla=%23ayuda_mensaje"+
+			"&orden="+texto_orden);
+
+		res_data= await res.json();
+		if (res_data==null || typeof(res_data)!='object') { res_data= {} }
+		res_data.ok= res.ok;
+
+		console.log(res_data[0].texto);
+
+
+	}
+	catch (ex) {
+		res_data= {ok: false};
+	}
+}
+
+async function apiTextoByCharlaYOrden(charla,orden){ //U: funcion que hace una consulta a la api y devuelve un texto si le pasas su charla y su orden
+	var res_data= {};
+	charla='%23'+charla; //A: el # en la url se pone '%23'
+	try {
+		const res= await fetch(
+			"/api/texto/con_charla_orden/?"+
+			"charla="+charla+
+			"&orden="+orden);
+
+		res_data= await res.json();
+		if (res_data==null || typeof(res_data)!='object') { res_data= {} }
+		res_data.ok= res.ok;
+
+	}
+	catch (ex) {
+		res_data= {ok: false};
+	}
+
+	return res_data;
+}
