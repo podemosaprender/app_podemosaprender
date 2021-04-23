@@ -32,6 +32,18 @@ class TextoViewSet(viewsets.ReadOnlyModelViewSet):
 	queryset = Texto.objects.all()
 	serializer_class = TextoSerializer
 
+	@action(detail= False)
+	def con_charla_orden(self, request):
+		# Ej: http://127.0.0.1:8000/api/texto/con_charla_orden/?charla=%23ayuda_mensaje&orden=comovoy_presentacion 
+		charla = request.GET['charla']
+		orden = request.GET['orden']
+		queryset= Texto.objects.filter(
+			charlaitem__orden=orden,
+			charlaitem__charla__titulo=charla
+		).all()
+		serializer= TextoSerializer(queryset, many= True)
+		return Response(serializer.data)		
+
 class CharlaViewSet(viewsets.ViewSet):
 	
 	def list(self, request):
