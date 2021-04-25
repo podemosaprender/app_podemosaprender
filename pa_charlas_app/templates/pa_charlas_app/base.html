@@ -144,6 +144,8 @@
 				<script src="{% static 'pa_lib/js/lib.js' %}"></script>
 				<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 				<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.7.1/build/highlight.min.js"></script>
+				<script src="https://cdn.jsdelivr.net/gh/johan/js-deflate@master/rawdeflate.js"></script>
+    <!-- A: tenemos la libreria para el deflate que requiere plantuml -->
 				<script>
 					function limpiar_indent(src) {
 											indent_min= 999; //A: por defecto un maximo grosero
@@ -178,7 +180,8 @@
 																	txt_con_tags = el.innerHTML.replace(/(^|\s)#([A-Za-záéíóúüñÁÉÍÓÚÜÑ0-9_]+)/g, (m,m1,m2) => (m1+hashtagAMarkdownLink('#'+m2))) //A: busco y reemplazo hashtags con links markdown
 																	txt_con_usuarios = txt_con_tags.replace(/(^|\s)@([A-Za-z0-9_\.-]+)/g, (m,m1,m2) => (m1+usuarioAMarkdownLink('@'+m2))) //A: busco y reemplazo usuarios con links markdown
 																	txt_con_video = txt_con_usuarios.replace(/https:\/\/www.youtube.com\/watch\S+/g, youtubeUrlAEmbed);
-																	markedHtml= marked(x= limpiar_indent(txt_con_video)); //A: convierto markdown a html
+																	txt_con_diagramas = txt_con_video.replace(PLANTUML_REGEX, plantumlImgHtmlPara);
+																	markedHtml= marked(x= limpiar_indent(txt_con_diagramas)); //A: convierto markdown a html
 																	markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
 																	markedEl.insertAfter(el); //A: lo puse a continuacion del original
 																	jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original

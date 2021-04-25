@@ -210,6 +210,10 @@ def texto_detail(request, pk=None): #U: ver un texto para compartir en las redes
 	texto= get_object_or_404(Texto, pk=pk) 
 	return render(request, 'pa_charlas_app/texto_detail.html', {'texto': texto})
 
+def texto_list(request): #U: los textos de UNA charla, btn para agregar
+	textos= Texto.objects.order_by('-fh_editado').all()
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'titulo': 'Textos recientes'})
+
 # S: Charlas ###############################################
 
 class CharlaListView(ListView): #U: la lista de charlas
@@ -258,7 +262,7 @@ class CharlaQueSigoListView(ListView): #U: la lista de charlas que visite
 			return charlas_y_ultimo()	
 
 # S: Charla vista comoda ##################################
-def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', orden='fh_creado', mostrar_titulo= None): #U: los textos de UNA charla, btn para agregar, prefijo_tag puede ser @ para un usuario
+def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', orden='texto__fh_creado', mostrar_titulo= None): #U: los textos de UNA charla, btn para agregar, prefijo_tag puede ser @ para un usuario
 	if not pk is None:
 		charla_qs= Charla.objects.filter(pk=pk)
 	else:
@@ -273,8 +277,8 @@ def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', ord
 
 
 	if request.GET.get('o')=='reciente':
-		orden='-fh_editado'
-	print(request.GET.get('o'), orden)
+		orden='-texto__fh_editado'
+	#DBG: print(request.GET.get('o'), orden)
 
 	fh_visita_anterior= dt.date(1972,1,1) #DFLT: como si hubiera venido hace muchiiiisimo
 	if request.user.is_authenticated and not charla.pk is None:
@@ -289,7 +293,7 @@ def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', ord
 	
 	participantes= charla_participantes(charla_titulo= charla_titulo, charla_pk= pk).order_by('-fh_ultimo') #A: con menos adelante es descendiente, mas reciente arriba
 
-	charlaitems= charla.charlaitem_set.order_by('orden',f'texto__{orden}').all() if not charla.pk is None else []
+	charlaitems= charla.charlaitem_set.order_by('orden',orden).all() if not charla.pk is None else []
 
 	mostrar_titulo= charla.titulo if mostrar_titulo is None else mostrar_titulo
 	return render(request, 'pa_charlas_app/charla_texto_list.html', {
