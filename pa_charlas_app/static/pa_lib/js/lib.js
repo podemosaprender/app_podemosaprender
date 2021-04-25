@@ -264,24 +264,11 @@ async function guardarOrdenEnCharlaClick(el, input_id, texto_pk, charla) { //U: 
 	}
 }
 
-async function ayuda(charla,texto_orden){ //U: carga la charla de ayuda en el modal
-	const mensajeAyuda = await apiTextoByCharlaYOrden(charla,texto_orden);  
+async function ayuda(titulo,texto){ //U: carga la charla de ayuda en el modal
+	const mensajeAyuda = await apiTextoByCharlaYOrden(texto.charla,texto.orden);  
 	// DBG: console.log('mensaje',mensajeAyuda);
 	
-	switch(texto_orden){ //U: le pone un titulo a la presentacion
-		case 'comovoy_presentacion':
-			$('#ModalAyudaTitle').html('Sobre la presentacion');
-			break;
-		case 'comovoy_ideas':
-			$('#ModalAyudaTitle').html('Sobre las ideas');
-			break;
-		case 'comovoy_tu_plan':
-			$('#ModalAyudaTitle').html('Sobre tu plan');
-			break;
-		default:
-			$('#ModalAyudaTitle').html('');
-
-	}
+	$('#ModalAyudaTitle').html(titulo);
 	$('#ModalAyudaBody').html(mensajeAyuda[0].texto); //A: actualizamos el texto del modal
 	$('#ModalAyuda').modal('show');
 }

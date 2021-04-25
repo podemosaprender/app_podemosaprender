@@ -20,7 +20,7 @@
 			<a name="presentacion"></a>
 			<h4>Cómo te presentás</h4> 
 			<!-- ayuda presentacion -->
-			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('ayuda_mensaje','comovoy_presentacion')">
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre la presentacion',{charla:'ayuda_mensaje',orden:'comovoy_presentacion'})">
 				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
 			<!-- Modal Ayuda VER: https://blog.gtoeurope.es/crear-modal-en-bootstrap/-->
@@ -54,7 +54,7 @@
 
 			<!-- ayuda ideas -->
 			<h5>Ideas</h5>
-			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('ayuda_mensaje','comovoy_ideas')">
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre las ideas',{charla:'ayuda_mensaje',orden:'comovoy_ideas'})">
 				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
 			
@@ -73,7 +73,7 @@
 			<a name="plan"></a>
 			<h4>Tu plan</h4>
 			<!-- ayuda tu plan -->
-			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('ayuda_mensaje','comovoy_tu_plan')">
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre tu plan',{charla:'ayuda_mensaje',orden:'comovoy_tu_plan'})">
 				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
 			
@@ -87,7 +87,7 @@
 
 			<h5>Ideas</h5>
 			<!-- ayuda ideas -->
-			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('ayuda_mensaje','comovoy_ideas')">
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre las ideas',{charla:'ayuda_mensaje',orden:'comovoy_ideas'})">
 				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
 			{% for item in textosPlanIdeas|slice:":5" %}
