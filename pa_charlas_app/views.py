@@ -183,7 +183,10 @@ def texto_img(request, pk=None): #U: imagen con texto para og:image que se muest
 def texto_edit(request, pk=None, charla_pk=None, charla_titulo=None): #U: crear Y editar textos, de charlas o para empezar una
 	texto= None #DFLT, nuevo
 	if not pk is None:
-		texto= get_object_or_404(Texto, pk=pk) 
+		texto= get_object_or_404(Texto, pk=pk) # A: esta tratando de editar un texto
+		if texto.de_quien != request.user and request.user != 'melisawhatsapp' and request.user != 'gonzalezsolisnm':
+			#A: esta tratando de editar alguien que no tiene derechos
+			return redirect('/') #TODO: enviar mensaje de error 'no tiene permiso de editar este texto'
 
 	if request.method == "POST":
 		form= TextoForm(request.POST, instance= texto)
