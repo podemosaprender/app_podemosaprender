@@ -23,28 +23,7 @@
 			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre la presentacion',{charla:'ayuda_mensaje',orden:'comovoy_presentacion'})">
 				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
-			<!-- Modal Ayuda VER: https://blog.gtoeurope.es/crear-modal-en-bootstrap/-->
-			<div id="ModalAyuda" class="modal fade" tabindex="-1" role="dialog">
-				<div class="modal-dialog">
-				  <div class="modal-content">
-					<div class="modal-header">
-					  <h5 class="modal-title" id="ModalAyudaTitle"></h5>
-					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					  </button>
-					</div>
-					<div class="modal-body" id="ModalAyudaBody">
-
-					conseguir el texto
-					
-					</div>
-					<div class="modal-footer">
-
-					  <button type="button" class="btn btn-outline-success" data-dismiss="modal">Cerrar</button>
-					</div>
-				  </div>
-				</div>
-			</div>
+			
 			<div class="px-3 py-3">
 				{% for item in textosPerfil %}
 					{% include 'pa_charlas_app/p_texto_simple.html' with item=item limpiar='#.*_de_participante_\\S+' %}
