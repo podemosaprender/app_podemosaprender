@@ -191,8 +191,18 @@ def texto_edit(request, pk=None, charla_pk=None, charla_titulo=None): #U: crear 
 	if request.method == "POST":
 		form= TextoForm(request.POST, instance= texto)
 		if form.is_valid():
+			responde_charlaitem_pk = request.GET.get('responde') #A: charla item a la que estoy respondiendo o None
+			print(f'texto_edit responde {responde_charlaitem_pk}')
+
 			extra_data= enc_b64_o_r(request.POST.get('extra_form_data'),{})
-			texto= texto_guardar(form, texto.de_quien if texto else request.user, charla_pk= extra_data.get('charla_pk'), charla_titulo= extra_data.get('charla_titulo'))
+			texto= texto_guardar(
+				form, 
+				texto.de_quien if texto else request.user, 
+				charla_pk= extra_data.get('charla_pk'), 
+				charla_titulo= extra_data.get('charla_titulo'), 
+				responde_charlaitem_pk= responde_charlaitem_pk
+			)
+
 			#A: si no le pase una charla y no existia, crea una "casual"
 			#A: si estoy editando un texto que ya tiene un autor que lo guarde con ese nombre, sino que use el del autor logueado
 			logger.debug(f'VW texto {request.user.username} {extra_data}')
