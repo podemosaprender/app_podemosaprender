@@ -126,7 +126,7 @@ def charla_titulo_valido(un_string): #U: devuelve un titulo de charla aceptado O
 	else:
 		return None
 
-def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= None): #U: agrega el texto a la charla, q crea si es necesario
+def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= None, nivel = None): #U: agrega el texto a la charla, q crea si es necesario
 	puedeModificarEstaCharla= True #DFLT
 
 	charla_titulo= charla_titulo_valido(charla_titulo)
@@ -157,6 +157,11 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 		)
 		if not orden is None:
 			chit.orden= orden
+		else:
+			chit.orden= texto.fh_creado.strftime('%y%m%d%H%M%S')
+
+		if not nivel is None:
+			chit.nivel= nivel
 
 		chit.save()
 
@@ -164,7 +169,7 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 
 	return False
 
-def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
+def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charlaitem_pk= None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
 	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
 
@@ -172,6 +177,15 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	if charla_titulo is None and not charla_pk is None:
 		ch= Charla.objects.get(pk= charla_pk)
 		charla_titulo= ch.titulo
+
+	nivel = 0 #DFTL
+	orden = None #DFLT
+
+	if not responde_charlaitem_pk is None:
+		charlaitem_respondido = CharlaItem.objects.get(pk= responde_charlaitem_pk)
+		nivel = charlaitem_respondido.nivel +1
+		orden = charlaitem_respondido.orden + '-1'
+		#A: si responde charla_titulo es el de la charla donde estoy respondiendo
 
 	if not charla_titulo is None:	
 		if not charla_titulo in texto.texto:
@@ -205,7 +219,11 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 	#TODO: borrar las charlas que se hayan quedado sin items
 
 	for ht in hts:
-		charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
+		if ht == charla_titulo:
+			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema,orden=orden , nivel = nivel)
+		else:
+			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
+			
 
 	return texto
 
