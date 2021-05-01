@@ -1,8 +1,12 @@
 {% extends 'pa_charlas_app/base.html' %}
+{% load static %}
 
 {% load bootstrap4 %}
 {% load pa_charlas_app_extras %}
 
+{% block extra_css %}
+	<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-como-voy.css' %}">
+{% endblock %}
 {% block content %}
 	<div class="containter">
 		<a name="arriba"></a>
@@ -16,31 +20,10 @@
 			<a name="presentacion"></a>
 			<h4>Cómo te presentás</h4> 
 			<!-- ayuda presentacion -->
-			<button type="button" class="btn btn-secondary" onclick="ayuda('ayuda_mensaje','comovoy_presentacion')">
-				ayuda
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre la presentacion',{charla:'ayuda_mensaje',orden:'comovoy_presentacion'})">
+				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
-			<!-- Modal Ayuda VER: https://blog.gtoeurope.es/crear-modal-en-bootstrap/-->
-			<div id="ModalAyuda" class="modal fade" tabindex="-1" role="dialog">
-				<div class="modal-dialog">
-				  <div class="modal-content">
-					<div class="modal-header">
-					  <h5 class="modal-title" id="ModalAyudaTitle"></h5>
-					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					  </button>
-					</div>
-					<div class="modal-body" id="ModalAyudaBody">
-
-					conseguir el texto
-					
-					</div>
-					<div class="modal-footer">
-
-					  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					</div>
-				  </div>
-				</div>
-			</div>
+			
 			<div class="px-3 py-3">
 				{% for item in textosPerfil %}
 					{% include 'pa_charlas_app/p_texto_simple.html' with item=item limpiar='#.*_de_participante_\\S+' %}
@@ -50,8 +33,8 @@
 
 			<!-- ayuda ideas -->
 			<h5>Ideas</h5>
-			<button type="button" class="btn btn-secondary" onclick="ayuda('ayuda_mensaje','comovoy_ideas')">
-				ayuda
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre las ideas',{charla:'ayuda_mensaje',orden:'comovoy_ideas'})">
+				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
 			
 			{% for item in textosPerfilIdeas|slice:":5" %}
@@ -69,8 +52,8 @@
 			<a name="plan"></a>
 			<h4>Tu plan</h4>
 			<!-- ayuda tu plan -->
-			<button type="button" class="btn btn-secondary" onclick="ayuda('ayuda_mensaje','comovoy_tu_plan')">
-				ayuda
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre tu plan',{charla:'ayuda_mensaje',orden:'comovoy_tu_plan'})">
+				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
 			
 			<div class="px-3 py-3">
@@ -83,8 +66,8 @@
 
 			<h5>Ideas</h5>
 			<!-- ayuda ideas -->
-			<button type="button" class="btn btn-secondary" onclick="ayuda('ayuda_mensaje','comovoy_ideas')">
-				ayuda
+			<button type="button" class="btn btn-outline-success ayuda" onclick="ayuda('Sobre las ideas',{charla:'ayuda_mensaje',orden:'comovoy_ideas'})">
+				<span class="fa fa-question-circle"><span class="sr-only">Agregar a otra charla</span></span>
 			</button>
 			{% for item in textosPlanIdeas|slice:":5" %}
 				{% include 'pa_charlas_app/p_texto_card.html' with item=item %}
