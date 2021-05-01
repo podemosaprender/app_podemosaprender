@@ -28,7 +28,7 @@ def then_sub(arg1, arg2):
 @register.filter
 def at_key(a_dict, key):
 	"""Return element at key"""
-	return a_dict[key]
+	return a_dict.get(key)
 
 @register.simple_tag
 def define(val=None):
