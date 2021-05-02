@@ -91,6 +91,9 @@ from .hashtags import hashtags_en
 def charla_tipo_tema(): #U: por comodidad
 	return TipoCharla.objects.get(titulo='Tema')
 
+def charla_tipo_hilo(): #U: por comodidad
+	return TipoCharla.objects.get(titulo='Hilo')
+
 def conUserYFecha_guardar(form, user, commit= True):
 	ahora= timezone.now() 
 	obj= form.save(commit=False)
@@ -126,7 +129,7 @@ def charla_titulo_valido(un_string): #U: devuelve un titulo de charla aceptado O
 	else:
 		return None
 
-def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= None): #U: agrega el texto a la charla, q crea si es necesario
+def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= None, nivel = None): #U: agrega el texto a la charla, q crea si es necesario
 	puedeModificarEstaCharla= True #DFLT
 
 	charla_titulo= charla_titulo_valido(charla_titulo)
@@ -155,8 +158,13 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 			charla= ch,
 			texto_id= texto_id
 		)
-		if not orden is None:
+		if not orden is None: #A: me pasaron un orden ej en una respuesta
 			chit.orden= orden
+		elif chit.orden is None: #A: no me pasaron Y no tenia puesto a mano de antes
+			chit.orden= texto.fh_creado.strftime('_%y%m%d%H%M%S')
+
+		if not nivel is None:
+			chit.nivel= nivel
 
 		chit.save()
 
@@ -164,7 +172,7 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 
 	return False
 
-def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
+def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charlaitem_pk= None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
 	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
 
@@ -173,20 +181,43 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 		ch= Charla.objects.get(pk= charla_pk)
 		charla_titulo= ch.titulo
 
+	nivel = 0 #DFTL
+	orden = None #DFLT
+	texto_respondido_id= None #DFLT
+
+	if not responde_charlaitem_pk is None:
+		charlaitem_respondido = CharlaItem.objects.get(pk= responde_charlaitem_pk)
+		nivel = charlaitem_respondido.nivel+1
+		orden = charlaitem_respondido.orden + '-1'
+		texto_respondido_id = charlaitem_respondido.texto_id #A: no requiere otra consulta a la db
+		#A: si responde charla_titulo es el de la charla donde estoy respondiendo
+
+	hts= list(hashtags_en(texto.texto, quiere_sin_tildes= False)) #A: nuestras urls y db soportan tildes
+	#DBG: print(f'hashtags {hts} en {texto.texto}')
+
 	if not charla_titulo is None:	
-		if not charla_titulo in texto.texto:
+		if not charla_titulo in hts:
 			texto.texto += f'\n\n {charla_titulo}'
+			hts.append(charla_titulo)
 		#A: si venia de una charla, le agrego el hashtag automaticamente, espacio para q no sea titulo markdown
 	else:
 		hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
-		if not hashtag in texto.texto:
+		if not hashtag in hts:
 			texto.texto += f'\n\n {hashtag}' 
+			hts.append(hashtag)
 		#A: si no venia de una charla, empieza una casual, espacio para q no sea titulo markdown
 
-	hts= hashtags_en(texto.texto, quiere_sin_tildes= False) #A: nuestras urls y db soportan tildes
-	#DBG: print(f'hashtags {hts} en {texto.texto}')
+	if not texto_respondido_id is None: #A: respondemos a otro texto, agregar al hilo
+		hashtag= f'#hilo_{texto_respondido_id}'		
+		if not hashtag in hts:
+			texto.texto += f'\n\n {hashtag}' 
+			hts.append(hashtag)
+
+	#A: agregamos hashtags al texto Y la lista de hashtags, evitando confundir #idea1 con #idea13
+
 	if '#juntada_virtual' in hts:
 		if 'meet' in texto.texto or 'zoom' in texto.texto or 'jit' in texto.texto:
+			#TODO: mejorar el matching de las urls
 			pass #A: ya habla de algun servicio de conferencias
 		else:
 			mhash= hashlib.md5(f'{texto.pk} {texto.de_quien.username} {texto.fh_creado}'.encode('utf-8')).hexdigest()
@@ -194,18 +225,32 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None):
 			tt= charla_titulo[1:] if not charla_titulo is None else texto.de_quien.username
 			jitsi_link= f'https://meet.jit.si/pa_{tt}_{mhash}'
 			texto.texto= texto.texto.replace('#juntada_virtual', f'#juntada_virtual [en este link]({jitsi_link})')
-	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
-	texto.save()
 
+	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
+	texto.save() 
+	#A: texto esta grabado, se puede agregar a otros modelos
 
 	#TODO:SEC: limitar quien y cuantas charlas puede crear, es facil crear muuchas
 	tch_tema= charla_tipo_tema()
 
-	CharlaItem.objects.filter(texto= texto.pk).delete() #A: borramos y volvemos a crear los tags
+	CharlaItem.objects.filter(texto= texto.pk).exclude(charla__titulo__in=hts).delete() 
+	#A: borramos de las charlas donde YA NO ESTA usando exclude con las que si
+
 	#TODO: borrar las charlas que se hayan quedado sin items
 
 	for ht in hts:
-		charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
+		if ht.startswith('#hilo_'): #A: es una respuesta 
+			tch_hilo= charla_tipo_hilo()
+			charla_agregar_texto(ht, texto_respondido_id, user, charla_tipo= tch_hilo, orden=charlaitem_respondido.orden , nivel= 0) #A: el inicial al que estamos respondiendo
+			charla_agregar_texto(ht, texto, user, charla_tipo= tch_hilo, orden=orden , nivel= nivel) #A: la respuesta
+			#A: charla_agregar_texto garantiza que se agregan una sola vez
+
+		elif ht == charla_titulo:
+			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema,orden=orden , nivel = nivel)
+		else:
+			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
+		#A: charla_agregar_texto usa get_or_create para agregar o actualizar
+			
 
 	return texto
 

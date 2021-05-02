@@ -19,7 +19,7 @@
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-botones.css' %}">
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-link-footer.css' %}">
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-nav.css' %}">
-
+		{% block extra_css %}{% endblock extra_css %}
 		<title>PodemosAprender</title>
 
 		{% block meta %}
@@ -101,6 +101,28 @@
 				{% bootstrap_messages %}
 				{% block content %}{% endblock %}
 			</main>
+			<!-- Modal Ayuda . VER: https://blog.gtoeurope.es/crear-modal-en-bootstrap/-->
+			<div id="ModalAyuda" class="modal fade" tabindex="-1" role="dialog">
+				<div class="modal-dialog">
+				  <div class="modal-content">
+					<div class="modal-header">
+					  <h5 class="modal-title" id="ModalAyudaTitle"></h5>
+					  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					  </button>
+					</div>
+					<div class="modal-body" id="ModalAyudaBody">
+
+					conseguir el texto
+					
+					</div>
+					<div class="modal-footer">
+
+					  <button type="button" class="btn btn-outline-success" data-dismiss="modal">Cerrar</button>
+					</div>
+				  </div>
+				</div>
+			</div>
 
 			<footer class="footer">
 				<div class="container">
