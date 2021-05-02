@@ -116,6 +116,17 @@ pip install PyJWT==1.7.1
 
 puso unos carteles avisando que otro paquete necesita la version 2.0 pero no hay que hacerles caso porque esa es la version de PyJWT que no anda en esta de Python
 
+### Optimizar acceso a la base de datos
+
+En el shell podes activar que muestre (log) los accesos y consultas con
+
+~~~
+import logging
+logger = logging.getLogger('django.db.backends')
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
+~~~
+
 ## Calendario y hashtags
 
 Queremos que sea fácil escribir qué día organizás una actividad  
