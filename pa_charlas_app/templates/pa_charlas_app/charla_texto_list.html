@@ -77,12 +77,14 @@
 	{% block item_links %}
 		{% url 'charla_texto_nuevo_s' charla_titulo=charla.titulo as texto_new_url %}
 		<div style="text-align: right;">
-			<a href="{% url 'charla_texto_edit' charla_pk=charla.pk pk=item.texto.pk %}" class="btn btn-accesible "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">editar</span></a>
-			{% if item.nivel < 1 %}	
-				<a href="{{texto_new_url}}?responde={{ item.pk }}" class="btn btn-social-icon btn-accesible"><span class="fa fa-reply"><span class="sr-only">responder</span></span></a>
-
+			{% if item.texto.de_quien == request.user %}
+				<a href="{% url 'charla_texto_edit' charla_pk=charla.pk pk=item.texto.pk %}" class="btn btn-accesible "><i class="fa fa-edit" aria-hidden="true"></i><span class="sr-only">editar</span></a>
 			{% endif %}
+
 			{% if request.user.is_authenticated %}
+				{% if item.nivel < 1 %}	
+					<a href="{{texto_new_url}}?responde={{ item.pk }}" class="btn btn-social-icon btn-accesible"><span class="fa fa-reply"><span class="sr-only">responder</span></span></a>
+				{% endif %}
 				<button type="button" class="btn btn-primary" onClick="agregarAOtraCharlaClick(this,{{item.texto.pk }})"><span class="fa fa-plus"><span class="sr-only">Agregar a otra charla</span></span></button>
 			{% endif %}
 

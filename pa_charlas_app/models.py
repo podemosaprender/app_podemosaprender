@@ -155,9 +155,9 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 			charla= ch,
 			texto_id= texto_id
 		)
-		if not orden is None:
+		if not orden is None: #A: me pasaron un orden ej en una respuesta
 			chit.orden= orden
-		else:
+		elif chit.orden is None: #A: no me pasaron Y no tenia puesto a mano de antes
 			chit.orden= texto.fh_creado.strftime('%y%m%d%H%M%S')
 
 		if not nivel is None:
@@ -215,7 +215,9 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 	#TODO:SEC: limitar quien y cuantas charlas puede crear, es facil crear muuchas
 	tch_tema= charla_tipo_tema()
 
-	CharlaItem.objects.filter(texto= texto.pk).delete() #A: borramos y volvemos a crear los tags
+	CharlaItem.objects.filter(texto= texto.pk).exclude(charla__titulo__in=hts).delete() 
+	#A: borramos de las charlas donde YA NO ESTA usando exclude con las que si
+
 	#TODO: borrar las charlas que se hayan quedado sin items
 
 	for ht in hts:
@@ -223,6 +225,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema,orden=orden , nivel = nivel)
 		else:
 			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
+		#A: charla_agregar_texto usa get_or_create para agregar o actualizar
 			
 
 	return texto

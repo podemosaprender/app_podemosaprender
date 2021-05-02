@@ -184,7 +184,7 @@ def texto_edit(request, pk=None, charla_pk=None, charla_titulo=None): #U: crear 
 	texto= None #DFLT, nuevo
 	if not pk is None:
 		texto= get_object_or_404(Texto, pk=pk) # A: esta tratando de editar un texto
-		if texto.de_quien != request.user and request.user != 'melisawhatsapp' and request.user != 'gonzalezsolisnm':
+		if texto.de_quien != request.user:
 			#A: esta tratando de editar alguien que no tiene derechos
 			return redirect('/') #TODO: enviar mensaje de error 'no tiene permiso de editar este texto'
 
