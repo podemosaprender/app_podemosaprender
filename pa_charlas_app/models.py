@@ -184,6 +184,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 	nivel = 0 #DFTL
 	orden = None #DFLT
 	texto_respondido_id= None #DFLT
+	charlaitem_respondido= None #DFLT
 
 	if not responde_charlaitem_pk is None:
 		charlaitem_respondido = CharlaItem.objects.get(pk= responde_charlaitem_pk)
@@ -241,9 +242,11 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 	for ht in hts:
 		if ht.startswith('#hilo_'): #A: es una respuesta 
 			tch_hilo= charla_tipo_hilo()
-			charla_agregar_texto(ht, texto_respondido_id, user, charla_tipo= tch_hilo, orden=charlaitem_respondido.orden , nivel= 0) #A: el inicial al que estamos respondiendo
-			charla_agregar_texto(ht, texto, user, charla_tipo= tch_hilo, orden=orden , nivel= nivel) #A: la respuesta
-			#A: charla_agregar_texto garantiza que se agregan una sola vez
+			if not charlaitem_respondido is None:
+				charla_agregar_texto(ht, texto_respondido_id, user, charla_tipo= tch_hilo, orden=charlaitem_respondido.orden , nivel= 0) #A: el inicial al que estamos respondiendo
+				charla_agregar_texto(ht, texto, user, charla_tipo= tch_hilo, orden=orden , nivel= nivel) #A: la respuesta
+				#A: charla_agregar_texto garantiza que se agregan una sola vez
+				#A: solo agregamos al hilo si apreto "responder", no si escribe el hashtag
 
 		elif ht == charla_titulo:
 			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema,orden=orden , nivel = nivel)
