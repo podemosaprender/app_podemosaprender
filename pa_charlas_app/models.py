@@ -158,7 +158,7 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 		if not orden is None: #A: me pasaron un orden ej en una respuesta
 			chit.orden= orden
 		elif chit.orden is None: #A: no me pasaron Y no tenia puesto a mano de antes
-			chit.orden= texto.fh_creado.strftime('%y%m%d%H%M%S')
+			chit.orden= texto.fh_creado.strftime('_%y%m%d%H%M%S')
 
 		if not nivel is None:
 			chit.nivel= nivel
