@@ -79,6 +79,7 @@ Tuve que usar mariadb en vez de sqlite, asi que agregue la configuracion de la d
 	"SOCIAL_AUTH_FACEBOOK_SECRET": "112233445566778899aabbccddeeff00",
 	"DB": {
 		"ENGINE": "django.db.backends.mysql",
+		"OPTIONS": {"charset": "utf8mb4"},
 		"NAME": "mibase",
 		"USER": "miuser",
 		"PASSWORD": "miclavesecreta",
@@ -87,6 +88,13 @@ Tuve que usar mariadb en vez de sqlite, asi que agregue la configuracion de la d
 	}
 }
 ~~~
+
+Tuve que cambiar la columna texto para que acepte unicode de 4 bytes para los emoji, entre directo con mysql desde la consola y ejecuté
+
+~~~
+alter table pa_charlas_app_texto CHANGE texto texto longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+~~~
+
 
 Tuve que agregar la url de autenticacion en la consola de facebook en Settings de Facebook Login (que no son los mismos que para la app, estan mas abajo)
 
