@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path, include
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
 from rest_framework import routers
@@ -43,6 +45,8 @@ urlpatterns = [
 	path('charla/<int:charla_pk>/<int:pk>', login_required(views.texto_edit), name='charla_texto_edit'),
 	#A: las charlas estan hechas de textos
 
+	path('imagen/<str:imagen_titulo>', login_required(views.imagen_edit), name='imagen_edit'),
+
 	path('texto/', views.texto_list, name='texto_list'),
 
 	path('texto/<int:pk>', views.texto_detail, name='texto_detail'),
@@ -71,3 +75,7 @@ urlpatterns = [
 	path('', views.CharlaQueSigoListView.as_view(), name='home'),
 	#A: la home page es algun tipo de lista de charlas
 ]
+
+
+if settings.IS_DEVEL_SERVER: #A: solo en desarrollo local! sino, configurar ej. nginx
+	urlpatterns+= static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #A: imagenes subidas 

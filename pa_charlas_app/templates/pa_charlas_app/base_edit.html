@@ -21,21 +21,24 @@
 		</a>
 	</form>
 	<div id="botonesParaTags"></div>
+	<div id="imagenes">
+	</div>
 {% endblock %}
 
 {% block extra_js%}
-<script>
-		// este script manda un mensaje de alerta 
-		// si estas escribiendo un texto y cerras la ventana sin guardarlo
-
-		const btnGuardar = document.getElementById('btnGuardar');
+	<script>
 		const elTexto = document.getElementById('id_texto'); //A: me guardo el textArea
+		const elImagenesList = document.getElementById('imagenes'); //A: me guardo el textArea
+
+		//S: este script manda un mensaje de alerta 
+		// si estas escribiendo un texto y cerras la ventana sin guardarlo
+		const btnGuardar = document.getElementById('btnGuardar');
 		let ultimoTextoGuardado = elTexto.value;//A: me guardo el texto que se cargo al incio
 
 		btnGuardar.addEventListener('click',function() {//A: apreto guardar texto
 			ultimoTextoGuardado = elTexto.value; //A: actualizo el texto por si el usuario lo modifico
 		});
-		
+
 		window.addEventListener('beforeunload', function (e) {//U: captura el evento 'cerrar la ventana'
 			if(elTexto.value != ultimoTextoGuardado){ 
 				//A: se modifico el texto y el usuario no le dio guardar
@@ -43,6 +46,53 @@
 				e.returnValue = '¿Desea salir y perder los cambios?';	
 			}
 		});
+
+		//S: imagenes en el texto
+		var ImagenesDetectadas= {}; //U: para redibujar solo si hay nuevas
+		function imagenesDetectarEnTexto(quiereRedibujarSioSi) { //U: busca tags de imagenes en el texto
+
+			const matches= {};
+			const txt= elTexto.value;
+			const re= /\/deusr\/([a-zA-Z0-9_-]+)\.(png|jpg)/g;
+			let m;
+			while ( m= re.exec(txt)) { 
+				matches[m[0]]= m[1];
+			}
+			//A: matches tienen las que detecte ahora
+			
+			const hayAlgunaMenos= Object.keys(ImagenesDetectadas).find(k => matches[k]==null);
+			const hayAlgunaMas= Object.keys(matches).find(k => ImagenesDetectadas[k]==null);
+
+			if (hayAlgunaMenos || hayAlgunaMas || quiereRedibujarSioSi) { ImagenesDetectadas= matches;
+				console.log("imagenesDetectarEnTexto cambio", ImagenesDetectadas);
+				elImagenesList.innerHTML=''; //A: vaciar anteriores
+				Object.keys(ImagenesDetectadas).forEach( p => {
+					const nombre= ImagenesDetectadas[p];
+					const el= $('<div>'); //A: creo nuevo li
+					const btn= $('<a>').text(nombre).appendTo(el); //A: con el nombre
+					const img= $('<img>').attr({src: p}).css({height: '5em'}).appendTo(el); //A: img con el link
+					el.on('click',() => { formSubirImagen(nombre); return false;});
+					el.appendTo(elImagenesList); //A: la agrego a la lista
+				});
+			}
+		}
+
+		function formSubirImagenCuandoCierra() {
+			console.log('actualizar imagenes');
+			imagenesDetectarEnTexto(true);
+		}
+
+		function formSubirImagen(titulo) {
+			const url= "{% url 'imagen_edit' imagen_titulo='_TITULO_IMAGEN_' %}".replace('_TITULO_IMAGEN_',titulo);
+			const wnd= window.open(url, 'PaSubirImagen'); wnd.focus(); //A: nueva ventana si no estaba
+			var timer = setInterval(function() { //A: perrito guardian a ver cuando se cierra (onclose no anda)
+				if(wnd.closed) { clearInterval(timer);  
+					formSubirImagenCuandoCierra();			
+				}  
+			}, 1000); 
+		}
+
+		setInterval(imagenesDetectarEnTexto, 1000); //A: cada 1segundo actualizamos imagenes para subir
 
 	</script>
 {% endblock extra_js%}
