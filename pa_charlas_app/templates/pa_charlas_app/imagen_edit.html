@@ -1,0 +1,32 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+	<h2>{{ titulo }}</h2>
+	{% comment %}VER: https://docs.djangoproject.com/en/3.2/topics/http/file-uploads/#basic-file-uploads {% endcomment %}
+	<form method="POST" enctype="multipart/form-data">{% csrf_token %}
+		<input type="hidden" name="url_donde_volver" value="{{ url_donde_volver }}">
+		<input type="hidden" name="extra_form_data" value="{{ extra_form_data }}">
+		{% bootstrap_form form %}
+
+		{% bootstrap_button 'Guardar'  id='btnGuardar' button_type='submit' %}
+	</form>
+
+	{% if form.errors %}
+		<div class="alert alert-danger alert-dismissible col-12 mx-1" role="alert">
+			<div id="form_errors">
+				{% for key, value in form.errors.items %}
+					<span class="fieldWrapper">
+						{{ key }}:{{ value }}
+					</span>
+				{% endfor %}
+			</div>
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+	{% endif %}
+
+{% endblock %}
+

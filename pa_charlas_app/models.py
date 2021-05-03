@@ -27,6 +27,15 @@ class Texto(models.Model): #U: cualquier texto que publiquemos, despues especial
 	def __str__(self):
 		return f'{self.fh_creado} {self.de_quien} {self.titulo}'
 
+class Imagen(models.Model): #U: las imagenes están en el primer nivel como los textos, despues los conectamos
+	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
+	fh_creado= models.DateTimeField(default=timezone.now)
+
+	titulo= models.CharField(max_length=200)
+	imagen= models.ImageField() 
+	#VER: https://www.geeksforgeeks.org/imagefield-django-models/
+	#VER: MEDIA_ROOT en settings.py
+
 class TipoCharla(models.Model): #U: casual, curso, etc.
 	titulo= models.CharField(max_length=200, unique=True)
 

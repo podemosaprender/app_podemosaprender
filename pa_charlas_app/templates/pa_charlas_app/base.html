@@ -19,6 +19,7 @@
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-botones.css' %}">
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-link-footer.css' %}">
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-nav.css' %}">
+		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-markdown.css' %}">
 		{% block extra_css %}{% endblock extra_css %}
 		<title>PodemosAprender</title>
 
@@ -164,14 +165,17 @@
 											referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
 										}
 
+
 					marked.setOptions({
-											highlight: function(code, language) { //A: controlo el highlighting de cada bloque
-																	const codeClean= code.replace(/&lt;/g,'<').replace(/&gt;/,'>'); //A: revierto el escape de django
-																	const highlighted= hljs.highlightAuto(codeClean);
-																	//DBG: console.log("code", codeClean, highlighted);
-																	return highlighted.value;
-																},
-										});
+						highlight: function(code, language) { //A: controlo el highlighting de cada bloque
+							const codeClean= code.replace(/&lt;/g,'<').replace(/&gt;/,'>'); //A: revierto el escape de django
+							const highlighted= hljs.highlightAuto(codeClean);
+							//DBG: console.log("code", codeClean, highlighted);
+							return highlighted.value;
+						},
+					});
+
+
 					function elementosMarkdownAHtml() {
 
 											md_els= document.querySelectorAll('.markdown')

@@ -19,12 +19,13 @@ import os
 import datetime as dt
 
 from .models import (
+	Imagen,
 	Texto, texto_guardar, textos_de_usuario,
 	Charla, TipoCharla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
 	usuario_para, redes_de_usuario,
 	charlas_calendario
 )
-from .forms import TextoForm
+from .forms import ImagenForm, TextoForm
 from .util import *
 
 import json
@@ -178,7 +179,52 @@ def texto_img(request, pk=None): #U: imagen con texto para og:image que se muest
 	return HttpResponse( img_bytes, content_type='image/png')
 
 
-# S: textos ################################################
+#S: imagenes ##############################################
+
+def imagen_edit(request, imagen_titulo=None): #U: crear Y editar textos, de charlas o para empezar una
+	imagen= None #DFLT, nuevo
+	error_a_responder= None #DFLT	
+	if not imagen_titulo is None:
+		if not re.match(r'^[a-zA-Z0-9_-]+$', imagen_titulo):
+			error_a_responder= 'Nombre de imagen no válido'
+		else:
+			imagen_q = Imagen.objects.filter(titulo=imagen_titulo) #A: esta tratando de editar un imagen, puede no existir
+			if imagen_q.exists():
+				imagen= imagen_q.first() #A: si hay con ese titulo, la usamos
+				if imagen.de_quien != request.user:
+					#A: esta tratando de editar alguien que no tiene derechos
+					error_a_responder= 'Sólo la persona que creo la imagen puede reemplazarla'
+
+	if not error_a_responder is None:
+		return redirect('/') #TODO: enviar mensaje de error 'no tiene permiso de editar este imagen'
+	#A: tiene permisos y el titulo es valido
+
+	if request.method == "POST":
+		#VER: https://docs.djangoproject.com/en/3.2/topics/http/file-uploads/#handling-uploaded-files-with-a-model	
+		form= ImagenForm(request.POST, request.FILES, instance= imagen)
+		if form.is_valid():
+			imagen= Imagen(titulo= imagen_titulo, de_quien= request.user) if imagen is None else imagen
+			img_file= request.FILES['imagen']
+			(x, ext)= os.path.splitext(img_file.name) #A: ext incluye el punto
+			img_file.name= f'{imagen_titulo}{ext}' #A: le cambiamos el nombre, misma extension
+			#TODO: race condition, si dos suben con el mismo nombre al mismo tiempo
+			imagen.imagen= img_file 
+			imagen.save()
+			print(f'imagen_edit form valid {img_file.name}')
+			return redirect('/') #TODO: cerrar la ventanita extra
+		print(f'imagen_edit form NOT valid {form.errors} {request.FILES}')
+	else:
+		form = ImagenForm(instance= imagen)
+
+	return render(
+		request, 
+		'pa_charlas_app/imagen_edit.html', 
+		{
+			'form': form, 
+		})
+
+
+#S: textos ################################################
 
 def texto_edit(request, pk=None, charla_pk=None, charla_titulo=None): #U: crear Y editar textos, de charlas o para empezar una
 	texto= None #DFLT, nuevo
