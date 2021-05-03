@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 from pa_lib_py.util import * #U: para cargar config via json
 from pathlib import Path
 from datetime import timedelta
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,8 @@ CFG= json_to_env('.env',str(BASE_DIR))
 SECRET_KEY = CFG['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+IS_DEVEL_SERVER= CFG.get('IS_PROD', (sys.argv[1] == 'runserver'))
+DEBUG = CFG.get('DEBUG', IS_DEVEL_SERVER)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']
 
@@ -146,6 +148,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT= CFG.get('STATIC_PATH',os.path.join(BASE_DIR, 'static'))
 print(f'STATIC FILES AT {STATIC_ROOT}')
+
+MEDIA_ROOT= CFG.get('UPLOADED_PATH', os.path.join(BASE_DIR,'www/deusr')) #U: donde suben las imagenes via upload
+os.makedirs(MEDIA_ROOT, exist_ok=True) #A: creamos el dir si no existia
+MEDIA_URL= 'deusr/' #U: url donde se muestran las imagenes subidas
+#VER: https://docs.djangoproject.com/en/3.2/ref/settings/#file-upload-settings
 
 
 LOGIN_URL = 'login'
