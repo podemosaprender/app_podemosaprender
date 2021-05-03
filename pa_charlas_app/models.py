@@ -153,15 +153,16 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 
 	
 		texto_id= texto if type(texto)==int else texto.pk
+		texto_fh= timezone.now() if type(texto)==int else texto.fh_creado
 		#DBG: print(f'TEXTO_ID {texto_id} CHARLA {ch}')
 		(chit, loCreoP)= CharlaItem.objects.get_or_create(
 			charla= ch,
 			texto_id= texto_id
 		)
-		if not orden is None: #A: me pasaron un orden ej en una respuesta
+		if not (orden is None): #A: me pasaron un orden ej en una respuesta
 			chit.orden= orden
-		elif chit.orden is None: #A: no me pasaron Y no tenia puesto a mano de antes
-			chit.orden= texto.fh_creado.strftime('_%y%m%d%H%M%S')
+		elif chit.orden is None or chit.orden=='': #A: no me pasaron Y no tenia puesto a mano de antes
+			chit.orden= texto_fh.strftime('_%y%m%d%H%M%S')
 
 		if not nivel is None:
 			chit.nivel= nivel
