@@ -175,28 +175,20 @@
 						},
 					});
 
-
+					var YaConvertiAMarkdown= false;
 					function elementosMarkdownAHtml() {
+						console.log("elementosMarkdownAHtml");
+						if (YaConvertiAMarkdown) return;
+						YaConvertiAMarkdown= true; //A: una sola vez!
 
 											md_els= document.querySelectorAll('.markdown')
-											md_els.forEach( el => {
-																	//TODO: No reemplazar hash en urls
-																	txt_con_tags = el.innerHTML.replace(/(^|\s)#([A-Za-záéíóúüñÁÉÍÓÚÜÑ0-9_\.]+)/g, (m,m1,m2) => (m1+hashtagAMarkdownLink('#'+m2))) //A: busco y reemplazo hashtags con links markdown
+											md_els.forEach( elMarkdownMostrarHTML );
 
-																	txt_con_usuarios = txt_con_tags.replace(/(^|\s)@([A-Za-z0-9_\.-]+)/g, (m,m1,m2) => (m1+usuarioAMarkdownLink('@'+m2))) //A: busco y reemplazo usuarios con links markdown
-																	txt_con_video = txt_con_usuarios.replace(/https:\/\/www.youtube.com\/watch\S+/g, youtubeUrlAEmbed);
-																	txt_con_diagramas = txt_con_video.replace(PLANTUML_REGEX, plantumlImgHtmlPara);
-																	markedHtml= marked(x= limpiar_indent(txt_con_diagramas)); //A: convierto markdown a html
-																	markedEl= jQuery('<div class="generado_de_markdown">'+markedHtml+'</div>'); //A: genere otro elemento
-																	markedEl.insertAfter(el); //A: lo puse a continuacion del original
-																	jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original
-																	//DBG: console.log(x)
-																});
 											$('code').addClass('hljs'); //A: le agrego a los elementos code ele stilo de hljs	
 
 											const anchor_els= document.getElementsByName(location.hash.slice(1))
 											if (anchor_els.length>0) { //A: hay un a para el hash
-												setTimeout(() => anchor_els[0].scrollIntoView(), 200); //A: ponerlo a la vista despues de dibujar markdown
+												setTimeout(() => elScrollTo(anchor_els[0], -100), 500); //A: ponerlo a la vista despues de dibujar markdown
 											}
 										}
 
