@@ -439,10 +439,10 @@ def evento_list_ical(request): #U: idem evento_list pero en formato icalendar pa
 	organizer.params['role'] = vText('APP')
 
 	schedule, charla_a_eventos = charlas_calendario(31)
-
+	#DBG: print('evento_list_ical', schedule, charla_a_eventos)
 	for (when, charla) in schedule:
-		print(when, charla)
-		for evento in charla_a_eventos[f'#{charla}']:
+		#DBG: print('evento_list_ical', when, charla)
+		for evento in charla_a_eventos.get(f'#{charla}',[]):
 			event = Event()
 			event['organizer'] = organizer
 			event['uid'] = f'texto/{evento["id"]}/{when.strftime("%Y%m%d")}'
