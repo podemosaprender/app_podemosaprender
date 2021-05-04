@@ -44,6 +44,40 @@
 			</div>
 		{% endfor %}
 
+<nav aria-label="Navegar páginas">
+  <ul class="pagination">
+    <li class="page-item{% if not object_list.has_previous %} disabled {% endif %}">
+      <a class="page-link" href="?page=1" aria-label="Primera">
+        <span aria-hidden="true">&laquo;</span>
+        <span class="sr-only">Primera</span>
+      </a>
+    </li>
+    <li class="page-item{% if not object_list.has_previous %} disabled {% endif %}">
+      <a class="page-link" href="?page={% if object_list.has_previous %}{{ object_list.previous_page_number }}{% endif %}" aria-label="Previa">
+        <span aria-hidden="true">&lt;</span>
+        <span class="sr-only">Previa</span>
+      </a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="?page={{ object_list.number }}" aria-label="Actual">
+       {{ object_list.number }} de {{ object_list.paginator.num_pages }}
+			</a>
+		</li>
+    <li class="page-item{% if not object_list.has_next %} disabled {% endif %}">
+      <a class="page-link" href="?page={% if object_list.has_next %}{{ object_list.next_page_number }}{% endif %}" aria-label="Siguiente">
+        <span aria-hidden="true">&gt;</span>
+        <span class="sr-only">Siguiente</span>
+      </a>
+    </li>
+    <li class="page-item{% if not object_list.has_next %} disabled {% endif %}">
+      <a class="page-link" href="?page={{ object_list.paginator.num_pages }}" aria-label="Ultima">
+        <span aria-hidden="true">&raquo;</span>
+        <span class="sr-only">Ultima</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+
 		<p>
 
 			{% block acciones_sin_item %}

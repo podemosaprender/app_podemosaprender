@@ -13,6 +13,7 @@ from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import SetPasswordForm, AuthenticationForm
 from django.contrib.auth import authenticate, login
 
+from django.core.paginator import Paginator
 from django import forms
 import re
 import os
@@ -271,7 +272,11 @@ def texto_detail(request, pk=None): #U: ver un texto para compartir en las redes
 
 def texto_list(request): #U: los textos de UNA charla, btn para agregar
 	textos= Texto.objects.order_by('-fh_editado').all()
-	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': textos, 'titulo': 'Textos recientes'})
+	paginator = Paginator(textos, 10) #A: ultimos 10
+	page_number = request.GET.get('page',1)
+	print('texto_list page ',page_number)
+	page_obj = paginator.get_page(page_number)
+	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': page_obj, 'titulo': 'Textos recientes'})
 
 # S: Charlas ###############################################
 
