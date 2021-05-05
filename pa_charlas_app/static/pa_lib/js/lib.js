@@ -398,14 +398,13 @@ async function apiTextoByCharlaYOrden(charla,orden){ //U: funcion que hace una c
 	return res_data;
 }
 function buscarCharla(pattern, tags_dst){ //U: Busca las charlas e imprime los resultados como botones
-	console.log(`buscar charla: | pattern: ${pattern}`);
 	var result = document.querySelector(tags_dst || '.result');
 	let matching = getMatchingCharlas(pattern);
 	const html = mostrarCharlasEncontradas(matching);
-	console.log(`buscar charla: | pattern: ${pattern} | ${matching} | ${html}`);
+	// DBG: console.log(`buscar charla: | pattern: ${pattern} | ${matching} | ${html}`);
 	
 	result.innerHTML = html;
-	console.log(result.innerHTML);
+	// DBG: console.log(result.innerHTML);
 	
 }
 
