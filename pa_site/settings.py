@@ -27,7 +27,7 @@ CFG= json_to_env('.env',str(BASE_DIR))
 SECRET_KEY = CFG['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-IS_DEVEL_SERVER= CFG.get('IS_PROD', (sys.argv[1] == 'runserver'))
+IS_DEVEL_SERVER= CFG.get('IS_PROD', (len(sys.argv)>1 and sys.argv[1] == 'runserver'))
 DEBUG = CFG.get('DEBUG', IS_DEVEL_SERVER)
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']

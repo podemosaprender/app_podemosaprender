@@ -1,6 +1,30 @@
 //TODO: traido de la app_semilla, unificar
 /************************************************************************** */
 //S: Util
+//
+
+function elTopLeft(elem) { //U: top y left en el documento de un elemento, para usar con scrollTo
+	var box = elem.getBoundingClientRect();
+
+	var body = document.body;
+	var docEl = document.documentElement;
+
+	var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+	var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+	var clientTop = docEl.clientTop || body.clientTop || 0;
+	var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+	var top  = box.top +  scrollTop - clientTop;
+	var left = box.left + scrollLeft - clientLeft;
+
+	return { top: Math.round(top), left: Math.round(left) };
+}
+
+function elScrollTo(elem, deltaY) { //U: como scrollIntoView pero se puede agregar un offset
+	const topLeft= elTopLeft(elem);
+	window.scrollTo(0, topLeft.top + deltaY);
+}
 
 CopyToClipboardEl= null; //U: el elemento donde ponemos texto para copiar
 function copyToClipboard(texto) { //U: pone texto en el clipboard
@@ -210,10 +234,9 @@ traerUsuarios();
 /************************************************************************** */
 //S: Convertir hashtags y usuarios dentro del texto en links markdown
 
-function hashtagAMarkdownLink(hashtag) {
-	//TODO: revisar si es una charla que existe, sino devolverlo tal cual
+function hashtagAMarkdownLink(hashtag, anchor) {
 	if (TagsTodos.indexOf(hashtag) > -1) { //A: el tag está en la lista de charlas
-		return `[${hashtag}](/charla/${hashtag.slice(1)})` //A: con forma de link markdown
+		return `[${hashtag}](/charla/${hashtag.slice(1)}${anchor||''})` //A: con forma de link markdown
 	}
 	else {
 		return hashtag;
@@ -241,6 +264,33 @@ function youtubeUrlAEmbed(yturl) { //U: html con video embebido para la url de y
 </div>
 `;
 	return html;
+}
+
+var HASHTAG_RE= /(^|\s)#([A-Za-záéíóúüñÁÉÍÓÚÜÑ0-9_\.]+)/g;
+var USUARIO_RE= /(^|\s)@([A-Za-z0-9_\.-]+)/g;
+function markdownTransformarHTML(src, el_id) { //U: convierte "nuestro" markdown en html, pura y facil de debuggear
+	//TODO: No reemplazar hash en urls
+	var t= {src: src}
+	t.txt_con_tags = t.src.replace(HASHTAG_RE, 
+		(m,m1,m2) => (m1+hashtagAMarkdownLink('#'+m2, '#'+el_id))); 
+	//A: busco y reemplazo hashtags con links markdown
+	t.txt_con_usuarios = t.txt_con_tags.replace( USUARIO_RE,
+		(m,m1,m2) => (m1+usuarioAMarkdownLink('@'+m2))); 
+	//A: busco y reemplazo usuarios con links markdown
+	t.txt_con_video = t.txt_con_usuarios.replace(/https:\/\/www.youtube.com\/watch\S+/g, youtubeUrlAEmbed);
+	t.txt_con_diagramas = t.txt_con_video.replace(PLANTUML_REGEX, plantumlImgHtmlPara);
+	t.limpiar_indent= limpiar_indent(t.txt_con_diagramas)
+	t.markedHtml= marked(t.limpiar_indent); //A: convierto markdown a html
+	return t;
+}
+
+function elMarkdownMostrarHTML(el) { //U: toma markdown de el, muestra formateado en su lugar
+	//TODO: No reemplazar hash en urls
+	const t= markdownTransformarHTML(el.innerHTML, el.id);
+	var markedEl= jQuery('<div class="generado_de_markdown">'+t.markedHtml+'</div>'); //A: genere otro elemento
+	markedEl.insertAfter(el); //A: lo puse a continuacion del original
+	jQuery(el).css({display: 'none'}) //A: oculto el elemento con el texto original
+	//DBG: console.log(x)
 }
 
 // S: votos ***************************************************
