@@ -397,3 +397,28 @@ async function apiTextoByCharlaYOrden(charla,orden){ //U: funcion que hace una c
 
 	return res_data;
 }
+function buscarCharla(pattern, tags_dst){ //U: Busca las charlas e imprime los resultados como botones
+	console.log(`buscar charla: | pattern: ${pattern}`);
+	var result = document.querySelector(tags_dst || '.result');
+	let matching = getMatchingCharlas(pattern);
+	const html = mostrarCharlasEncontradas(matching);
+	console.log(`buscar charla: | pattern: ${pattern} | ${matching} | ${html}`);
+	
+	result.innerHTML = html;
+	console.log(result.innerHTML);
+	
+}
+
+function getMatchingCharlas(pattern) {
+	if(!pattern){ return []; } //A: No hay nada para buscar
+	return filterSubstring(Tags,pattern);
+}
+
+function mostrarCharlasEncontradas(list) {
+	var res = '';
+	list.forEach( valor => {
+		valor = valor.split('#')[1];//A: le saco el '#' para poder meter el resultado en la url
+		res += `<a href=/charla/${ valor }><button type="button" value="#${ valor }" class="btn btn-success mr-1">#${ valor }</button></a>`; //TODO: dejarle el estilo del boton al que llama
+	});
+	return res;
+}

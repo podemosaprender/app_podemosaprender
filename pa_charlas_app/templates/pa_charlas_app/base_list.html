@@ -11,6 +11,13 @@
 		{% endblock %}
 		</div>
 
+		<!-- Buscador de charlas -->
+		<input type="text" 
+		placeholder="Buscar charla" 
+		onkeyup="buscarCharla(this.value, '#botonesParaCharlas')"
+		>
+		<div id="botonesParaCharlas"></div>
+
 		{% for item in object_list %}
 
 			<div class="card" {% block item_tag_atributos %}{% endblock %}>
