@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', #U: tambien lo requiere graphene_django
+
+	  'django_filters', #U: filtrar querysets con parametros de url #VER: https://django-filter.readthedocs.io/en/stable/
 
     'django_extensions', #U: runserver_plus con httpS para Facebook
 
@@ -48,9 +50,13 @@ INSTALLED_APPS = [
 
     'social_django', #U: autenticacion con facebook, google 
 
+    'corsheaders', #U: headers para que la API REST/GraphQL se pueda consumir desde otras paginas
+
     'rest_framework', #U: atendemos pedidos REST
-    'corsheaders', #U: headers para que la API REST se pueda consumir desde otras paginas
-		'rest_framework_simplejwt.token_blacklist', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/blacklist_app.html
+
+    'rest_framework_simplejwt.token_blacklist', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/blacklist_app.html
+
+    'graphene_django', #U: GraphQL en vez de rest, #VER: https://docs.graphene-python.org/projects/django/en/latest/installation/
 
     'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
 ]
@@ -192,6 +198,12 @@ REST_FRAMEWORK = {
   	'rest_framework_simplejwt.authentication.JWTAuthentication', #A: con token
 		'rest_framework.authentication.SessionAuthentication', #A: si te logueaste en la ui web
 	)
+}
+
+#S: servicios graphql
+GRAPHENE = {
+	"SCHEMA": "pa_charlas_app.graphql_schema.schema",
+	"ATOMIC_MUTATIONS": True, #U: todos los cambios en un request o ninguno, #VER: https://docs.graphene-python.org/projects/django/en/latest/mutations/
 }
 
 #VER: https://github.com/adamchainz/django-cors-headers

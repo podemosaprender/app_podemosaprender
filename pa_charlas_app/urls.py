@@ -4,8 +4,12 @@ from django.urls import path, re_path, include
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
+from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+
+from graphene_django.views import GraphQLView
 
 from . import views
 from . import views_rest
@@ -18,12 +22,15 @@ rest_router.register('charlaitem', views_rest.CharlaItemViewSet)
 #A: agregamos las vistas rest al router asi las muestra en la UI
 
 urlpatterns = [
-	path('api/', include(rest_router.urls)),
 	path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
 	path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 	path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 	path('api/token/user/', views_rest.token_user, name='token_user'),
-	#A: documentacion y autenticacion de la api REST
+	#A: autenticacion de la api REST o GraphQL
+
+	path('api/', include(rest_router.urls)), #A: api REST
+
+	path("graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))), #A: api graphql
 
 	path("login/", views.login, name="login"),
 	path('clave/', login_required(views.UserPassCambiar), name="user_pass_cambiar"),
