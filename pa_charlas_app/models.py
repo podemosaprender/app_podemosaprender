@@ -64,13 +64,13 @@ class CharlaItem(models.Model): #U: conecta un texto con una charla
 	def __str__(self):
 		return f'{self.charla.titulo} {self.texto}'
 
-class Voto(models.Model): #U: una coleccion de textos sobre algun tema
+class Voto(models.Model): #U: Un tipo de voto, ej "Quiero participar"
 	titulo= models.CharField(max_length=200, unique=True)
 
 	def __str__(self):
 		return f'{self.titulo}'
 
-class VotoItem(models.Model): #U: conecta un texto con una charla
+class VotoItem(models.Model): #U: Un voto que le puso una persona a un texto
 	de_quien= models.ForeignKey('auth.User', on_delete=models.CASCADE)
 	texto=  models.ForeignKey('Texto', on_delete=models.CASCADE)
 	voto= models.ForeignKey('Voto', on_delete=models.CASCADE)
