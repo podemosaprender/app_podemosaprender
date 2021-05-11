@@ -75,7 +75,7 @@ Si bajaste este repo los archivos ya están listos y no necesitas editar nada. A
 Después de clonar este repositorio, entre a la carpeta donde está este README y ejecuté
 
 ~~~
-heorku login #A: para entrar con mi usuario
+heroku login #A: para entrar con mi usuario
 heroku apps:create #A: creo la aplicacion (una vez)
 git push heroku main #A: subo el codigo, cada vez que lo cambio, despues de hacer commit
 heroku run python manage.py migrate #A: actualizo la DB postgress cada vez que cambio models
