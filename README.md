@@ -70,6 +70,31 @@ Si tenés linux mint o ubuntu y te da error, tal vez tengas que ejecutar [estos 
 
 ### Desplegar en Heroku
 
+Si bajaste este repo los archivos ya están listos y no necesitas editar nada. Abajo cuento como hice para que nos quede.
+
+Después de clonar este repositorio, entre a la carpeta donde está este README y ejecuté
+
+~~~
+heorku login #A: para entrar con mi usuario
+heroku apps:create #A: creo la aplicacion (una vez)
+git push heroku main #A: subo el codigo, cada vez que lo cambio, despues de hacer commit
+heroku run python manage.py migrate #A: actualizo la DB postgress cada vez que cambio models
+heroku run python manage.py createsuperuser #A: una vez
+heroku apps:info #A: para ver y abrir la url donde se desplegó
+heroku pg:psql #A: para acceder como admin a la base de datos
+~~~
+
+Si accedes a la base de datos podés consultar por ej
+
+~~~
+select * from pa_charlas_app_texto;
+~~~
+
+Podríamos tener datos de prueba y [subirlos como dice aquí](https://devcenter.heroku.com/articles/heroku-postgres-import-export)
+
+
+#### Como hice (sirve para otras apps Django)
+
 Tomando información de [estas instrucciones](https://devcenter.heroku.com/articles/getting-started-with-python) edité
 
 * Procfile
@@ -77,7 +102,6 @@ Tomando información de [estas instrucciones](https://devcenter.heroku.com/artic
 * requirements.txt
 
 y puse DEBUG true en .env.json
-
 ~~~
 {
 	"SECRET_KEY": "LaClaveSecretaQueGeneraDjangoEnSettingsVaAca-djahd",
