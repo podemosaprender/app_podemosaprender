@@ -30,7 +30,9 @@ SECRET_KEY = CFG['SECRET_KEY']
 IS_DEVEL_SERVER= CFG.get('IS_PROD', (len(sys.argv)>1 and sys.argv[1] == 'runserver'))
 DEBUG = CFG.get('DEBUG', IS_DEVEL_SERVER)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']
+ALLOWED_HOSTS = CFG.get('ALLOWED_HOSTS', #U: SEC: restringir en Produccion
+	['localhost', '127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']
+)
 
 # Application definition
 

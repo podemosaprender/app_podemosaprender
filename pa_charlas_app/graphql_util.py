@@ -4,6 +4,9 @@ import graphene
 from graphene_django.filter import DjangoFilterConnectionField
 from graphene.utils.str_converters import to_snake_case
 
+from django.core.exceptions import PermissionDenied
+
+import re
 
 # S: autenticar con el mismo token de django rest ################
 
@@ -16,18 +19,37 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 DRF_JWT_Authenticator= JWTAuthentication() #U: instancia para autenticar
 
 def auth_middleware(next, root, info, **args):
-	jwt_data= None #DFLT
+	confirmamosPuedeSeguir = False #DFLT
+
+	request= info.context #U: alias, por claridad
+	hostDeberiaSer= request.META.get('HTTP_HOST','si.podemosaprender.org') #U: el nombre donde publicamos ej localhost:8000
+
 	try:
-		jwt_data= DRF_JWT_Authenticator.authenticate(info.context)
+		jwt_data= DRF_JWT_Authenticator.authenticate(request)
 		print(f'graphql auth drf_jwt {jwt_data}')
 		if not jwt_data is None: #A: tenia token valido
 			(user, token)= jwt_data
+			confirmamosPuedeSeguir= True
 			info.context.user= user #A: tomo el usuario activo del token
 	except:
 		pass #A: no tenia token o expiro
+
+	#VER: https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#verifying-origin-with-standard-headers
+	if not confirmamosPuedeSeguir: #A: tenemos que revisar si viene de nuestra pagina para evitar CSRF
+		originDice= request.META.get('HTTP_ORIGIN','') #A: este el navegador no lo deja modificar ej en fecth	
+		refererDice= request.META.get('HTTP_REFERER','') #A: este el navegador no lo deja modificar ej en fecth	
+
+		originOk= re.match(f'^https?://{hostDeberiaSer}$',originDice)	and True
+		refererOk= re.match(f'^https?://{hostDeberiaSer}(/.*)$',refererDice) and True
+
+		confirmamosPuedeSeguir= refererOk and originOk
+		print(f'graphql auth host={hostDeberiaSer} origin={originDice} originOk={originOk}  referer={refererDice} refererOk={refererOk}')
 	
-	return_value = next(root, info, **args)
-	return return_value
+	if confirmamosPuedeSeguir:
+		return_value = next(root, info, **args)
+		return return_value
+	else:
+		raise PermissionDenied(f'Solo podes acceder con un token o desde nuestro sitio {hostDeberiaSer}')
 
 
 # S: orderBy ###############################################
