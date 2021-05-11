@@ -76,6 +76,27 @@ Tomando información de [estas instrucciones](https://devcenter.heroku.com/artic
 * pa_site/settings.py
 * requirements.txt
 
+y puse DEBUG true en .env.json
+
+~~~
+{
+	"SECRET_KEY": "LaClaveSecretaQueGeneraDjangoEnSettingsVaAca-djahd",
+	"SOCIAL_AUTH_FACEBOOK_KEY": "112233445566778", 
+	"SOCIAL_AUTH_FACEBOOK_SECRET": "112233445566778899aabbccddeeff00",
+	"SOCIAL_AUTH_GOOGLE_KEY": "11223344556-112233445566778899aabbccddeeffgg.apps.googleusercontent.com",
+	"SOCIAL_AUTH_GOOGLE_SECRET": "i2iu7hajhas-Wndkakhh12lm",
+	"ALLOWED_HOSTS": ["127.0.0.1","localhost"],
+	"DEBUG": true
+}
+~~~
+
+Sin eso __no funciona gunicorn__ , hay algún problema con los archivos estáticos como explican en [este hilo en stackoverflow](https://stackoverflow.com/questions/44160666/valueerror-missing-staticfiles-manifest-entry-for-favicon-ico/51060143#51060143) junto con soluciones más generales.
+
+También funcionó poniendo en Procfile
+
+~~~
+web: python manage.py runserver 0.0.0.0:$PORT
+~~~
 
 ### Cuando desplegue en un hosting
 
