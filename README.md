@@ -68,6 +68,15 @@ docker run -it --rm -v "$(pwd)":/pa_app/ -p 8000:8000 pa_app /scripts/docker/doc
 
 Si tenés linux mint o ubuntu y te da error, tal vez tengas que ejecutar [estos comandos](https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket)
 
+### Desplegar en Heroku
+
+Tomando información de [estas instrucciones](https://devcenter.heroku.com/articles/getting-started-with-python) edité
+
+* Procfile
+* pa_site/settings.py
+* requirements.txt
+
+
 ### Cuando desplegue en un hosting
 
 Tuve que usar mariadb en vez de sqlite, asi que agregue la configuracion de la db a .env.json que queda asi:

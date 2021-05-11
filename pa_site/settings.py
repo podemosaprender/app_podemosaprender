@@ -10,6 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+ES_HEROKU= False
+try:
+	import django_heroku #U: autoconfiguracion Heroku, comando complementario al final del archivo
+	ES_HEROKU= True
+except ImportError:
+	print('django_heroku no esta disponible')
+
 from pa_lib_py.util import * #U: para cargar config via json
 from pathlib import Path
 from datetime import timedelta
@@ -224,3 +231,7 @@ SIMPLE_JWT = {
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html#auth-header-name
 }
 #A: para acceder con token hay que pasarlo en el header Authorization
+
+if ES_HEROKU:
+	django_heroku.settings(locals()) #A: Activate Django-Heroku.
+
