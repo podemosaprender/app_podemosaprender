@@ -1,6 +1,7 @@
 {% extends 'pa_charlas_app/base.html' %}
 
 {% load bootstrap4 %}
+{% load pa_charlas_app_extras %}
 
 {% block content %}
 	<div class="container">
@@ -44,6 +45,9 @@
 			</div>
 		{% endfor %}
 
+{% if page_obj %}
+	{% define page_obj as object_list %}
+{% endif %}
 <nav aria-label="Navegar páginas">
   <ul class="pagination">
     <li class="page-item{% if not object_list.has_previous %} disabled {% endif %}">

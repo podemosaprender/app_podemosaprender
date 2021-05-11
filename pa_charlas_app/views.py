@@ -274,7 +274,6 @@ def texto_list(request): #U: los textos de UNA charla, btn para agregar
 	textos= Texto.objects.order_by('-fh_editado').all()
 	paginator = Paginator(textos, 10) #A: ultimos 10
 	page_number = request.GET.get('page',1)
-	print('texto_list page ',page_number)
 	page_obj = paginator.get_page(page_number)
 	return render(request, 'pa_charlas_app/texto_list.html', {'object_list': page_obj, 'titulo': 'Textos recientes'})
 
@@ -359,9 +358,13 @@ def charla_texto_list(request, charla_titulo=None, pk=None, prefijo_tag='#', ord
 
 	charlaitems= charla.charlaitem_set.order_by('orden',orden).all() if not charla.pk is None else []
 
+	paginator = Paginator(charlaitems, 50) 
+	page_number = request.GET.get('page',1)
+	page_obj = paginator.get_page(page_number)
+
 	mostrar_titulo= charla.titulo if mostrar_titulo is None else mostrar_titulo
 	return render(request, 'pa_charlas_app/charla_texto_list.html', {
-		'object_list': charlaitems, 
+		'object_list': page_obj, 
 		'participantes': participantes, 
 		'charla': charla, 
 		'titulo': mostrar_titulo, 
