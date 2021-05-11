@@ -30,7 +30,9 @@ SECRET_KEY = CFG['SECRET_KEY']
 IS_DEVEL_SERVER= CFG.get('IS_PROD', (len(sys.argv)>1 and sys.argv[1] == 'runserver'))
 DEBUG = CFG.get('DEBUG', IS_DEVEL_SERVER)
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']
+ALLOWED_HOSTS = CFG.get('ALLOWED_HOSTS', #U: SEC: restringir en Produccion
+	['localhost', '127.0.0.1', '.pythonanywhere.com', '.podemosaprender.org']
+)
 
 # Application definition
 
@@ -40,7 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', #U: tambien lo requiere graphene_django
+
+	  'django_filters', #U: filtrar querysets con parametros de url #VER: https://django-filter.readthedocs.io/en/stable/
 
     'django_extensions', #U: runserver_plus con httpS para Facebook
 
@@ -48,9 +52,13 @@ INSTALLED_APPS = [
 
     'social_django', #U: autenticacion con facebook, google 
 
+    'corsheaders', #U: headers para que la API REST/GraphQL se pueda consumir desde otras paginas
+
     'rest_framework', #U: atendemos pedidos REST
-    'corsheaders', #U: headers para que la API REST se pueda consumir desde otras paginas
-		'rest_framework_simplejwt.token_blacklist', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/blacklist_app.html
+
+    'rest_framework_simplejwt.token_blacklist', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/blacklist_app.html
+
+    'graphene_django', #U: GraphQL en vez de rest, #VER: https://docs.graphene-python.org/projects/django/en/latest/installation/
 
     'pa_charlas_app.apps.PaCharlasAppConfig', #A: la app de charlas de PodemosAprender
 ]
@@ -194,8 +202,17 @@ REST_FRAMEWORK = {
 	)
 }
 
+#S: servicios graphql
+GRAPHENE = {
+	'SCHEMA': 'pa_charlas_app.graphql_schema.schema',
+	'ATOMIC_MUTATIONS': True, #U: todos los cambios en un request o ninguno, #VER: https://docs.graphene-python.org/projects/django/en/latest/mutations/
+	'MIDDLEWARE': [
+		'pa_charlas_app.graphql_util.auth_middleware', #U: usar el mismo jwt que django rest
+	]
+}
+
 #VER: https://github.com/adamchainz/django-cors-headers
-CORS_URLS_REGEX = r'^/api/.*$' #A: solo enviamos CORS allow para request a la api
+CORS_URLS_REGEX = r'^/(api/.*|graphql)$' #A: solo enviamos CORS allow para request a la api
 CORS_ALLOW_ALL_ORIGINS= True #A:SEC: OjO! permitimos todos porque estamos filtrando con CORS_URLS_REGEX
 
 SIMPLE_JWT = {
