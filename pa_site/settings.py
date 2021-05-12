@@ -207,3 +207,12 @@ SIMPLE_JWT = {
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION', #VER: https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html#auth-header-name
 }
 #A: para acceder con token hay que pasarlo en el header Authorization
+
+
+#Email Configurations
+EMAIL_BACKEND ="django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER ='podemosaprenderconfig@gmail.com'
+EMAIL_HOST_PASSWORD = 'Podemos123' 

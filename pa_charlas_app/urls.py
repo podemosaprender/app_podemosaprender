@@ -74,6 +74,13 @@ urlpatterns = [
 
 	path('', views.texto_list, name='home'),
 	#A: la home page es la lista de textos nuevos
+ 
+ 
+    path('contacto', views.contacto, name="contacto"),
+    #Contacto y email enviado
+    path('email_sent', views.email_sent, name="email_sent"),
+    
+    
 ]
 
 

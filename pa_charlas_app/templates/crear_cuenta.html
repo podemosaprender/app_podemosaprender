@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear cuenta{% endblock %}
+
+{% block content %}
+<div style="width: 450px;  margin: 0 auto; padding: 10px;">
+<h2>Crear cuenta</h2>
+<form method="post" >
+  {% csrf_token %}
+  {{ form|crispy}}
+  <button class="btn btn-primary" type="submit">Registrar</button>
+  <a href="{% url 'login' %}"><button class="btn btn-danger">Cancelar</button></a>
+</form>
+</div>
+{% endblock %}
