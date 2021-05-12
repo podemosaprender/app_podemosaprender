@@ -12,9 +12,14 @@ Django==3.1.7
 django-bootstrap4==2.3.1
 django-cors-headers==3.7.0
 django-extensions==3.1.1
+django-filter==2.4.0
 django-restframework==0.0.1
 djangorestframework==3.12.2
 djangorestframework-simplejwt==4.4.0
+graphene==2.1.8
+graphene-django==2.15.0
+graphql-core==2.3.2
+graphql-relay==2.0.1
 icalendar==4.0.7
 idna==2.10
 importlib-metadata==2.1.1

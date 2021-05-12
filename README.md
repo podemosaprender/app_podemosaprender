@@ -68,6 +68,60 @@ docker run -it --rm -v "$(pwd)":/pa_app/ -p 8000:8000 pa_app /scripts/docker/doc
 
 Si tenés linux mint o ubuntu y te da error, tal vez tengas que ejecutar [estos comandos](https://www.digitalocean.com/community/questions/how-to-fix-docker-got-permission-denied-while-trying-to-connect-to-the-docker-daemon-socket)
 
+### Desplegar en Heroku
+
+Si bajaste este repo los archivos ya están listos y no necesitas editar nada. Abajo cuento como hice para que nos quede.
+
+Después de clonar este repositorio, entre a la carpeta donde está este README y ejecuté
+
+~~~
+heroku login #A: para entrar con mi usuario
+heroku apps:create #A: creo la aplicacion (una vez)
+git push heroku main #A: subo el codigo, cada vez que lo cambio, despues de hacer commit
+heroku run python manage.py migrate #A: actualizo la DB postgress cada vez que cambio models
+heroku run python manage.py createsuperuser #A: una vez
+heroku apps:info #A: para ver y abrir la url donde se desplegó
+heroku pg:psql #A: para acceder como admin a la base de datos
+~~~
+
+Si accedes a la base de datos podés consultar por ej
+
+~~~
+select * from pa_charlas_app_texto;
+~~~
+
+Podríamos tener datos de prueba y [subirlos como dice aquí](https://devcenter.heroku.com/articles/heroku-postgres-import-export)
+
+
+#### Como hice (sirve para otras apps Django)
+
+Tomando información de [estas instrucciones](https://devcenter.heroku.com/articles/getting-started-with-python) edité
+
+* Procfile
+* pa_site/settings.py
+* requirements.txt
+
+y puse DEBUG true en .env.json
+~~~
+{
+	"SECRET_KEY": "LaClaveSecretaQueGeneraDjangoEnSettingsVaAca-djahd",
+	"SOCIAL_AUTH_FACEBOOK_KEY": "112233445566778", 
+	"SOCIAL_AUTH_FACEBOOK_SECRET": "112233445566778899aabbccddeeff00",
+	"SOCIAL_AUTH_GOOGLE_KEY": "11223344556-112233445566778899aabbccddeeffgg.apps.googleusercontent.com",
+	"SOCIAL_AUTH_GOOGLE_SECRET": "i2iu7hajhas-Wndkakhh12lm",
+	"ALLOWED_HOSTS": ["127.0.0.1","localhost"],
+	"DEBUG": true
+}
+~~~
+
+Sin eso __no funciona gunicorn__ , hay algún problema con los archivos estáticos como explican en [este hilo en stackoverflow](https://stackoverflow.com/questions/44160666/valueerror-missing-staticfiles-manifest-entry-for-favicon-ico/51060143#51060143) junto con soluciones más generales.
+
+También funcionó poniendo en Procfile
+
+~~~
+web: python manage.py runserver 0.0.0.0:$PORT
+~~~
+
 ### Cuando desplegue en un hosting
 
 Tuve que usar mariadb en vez de sqlite, asi que agregue la configuracion de la db a .env.json que queda asi:
