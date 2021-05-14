@@ -211,7 +211,7 @@ REST_FRAMEWORK = {
 
 #S: servicios graphql
 GRAPHENE = {
-	'SCHEMA': 'pa_charlas_app.graphql_schema.schema',
+	'SCHEMA': 'pa_charlas_app.views_graphql.schema',
 	'ATOMIC_MUTATIONS': True, #U: todos los cambios en un request o ninguno, #VER: https://docs.graphene-python.org/projects/django/en/latest/mutations/
 	'MIDDLEWARE': [
 		'pa_charlas_app.graphql_util.auth_middleware', #U: usar el mismo jwt que django rest
