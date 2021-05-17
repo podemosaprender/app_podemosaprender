@@ -4,10 +4,16 @@ import graphene
 from graphene import relay
 from graphene_django import DjangoObjectType
 from graphql_relay import from_global_id
-from django.core.exceptions import PermissionDenied
+import django_filters
+
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.shortcuts import get_object_or_404
+
 from datetime import datetime
 
 from .graphql_util import ListaRelayConOrderBy
+
+from .forms import TextoForm
 from .models import *
 
 
@@ -18,14 +24,26 @@ class UserNode(DjangoObjectType):
 		model = User
 		fields = ('id','username')
 
+#VER: https://django-filter.readthedocs.io/en/stable/guide/usage.html#the-filter
+class TextoFilterSet(django_filters.FilterSet): #U: para texto necesitamos mas detalles
+	enCharla= django_filters.CharFilter(method='filter_enCharla')
+	def filter_enCharla(self, queryset, name, value):
+		print(f'FILTER {name} {value}')
+		qCharlaItem= CharlaItem.objects.filter(charla__titulo= value).values('texto_id')
+		return queryset.filter(id__in= qCharlaItem)
+
+	class Meta:
+		model = Texto
+		fields = {
+			'fh_creado': ['gt','lt'],
+			'fh_editado': ['gt','lt'],
+			'de_quien__username': ['exact'],
+		}
+
 class TextoNode(DjangoObjectType): 
 	class Meta:
 		model = Texto
 		fields = '__all__'
-		filter_fields = {
-			'de_quien__username': ['exact'],
-			'fh_creado': ['gt','lt'],
-		}
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
 
 class CharlaNode(DjangoObjectType):
@@ -55,7 +73,7 @@ class Consultas(graphene.ObjectType):
 	#U: fetchData('http://127.0.0.1:8000/graphql',{method:'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({"query":"{ hola }\n\n","variables":null})}, x => console.log(JSON.stringify(x.data,null,1),x))
 
 	texto = relay.Node.Field(TextoNode) #U: { texto(id: "VGV4dG9Ob2RlOjE=") {  id, fhCreado, texto } } 
-	texto_lista = ListaRelayConOrderBy(TextoNode)
+	texto_lista = ListaRelayConOrderBy(TextoNode, filterset_class= TextoFilterSet)
 	#U: { textoLista { edges { node { id, fhCreado, deQuien { id, username }, texto } } } }
 	#U: { textoLista(deQuien_Username: "pepita") { edges { node { id, fhCreado, texto } } } }
 	#U: { textoLista(orderBy: ["-fhCreado"]) { edges { node { id, fhCreado, texto } } } }
@@ -94,6 +112,36 @@ class Consultas(graphene.ObjectType):
 			raise PermissionDenied('No tenes permisos')	
 
 
+class TextoModificar(relay.ClientIDMutation):
+	texto = graphene.Field(TextoNode)
+
+	class Input:
+		texto = graphene.String(required=True)
+		id = graphene.ID(required=False)
+		charla_titulo = graphene.String(required=False)
+
+	@classmethod
+	def mutate_and_get_payload(cls, root, info, texto, id=None, charla_titulo=None):
+		if not info.context.user.is_authenticated:
+			raise PermissionDenied('No tenes permisos')	
+
+		elTextoExistenteId= None #DFLT
+		elTextoExistente= None #DFLT
+		if not id is None:
+			elTextoExistenteId= from_global_id(id)[1]
+			elTextoExistente= get_object_or_404(Texto, pk= elTextoExistenteId )
+
+		#DBG:print(f'TextoModificar id={id} texto={texto}')
+		textoForm= TextoForm({'texto': texto}, instance= elTextoExistente)
+		if not textoForm.is_valid():
+			raise ValidationError(textoForm.errors)
+
+		item= texto_guardar(textoForm, info.context.user, charla_titulo=charla_titulo)
+		#DBG: print(f'TextoModificar id={elTextoExistenteId} vs. guarde {item.id}')
+
+		return TextoModificar(texto=item)
+
+
 class CharlaItemModificar(relay.ClientIDMutation):
 	charlaitem = graphene.Field(CharlaItemNode)
 
@@ -112,6 +160,9 @@ class CharlaItemModificar(relay.ClientIDMutation):
 		return CharlaItemModificar(charlaitem=charlaitem)
 
 class Modificaciones(graphene.ObjectType):
+	texto_modificar = TextoModificar.Field();
+	#U: mutation pruebaTexto { textoModificar(input: {texto: "otro va en #bandadjango", id: "VGV4dG9Ob2RlOjcz"}) { clientMutationId texto { id texto fhCreado fhEditado } } }
+
 	charlaitem_crear = CharlaItemModificar.Field()	
 	#U: mutation miMutacion { charlaitemCrear(input: {textoId: "VGV4dG9Ob2RlOjE=", charlaTitulo: "#bandadjango"}) { charlaitem { id, texto { id, texto }, } } }
 
