@@ -215,7 +215,11 @@ GRAPHENE = {
 	'ATOMIC_MUTATIONS': True, #U: todos los cambios en un request o ninguno, #VER: https://docs.graphene-python.org/projects/django/en/latest/mutations/
 	'MIDDLEWARE': [
 		'pa_charlas_app.graphql_util.auth_middleware', #U: usar el mismo jwt que django rest
-	]
+	],
+	#VER: https://docs.graphene-python.org/projects/django/en/latest/introspection/
+	#U: python manage.py graphql_schema
+	'SCHEMA_OUTPUT': 'graphql_schema.json',  # defaults to schema.json,
+	'SCHEMA_INDENT': 2,  # Defaults to None (displays all data on a single line)
 }
 
 #VER: https://github.com/adamchainz/django-cors-headers
