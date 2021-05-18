@@ -217,3 +217,10 @@ dia_sabado_1ro_marzo_a_junio
 ## Para más adelante
 
 Un editor con preview para los textos usando Markdown? https://neutronx.github.io/django-markdownx/
+
+
+## Borrar datos de prueba
+
+~~~
+python manage.py runscript -v3 mantenimiento.borrar_borrames
+~~~

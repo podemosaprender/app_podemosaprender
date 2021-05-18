@@ -119,9 +119,10 @@ class TextoModificar(relay.ClientIDMutation):
 		texto = graphene.String(required=True)
 		id = graphene.ID(required=False)
 		charla_titulo = graphene.String(required=False)
+		orden = graphene.String(required=False)
 
 	@classmethod
-	def mutate_and_get_payload(cls, root, info, texto, id=None, charla_titulo=None):
+	def mutate_and_get_payload(cls, root, info, texto, id=None, charla_titulo=None, orden= None):
 		if not info.context.user.is_authenticated:
 			raise PermissionDenied('No tenes permisos')	
 
@@ -136,7 +137,7 @@ class TextoModificar(relay.ClientIDMutation):
 		if not textoForm.is_valid():
 			raise ValidationError(textoForm.errors)
 
-		item= texto_guardar(textoForm, info.context.user, charla_titulo=charla_titulo)
+		item= texto_guardar(textoForm, info.context.user, charla_titulo=charla_titulo, orden=orden)
 		#DBG: print(f'TextoModificar id={elTextoExistenteId} vs. guarde {item.id}')
 
 		return TextoModificar(texto=item)
