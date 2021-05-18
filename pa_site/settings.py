@@ -223,7 +223,7 @@ GRAPHENE = {
 }
 
 #VER: https://github.com/adamchainz/django-cors-headers
-CORS_URLS_REGEX = r'^/(api/.*|graphql)$' #A: solo enviamos CORS allow para request a la api
+CORS_URLS_REGEX = r'^/(api/.*|graphql/)$' #A: solo enviamos CORS allow para request a la api
 CORS_ALLOW_ALL_ORIGINS= True #A:SEC: OjO! permitimos todos porque estamos filtrando con CORS_URLS_REGEX
 
 SIMPLE_JWT = {
