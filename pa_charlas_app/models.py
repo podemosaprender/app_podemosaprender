@@ -107,7 +107,7 @@ def conUserYFecha_guardar(form, user, commit= True):
 	ahora= timezone.now() 
 	obj= form.save(commit=False)
 	try:
-		de_quien_vacio= (texto.de_quien is None) #A: si no es none, no lanza excepcion y guarda false
+		de_quien_vacio= (obj.de_quien is None) #A: si no es none, no lanza excepcion y guarda false
 	except:
 		de_quien_vacio= True
 	if de_quien_vacio: #A: Si no tiene autor es nuevo 
