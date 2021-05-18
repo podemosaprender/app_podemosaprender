@@ -106,10 +106,7 @@ def charla_tipo_hilo(): #U: por comodidad
 def conUserYFecha_guardar(form, user, commit= True):
 	ahora= timezone.now() 
 	obj= form.save(commit=False)
-	try:
-		de_quien_vacio= (obj.de_quien is None) #A: si no es none, no lanza excepcion y guarda false
-	except:
-		de_quien_vacio= True
+	de_quien_vacio= (not hasattr(obj,'de_quien')) or (obj.de_quien is None) #A: si no es none, no lanza excepcion y guarda false
 	if de_quien_vacio: #A: Si no tiene autor es nuevo 
 		obj.de_quien= user
 		obj.fh_creado= ahora
