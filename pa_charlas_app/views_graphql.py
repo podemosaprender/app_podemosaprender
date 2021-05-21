@@ -26,9 +26,9 @@ class UserNode(DjangoObjectType):
 
 #VER: https://django-filter.readthedocs.io/en/stable/guide/usage.html#the-filter
 class TextoFilterSet(django_filters.FilterSet): #U: para texto necesitamos mas detalles
-	enCharla= django_filters.CharFilter(method='filter_enCharla')
+	charla__titulo= django_filters.CharFilter(method='filter_enCharla')
+
 	def filter_enCharla(self, queryset, name, value):
-		print(f'FILTER {name} {value}')
 		qCharlaItem= CharlaItem.objects.filter(charla__titulo= value).values('texto_id')
 		return queryset.filter(id__in= qCharlaItem)
 
@@ -57,15 +57,29 @@ class CharlaNode(DjangoObjectType):
 		}
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
 
+class CharlaItemFilterSet(django_filters.FilterSet): 
+	deQuien__username= django_filters.CharFilter(method='filter_deQuien')
+	charla__titulo= django_filters.CharFilter(method='filter_titulo')
+
+	def filter_deQuien(self, queryset, name, value):
+		return queryset.filter(texto__de_quien__username= value)
+
+	def filter_titulo(self, queryset, name, value):
+		return queryset.filter(charla__titulo= value)
+
+	class Meta:
+		model= CharlaItem
+		fields = {
+			'texto_id': ['exact'],
+			'charla_id': ['exact'],
+			'orden': ['exact','icontains','contains','startswith'],
+			#'charla__titulo': ['exact','icontains','startswith'],
+		}
+
 class CharlaItemNode(DjangoObjectType):
 	class Meta:
 		model = CharlaItem	
 		fields = '__all__'
-		filter_fields = {
-			'texto_id': ['exact'],
-			'charla_id': ['exact'],
-			'charla__titulo': ['exact','icontains'],
-		}
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
 
 class Consultas(graphene.ObjectType):
@@ -84,7 +98,7 @@ class Consultas(graphene.ObjectType):
 	charla_lista = ListaRelayConOrderBy(CharlaNode)
 
 	charlaitem = relay.Node.Field(CharlaItemNode)
-	charlaitem_lista = ListaRelayConOrderBy(CharlaItemNode)
+	charlaitem_lista = ListaRelayConOrderBy(CharlaItemNode, filterset_class= CharlaItemFilterSet)
 	#U: { charlaitemLista(charla_Titulo_Icontains: "banda") { edges { node { id, charla { titulo }, texto { texto }} }}}
 
 	def resolve_hola(self, info, **kwargs): #U: para probar si estamos autenticados
