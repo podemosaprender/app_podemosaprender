@@ -27,6 +27,15 @@ class TextoNode(DjangoObjectType): #U:
 		}
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
 
+class BancoTxNode(DjangoObjectType): #U: 
+	class Meta:
+		model = BancoTx
+		fields = '__all__'
+		filter_fields = {
+			'fh_creado': ['gt'],
+		}
+		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
+
 class Consultas(graphene.ObjectType):
 	hola = graphene.String(default_value='PodemosAprender', description='Devuelve "PodemosAprender"')
 	#U: fetchData('http://127.0.0.1:8000/graphql',{method:'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({"query":"{ hola }\n\n","variables":null})}, x => console.log(JSON.stringify(x.data,null,1),x))
@@ -38,6 +47,9 @@ class Consultas(graphene.ObjectType):
 	#U: { textoAll(orderBy: ["-fhCreado"]) { edges { node { id, fhCreado, texto } } } }
 	#U: { textoAll(orderBy: ["-fhCreado"]) { edges { node { id, fhCreado, texto } } } }
 	#VER: https://graphql.org/learn/pagination/
+
+	bancoTx = relay.Node.Field(BancoTxNode)
+	bancoTx_all = ListaRelayConOrderBy(BancoTxNode)
 
 	def resolve_hola(self, info, **kwargs): #U: para probar si estamos autenticados
 		return f'Hola {info.context.user.username}! PodemosAprender!'

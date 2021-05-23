@@ -355,3 +355,17 @@ def redes_de_usuario(user): #U: Diccionario red -> usr_id
 		provider = re.sub(r'-.*', '', red.provider) #A: google-oatuh -> google
 		r[provider] = red.uid
 	return r
+
+# S: banquito de horas ###########################################################
+
+class BancoTx(models.Model): # U: Una transaccion de horas entre dos usuarios
+	
+	quien_da= models.ForeignKey('auth.User',related_name="bancotx_di", on_delete=models.CASCADE)
+	quien_recibe= models.ForeignKey('auth.User',related_name="bancotx_recibi" ,on_delete=models.CASCADE)
+	fh_creado= models.DateTimeField(default=timezone.now)
+	titulo= models.CharField(max_length=200)
+	cuanto= models.IntegerField()
+	que = models.CharField(max_length=200)
+
+	def __str__(self):
+		return f'{self.fh_creado} {self.quien_da} {self.quien_recibe} {self.titulo} {self.cuanto}'
