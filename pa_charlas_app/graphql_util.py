@@ -26,7 +26,7 @@ def auth_middleware(next, root, info, **args):
 
 	try:
 		jwt_data= DRF_JWT_Authenticator.authenticate(request)
-		print(f'graphql auth drf_jwt {jwt_data}')
+		#DBG: print(f'graphql auth drf_jwt {jwt_data}')
 		if not jwt_data is None: #A: tenia token valido
 			(user, token)= jwt_data
 			confirmamosPuedeSeguir= True
@@ -105,7 +105,11 @@ class OrderedDjangoFilterConnectionField_2_6(DjangoFilterConnectionField):
 			qs = qs.order_by(*snake_order)
 		return qs
 
-def ListaRelayConOrderBy(tipoNode): #U: para que tenga filtros y orderBy
-	return OrderedDjangoFilterConnectionField_2_6(tipoNode, orderBy=graphene.List(of_type=graphene.String)) 
+def ListaRelayConOrderBy(tipoNode, filterset_class= None): #U: para que tenga filtros y orderBy
+	return OrderedDjangoFilterConnectionField_2_6(
+		tipoNode, 
+		orderBy=graphene.List(of_type=graphene.String),
+		filterset_class= filterset_class
+	) 
 
 

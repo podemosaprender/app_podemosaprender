@@ -106,10 +106,7 @@ def charla_tipo_hilo(): #U: por comodidad
 def conUserYFecha_guardar(form, user, commit= True):
 	ahora= timezone.now() 
 	obj= form.save(commit=False)
-	try:
-		de_quien_vacio= (texto.de_quien is None) #A: si no es none, no lanza excepcion y guarda false
-	except:
-		de_quien_vacio= True
+	de_quien_vacio= (not hasattr(obj,'de_quien')) or (obj.de_quien is None) #A: si no es none, no lanza excepcion y guarda false
 	if de_quien_vacio: #A: Si no tiene autor es nuevo 
 		obj.de_quien= user
 		obj.fh_creado= ahora
@@ -182,7 +179,7 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 
 	return False
 
-def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charlaitem_pk= None):
+def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charlaitem_pk= None, orden=None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
 	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
 
@@ -192,7 +189,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 		charla_titulo= ch.titulo
 
 	nivel = 0 #DFTL
-	orden = None #DFLT
+	#orden = None #DFLT como parametro
 	texto_respondido_id= None #DFLT
 	charlaitem_respondido= None #DFLT
 

@@ -216,15 +216,19 @@ REST_FRAMEWORK = {
 
 #S: servicios graphql
 GRAPHENE = {
-	'SCHEMA': 'pa_charlas_app.graphql_schema.schema',
+	'SCHEMA': 'pa_charlas_app.views_graphql.schema',
 	'ATOMIC_MUTATIONS': True, #U: todos los cambios en un request o ninguno, #VER: https://docs.graphene-python.org/projects/django/en/latest/mutations/
 	'MIDDLEWARE': [
 		'pa_charlas_app.graphql_util.auth_middleware', #U: usar el mismo jwt que django rest
-	]
+	],
+	#VER: https://docs.graphene-python.org/projects/django/en/latest/introspection/
+	#U: python manage.py graphql_schema
+	'SCHEMA_OUTPUT': 'graphql_schema.json',  # defaults to schema.json,
+	'SCHEMA_INDENT': 2,  # Defaults to None (displays all data on a single line)
 }
 
 #VER: https://github.com/adamchainz/django-cors-headers
-CORS_URLS_REGEX = r'^/(api/.*|graphql)$' #A: solo enviamos CORS allow para request a la api
+CORS_URLS_REGEX = r'^/(api/.*|graphql/)$' #A: solo enviamos CORS allow para request a la api
 CORS_ALLOW_ALL_ORIGINS= True #A:SEC: OjO! permitimos todos porque estamos filtrando con CORS_URLS_REGEX
 
 SIMPLE_JWT = {

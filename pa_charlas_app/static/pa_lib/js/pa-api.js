@@ -1,10 +1,9 @@
 //INFO: API REST CON TOKEN en si.podemosaprender.org
 // escribo funciones que se puedan probar por separado, despues las junto
 
-//const PODEMOS_APRENDER_API_PFX = "https://si.podemosaprender.org/api/";
-const PODEMOS_APRENDER_API_PFX = "http://localhost:8000/api/";
-// eslint-disable-next-line
-var Tokens = null;
+export const CFG = {
+	api_url: 'https://si.podemosaprender.org', //U: para usar otro servidor si queres
+}
 
 //S: guardar el token aunque se cierre la app o pagina
 export function tokenGuardar(tokens, usuario) {
@@ -35,15 +34,15 @@ export function usuarioLeer() {
 
 export function tokenBorrar() {
   //U: ej para cerrar sesion en navegador publico
-  localStorage.tokens = null;
-  localStorage.usuario = null;
+  localStorage.tokens = '';
+  localStorage.usuario = '';
   //TODO: ademas deberia invalidarlo en el servidor
 }
 
 //S: en esta parte SOLAMENTE accedo a la API
 export async function apiTokenConseguir(usr, pass) {
   //U: se autentica con usuario y clave para conseguir un token
-  const res = await fetch(PODEMOS_APRENDER_API_PFX + "token/", {
+  const res = await fetch(CFG.api_url + "/api/token/", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -52,13 +51,12 @@ export async function apiTokenConseguir(usr, pass) {
     body: JSON.stringify({ username: usr, password: pass }),
   });
   const resData = await res.json();
-  Tokens = resData; //A: los guardo para uso futuro
   return resData;
 }
 
 export async function apiTokenNoSirve(tokenAccess) {
   //U: null o por que no sirve
-  const res = await fetch(PODEMOS_APRENDER_API_PFX + "token/verify/", {
+  const res = await fetch(CFG.api_url + "/api/token/verify/", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -76,7 +74,7 @@ export async function apiTokenNoSirve(tokenAccess) {
 
 export async function apiTokenRenovar(tokenRefresh) {
   //U: null o por que no sirve
-  const res = await fetch(PODEMOS_APRENDER_API_PFX + "token/refresh/", {
+  const res = await fetch(CFG.api_url + "/api/token/refresh/", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -90,9 +88,25 @@ export async function apiTokenRenovar(tokenRefresh) {
 
 //S: integro acceso a la api y guardar localmente
 export async function apiLogin(usr, pass) {
-  const tok = await apiTokenConseguir(usr, pass);
-  tokenGuardar(tok, usr);
-  return tok;
+	try {
+		const res = await apiTokenConseguir(usr, pass);
+		if (res.access) { //A: fue bien
+			tokenGuardar(res, usr);
+			return {}; //A: si no hay detail ni error es ok
+		}
+		else {
+			return {...res, error: res.detail || 'error desconocido'};
+		}
+	}
+	catch (ex) {
+		return {error: ex.message || 'error desconocido'}
+	}
+}
+
+export async function apiLogout() {
+	tokenBorrar();
+	//TODO: invalidarlo en el servidor, por eso la declaramos async
+	return true;
 }
 
 export async function apiNecesitoLoginP() {
@@ -111,19 +125,47 @@ export async function apiNecesitoLoginP() {
   return result;
 }
 
-export async function fetchConToken(url, opciones) {
+const ErrorMsgNecesitaLogin= 'PaApi fetchConToken no tengo token, llamaste apiLogin?';
+
+export async function fetchConToken(data, opciones, url, noQuiereJson) { //U: hace fetch agregando token, y con defaults
   //U: agrega el token a un fetch
   const tok = tokenLeer();
   if (!tok || !tok.access) {
-    throw "token, no tengo";
+    throw new Error(ErrorMsgNecesitaLogin);
   }
+
+	url= url || '/graphql'; //DFLT 
+	if (! url.startsWith('http') ) {
+		url= CFG.api_url+url;
+	}
 
   opciones = opciones || {};
   opciones.headers = opciones.headers || {};
   opciones.headers.Authorization = "Bearer " + tok.access;
-  return fetch(url, opciones);
+
+	if (data!=null) {
+		if (typeof(data)=='object') {
+			opciones.body= JSON.stringify(data);
+		}
+		else {
+			opciones.body= data;
+		}
+		opciones.method= opciones.method || 'POST';
+		opciones.headers= opciones.headers || {};
+		opciones.headers['Content-Type']= opciones.headers['Content-Type'] || 'application/json';
+	}	
+
+	//TODO: excepcion token expiro?
+  const res= await fetch(url, opciones);
+	if (noQuiereJson) { 
+		return res;
+	}
+	else {
+		const data= await res.json();
+		return data;
+	}
 }
-//TEST: fetchConToken('https://si.podemosaprender.org/api/token/user/').then(x=>x.json()).then(console.log)
+//TEST: fetchConToken('https://si.podemosaprender.org/api/token/user/').then(console.log)
 // Object { user: "mauriciocap", auth: "eyJ0eXA..." }
 
 //#########################################################################################################
@@ -135,3 +177,8 @@ fetchData('http://127.0.0.1:8000/graphql',{method:'POST', headers: {
 
 */
 
+export function esErrorNecesitaLogin(ex) {
+	return ex.message === ErrorMsgNecesitaLogin;
+}
+
+export default { fetchConToken, apiLogin, apiLogout, CFG, esErrorNecesitaLogin }

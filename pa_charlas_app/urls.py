@@ -30,7 +30,7 @@ urlpatterns = [
 
 	path('api/', include(rest_router.urls)), #A: api REST
 
-	path("graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))), #A: api graphql
+	path("graphql/", csrf_exempt(GraphQLView.as_view(graphiql=True))), #A: api graphql
 
 	path("login/", views.login, name="login"),
 	path('clave/', login_required(views.UserPassCambiar), name="user_pass_cambiar"),
