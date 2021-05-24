@@ -80,6 +80,12 @@ class CharlaItemNode(DjangoObjectType):
 	class Meta:
 		model = CharlaItem	
 		fields = '__all__'
+		filter_fields = {
+			'texto_id': ['exact'],
+			'charla_id': ['exact'],
+			'orden': ['exact','icontains','contains','startswith'],
+			'charla__titulo': ['exact','icontains','startswith'],
+		}
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
 
 class Consultas(graphene.ObjectType):
