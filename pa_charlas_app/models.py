@@ -194,11 +194,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 	charlaitem_respondido= None #DFLT
 
 	if not responde_charlaitem_pk is None:
-		charlaitem_respondido = CharlaItem.objects.get(pk= responde_charlaitem_pk)
-		nivel = charlaitem_respondido.nivel+1
-		orden = charlaitem_respondido.orden + '-1'
-		texto_respondido_id = charlaitem_respondido.texto_id #A: no requiere otra consulta a la db
-		#A: si responde charla_titulo es el de la charla donde estoy respondiendo
+		(nivel, orden, texto_respondido_id) = datos_respuesta(responde_charlaitem_pk)
 
 	hts= list(hashtags_en(texto.texto, quiere_sin_tildes= False)) #A: nuestras urls y db soportan tildes
 	#DBG: print(f'hashtags {hts} en {texto.texto}')
@@ -263,6 +259,15 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 			
 
 	return texto
+
+def datos_respuesta(responde_charlaitem_pk):
+	charlaitem_respondido = CharlaItem.objects.get(pk= responde_charlaitem_pk)
+	nivel = charlaitem_respondido.nivel+1
+	orden = charlaitem_respondido.orden + '-1'
+	texto_respondido_id = charlaitem_respondido.texto_id #A: no requiere otra consulta a la db
+	#A: si responde charla_titulo es el de la charla donde estoy respondiendo
+	
+	return (nivel,orden,texto_respondido_id)
 
 # S: consultas comodas #####################################
 def usuario_para(request, username=None, pk=None): #U: conseguir con username, pk, o request
