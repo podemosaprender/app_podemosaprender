@@ -110,7 +110,7 @@ def conUserYFecha_guardar(form, user, commit= True):
 	if de_quien_vacio: #A: Si no tiene autor es nuevo 
 		obj.de_quien= user
 		obj.fh_creado= ahora
-	elif obj.de_quien != user: #A: no era el autor!
+	elif obj.de_quien != user: #A: no era el autor! no se lo dejo modificar
 		raise PermissionDenied	
 	else:
 		pass
@@ -179,6 +179,28 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 
 	return False
 
+def link_jitsi_para(texto, charla_titulo):
+	mhash= hashlib.md5(f'{texto.pk} {texto.de_quien.username} {texto.fh_creado}'.encode('utf-8')).hexdigest()
+	#A: un hash para que no se nos metan en la call adivinando PERO que no cambie despues que cree el texto
+	tt= charla_titulo[1:] if not charla_titulo is None else texto.de_quien.username
+	jitsi_link= f'https://meet.jit.si/pa_{tt}_{mhash}'
+	return jitsi_link
+
+def texto_con_juntada_virtual(texto, hashtags): #U: si texto menciona #juntada_virtual y no hay link, devueve uno con link (no modifica nada, no guarda en la db, solo devuelve texto recomendado)
+	resultado= texto.texto #DFLT
+	if '#juntada_virtual' in hashtags:
+		if 'meet.' in texto.texto or 'zoom.' in texto.texto or 'jit.' in texto.texto:
+			#TODO: mejorar el matching de las urls
+			pass #A: no hago nada, ya habla de algun servicio de conferencias
+		else:
+			jitsi_link= link_jitsi_para(texto, charla_titulo)
+			resultado= texto.texto.replace('#juntada_virtual', f'#juntada_virtual [en este link]({jitsi_link})')
+	return resultado
+
+def hastagCasual(user):
+	hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
+	return hashtag
+
 def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charlaitem_pk= None, orden=None):
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
 	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
@@ -205,7 +227,7 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 			hts.append(charla_titulo)
 		#A: si venia de una charla, le agrego el hashtag automaticamente, espacio para q no sea titulo markdown
 	else:
-		hashtag= f'#casual{ timezone.now().strftime("%y%m%d%H%M") }{user.username}'
+		hashtag= hastagCasual(user)
 		if not hashtag in hts:
 			texto.texto += f'\n\n {hashtag}' 
 			hts.append(hashtag)
@@ -219,16 +241,8 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 
 	#A: agregamos hashtags al texto Y la lista de hashtags, evitando confundir #idea1 con #idea13
 
-	if '#juntada_virtual' in hts:
-		if 'meet' in texto.texto or 'zoom' in texto.texto or 'jit' in texto.texto:
-			#TODO: mejorar el matching de las urls
-			pass #A: ya habla de algun servicio de conferencias
-		else:
-			mhash= hashlib.md5(f'{texto.pk} {texto.de_quien.username} {texto.fh_creado}'.encode('utf-8')).hexdigest()
-			#A: un hash para que no se nos metan en la call adivinando PERO que no cambie despues que cree el texto
-			tt= charla_titulo[1:] if not charla_titulo is None else texto.de_quien.username
-			jitsi_link= f'https://meet.jit.si/pa_{tt}_{mhash}'
-			texto.texto= texto.texto.replace('#juntada_virtual', f'#juntada_virtual [en este link]({jitsi_link})')
+	texto.texto= texto_con_juntada_virtual(texto, hts)
+	#A: si mencionaba #juntada_virtual agregamos link, sino queda igual
 
 	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
 	texto.save() 
@@ -256,7 +270,6 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 		else:
 			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
 		#A: charla_agregar_texto usa get_or_create para agregar o actualizar
-			
 
 	return texto
 
