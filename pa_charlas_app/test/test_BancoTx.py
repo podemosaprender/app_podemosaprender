@@ -14,19 +14,54 @@ from django.db import transaction
 
 # Ejemplo de que: "horas de consultoria de Mauri"
 
+def horas_prometidas_detalle(user): #U: para saber si Alexander prometio varias reencarnaciones (20000000 horas)
+    #TODO: descontar las que ya cumplio
+    #VER: https://docs.djangoproject.com/en/3.2/topics/db/aggregation/#cheat-sheet
+    prometidas = BancoTx.objects.filter(quien_hace=user, quien_da=user).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
+    cumplidas = BancoTx.objects.filter(quien_hace=user, quien_recibe=user).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
+    #A: cuando alguien cumple las horas, el que las tenia se las transfiere y queda quien_recibe = quien_hace
+    saldo = prometidas - cumplidas
+    return (saldo, prometidas, cumplidas)
+
+def horas_prometidas(user):
+    (saldo, prometidas, cumplidas) = horas_prometidas_detalle(user)
+    return saldo
+
+def horas_recibidas(user, que): #U: OJO! no descuenta las que ya gasto.
+    horas_recibidas = BancoTx.objects.filter(quien_recibe=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
+    return horas_recibidas
+
+def horas_que_puede_usar_detalle(user, que):
+    recibidas = horas_recibidas(user, que)
+    #A: contamos las horas que recibio antes, el que ahora las va a dar
+
+    horas_gastadas = BancoTx.objects.filter(quien_da=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
+    #A: tenemos que descontar las que ya entrego
+    saldo = recibidas - horas_gastadas
+
+    return (saldo, recibidas, horas_gastadas)
+
+
+def horas_que_puede_usar(user, que):
+    (saldo, recibidas, horas_gastadas) = horas_que_puede_usar_detalle(user, que)
+    return saldo
+
 #VER: https://docs.djangoproject.com/en/3.2/topics/db/transactions/#controlling-transactions-explicitly
 @transaction.atomic #A: asegurar la consistencia de la operacion. Si lanza excepcion no se guarda nada.
-def banco_registrar(quien_da, quien_recibe, cuanto, que="horas", titulo=None, son_propias= True):
+def banco_registrar(quien_da, quien_recibe, cuanto, que="horas", quien_hace=None, titulo=None):
     #TODO: Averiguar de una forma segura si son propias
-    #TODO: cuanto no puede ser negativo!
+    #OJO: cuanto no puede ser negativo! 
     #TODO: quien_da solo debe el usuario activo.
     #TODO: podria tener fecha de expiracion
     #TODO: podria tener una condicion ejecutable (url tipo smart contract)
     #TODO: limite maximo de horas prometidos por usuario
 
+    quien_hace = quien_da if quien_hace is None else quien_hace
+
     tx1 = BancoTx(
             quien_da=quien_da, 
             quien_recibe=quien_recibe, 
+            quien_hace= quien_hace,
             titulo=titulo, 
             cuanto=cuanto, 
             que=que
@@ -36,42 +71,21 @@ def banco_registrar(quien_da, quien_recibe, cuanto, que="horas", titulo=None, so
         raise ValueError('Cuanto debe ser positivo')
     tx1.save()
 
-    if not son_propias:   
-        (horas_disponible, horas_recibidas, horas_gastadas) = horas_que_puede_usar(quien_da, que, True)
+    if quien_da != quien_hace:   
+        (horas_disponible, horas_recibidas, horas_gastadas) = horas_que_puede_usar_detalle(quien_da, que)
 
         if horas_recibidas<horas_gastadas:
             raise ValueError(f'saldo insuficiente {horas_recibidas} < {horas_gastadas}')
 
-def horas_prometidas(user):
-    #VER: https://docs.djangoproject.com/en/3.2/topics/db/aggregation/#cheat-sheet
-    horas = BancoTx.objects.filter(quien_da=user).aggregate(Sum('cuanto'))
-    return horas['cuanto__sum']
 
-def horas_recibidas(user, que): 
-    horas_recibidas = BancoTx.objects.filter(quien_recibe=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-    return horas_recibidas
-
-def horas_que_puede_usar(user, que, quiere_detalle=False):
-    horas_recibidas = BancoTx.objects.filter(quien_recibe=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-    #A: contamos las horas que recibio antes, el que ahora las va a dar
-
-    horas_gastadas = BancoTx.objects.filter(quien_da=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-    #A: tenemos que descontar las que ya entrego
-    saldo = horas_recibidas - horas_gastadas
-
-    if quiere_detalle:
-        return (saldo, horas_recibidas, horas_gastadas)
-    else:
-        return saldo
-
-
-userA = User.objects.get(pk=1)
-userM = User.objects.get(pk=2)
-userX = User.objects.get(pk=3)
 
 class BancoTxTest(BaseTextCase):
-    def test_crear_transaccion(self):
 
+
+    def test_crear_transaccion(self):
+        userA = User.objects.get(pk=3)
+        userM = User.objects.get(pk=1)
+        userX = User.objects.get(pk=2)
         
         banco_registrar(
             quien_da=userA, 
@@ -91,6 +105,10 @@ class BancoTxTest(BaseTextCase):
         self.assertEqual(encontrado.exists(),True)
 
     def test_cuanto_no_negativo(self):
+        userA = User.objects.get(pk=3)
+        userM = User.objects.get(pk=1)
+        userX = User.objects.get(pk=2)
+
         with self.assertRaises(ValueError):
             banco_registrar(
                 quien_da=userA, 
@@ -106,6 +124,10 @@ class BancoTxTest(BaseTextCase):
         self.assertEqual(encontrado.exists(), False)
 
     def test_horas_prometidas(self):
+        userA = User.objects.get(pk=3)
+        userM = User.objects.get(pk=1)
+        userX = User.objects.get(pk=2)
+
         for cuanto in [10,20,30]:
             banco_registrar(
                 quien_da=userA, 
@@ -132,6 +154,10 @@ class BancoTxTest(BaseTextCase):
         self.assertEqual(horas2,3)
 
     def test_M_transfiere_a_X_horas_de_A(self):
+        userA = User.objects.get(pk=3)
+        userM = User.objects.get(pk=1)
+        userX = User.objects.get(pk=2)
+
         horas_de_A="horas de A para programar"
         for cuanto in [10,20,30]:
             banco_registrar(
@@ -157,10 +183,10 @@ class BancoTxTest(BaseTextCase):
         banco_registrar(
             quien_da=userM, 
             quien_recibe=userX, 
+            quien_hace= userA,
             titulo="transferir a X", 
             cuanto=35, 
             que=horas_de_A, #A: el que es igual al que recibi.
-            son_propias=False
         )
         #A: M las transferiere a X
 
@@ -182,7 +208,7 @@ class BancoTxTest(BaseTextCase):
                 titulo="transferir a X", 
                 cuanto=26, #A: son mas horas de las que tiene
                 que=horas_de_A, #A: el que es igual al que recibi.
-                son_propias=False
+                quien_hace = userA
             )
         #A: M las transferiere a X
 
@@ -196,7 +222,7 @@ class BancoTxTest(BaseTextCase):
             titulo="transferir a X", 
             cuanto=25, 
             que=horas_de_A, #A: el que es igual al que recibi.
-            son_propias=False
+            quien_hace = userA
         )
         #A: M las transferiere a X
 
