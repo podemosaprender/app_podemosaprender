@@ -15,7 +15,7 @@ from django.db import transaction
 # Ejemplo de que: "horas de consultoria de Mauri"
 
 #VER: https://docs.djangoproject.com/en/3.2/topics/db/transactions/#controlling-transactions-explicitly
-@transaction.atomic #A: asegurar la consistencia de la operacion 
+@transaction.atomic #A: asegurar la consistencia de la operacion. Si lanza excepcion no se guarda nada.
 def banco_registrar(quien_da, quien_recibe, cuanto, que="horas", titulo=None, son_propias= True):
     #TODO: Averiguar de una forma segura si son propias
     #TODO: cuanto no puede ser negativo!
@@ -37,11 +37,7 @@ def banco_registrar(quien_da, quien_recibe, cuanto, que="horas", titulo=None, so
     tx1.save()
 
     if not son_propias:   
-        horas_recibidas = BancoTx.objects.filter(quien_recibe=quien_da, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-        #A: contamos las horas que recibio antes, el que ahora las va a dar
-
-        horas_gastadas = BancoTx.objects.filter(quien_da=quien_da, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-        #A: tenemos que descontar las que ya entrego
+        (horas_disponible, horas_recibidas, horas_gastadas) = horas_que_puede_usar(quien_da, que, True)
 
         if horas_recibidas<horas_gastadas:
             raise ValueError(f'saldo insuficiente {horas_recibidas} < {horas_gastadas}')
@@ -51,9 +47,22 @@ def horas_prometidas(user):
     horas = BancoTx.objects.filter(quien_da=user).aggregate(Sum('cuanto'))
     return horas['cuanto__sum']
 
-def horas_recibidas(user, que):
-    horas_recibidas = BancoTx.objects.filter(quien_recibe=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum']
+def horas_recibidas(user, que): 
+    horas_recibidas = BancoTx.objects.filter(quien_recibe=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
     return horas_recibidas
+
+def horas_que_puede_usar(user, que, quiere_detalle=False):
+    horas_recibidas = BancoTx.objects.filter(quien_recibe=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
+    #A: contamos las horas que recibio antes, el que ahora las va a dar
+
+    horas_gastadas = BancoTx.objects.filter(quien_da=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
+    #A: tenemos que descontar las que ya entrego
+    saldo = horas_recibidas - horas_gastadas
+
+    if quiere_detalle:
+        return (saldo, horas_recibidas, horas_gastadas)
+    else:
+        return saldo
 
 
 userA = User.objects.get(pk=1)
@@ -134,6 +143,17 @@ class BancoTxTest(BaseTextCase):
             )
         #A: A le transfirio 10+20+30 hs a M
 
+        a_M_le_quedan_hs = horas_que_puede_usar(userM,horas_de_A) 
+        print(f'las horas que tiene A son {a_M_le_quedan_hs}')
+
+        a_X_le_quedan_hs = horas_que_puede_usar(userX, horas_de_A)
+        print(f'las horas que tiene M son {a_X_le_quedan_hs}')
+
+        #TODO: testear tambien con distinto que
+
+        self.assertEqual(a_M_le_quedan_hs, 60)
+        self.assertEqual(a_X_le_quedan_hs, 0)
+        
         banco_registrar(
             quien_da=userM, 
             quien_recibe=userX, 
@@ -144,16 +164,32 @@ class BancoTxTest(BaseTextCase):
         )
         #A: M las transferiere a X
 
-        horas1 = horas_recibidas(userM,horas_de_A) 
-        print(f'las horas que tiene A son {horas1}')
+        a_M_le_quedan_hs = horas_que_puede_usar(userM,horas_de_A) 
+        print(f'las horas que tiene A son {a_M_le_quedan_hs}')
 
-        horas2 = horas_recibidas(userX, horas_de_A)
-        print(f'las horas que tiene M son {horas2}')
+        a_X_le_quedan_hs = horas_que_puede_usar(userX, horas_de_A)
+        print(f'las horas que tiene M son {a_X_le_quedan_hs}')
 
         #TODO: testear tambien con distinto que
 
-        self.assertEqual(horas2, 35)
+        self.assertEqual(a_M_le_quedan_hs, 60-35)
+        self.assertEqual(a_X_le_quedan_hs, 35)
         
+        with self.assertRaises(ValueError):
+            banco_registrar(
+                quien_da=userM, 
+                quien_recibe=userX, 
+                titulo="transferir a X", 
+                cuanto=26, #A: son mas horas de las que tiene
+                que=horas_de_A, #A: el que es igual al que recibi.
+                son_propias=False
+            )
+        #A: M las transferiere a X
+
+        self.assertEqual(a_M_le_quedan_hs, 60-35)
+        self.assertEqual(a_X_le_quedan_hs, 35)
+        #A: no cambio porque lanzo excepcion
+
         banco_registrar(
             quien_da=userM, 
             quien_recibe=userX, 
@@ -164,11 +200,11 @@ class BancoTxTest(BaseTextCase):
         )
         #A: M las transferiere a X
 
-        horas1 = horas_recibidas(userM,horas_de_A) 
-        print(f'las horas que tiene A son {horas1}')
+        a_M_le_quedan_hs = horas_que_puede_usar(userM,horas_de_A) 
+        print(f'las horas que tiene A son {a_M_le_quedan_hs}')
 
-        horas2 = horas_recibidas(userX, horas_de_A)
-        print(f'las horas que tiene M son {horas2}')
+        a_X_le_quedan_hs = horas_que_puede_usar(userX, horas_de_A)
+        print(f'las horas que tiene M son {a_X_le_quedan_hs}')
 
-        #TODO: revisar que lanzo excepcion y que el saldo quedo bien.
-        self.assertEqual(horas2, 60)
+        self.assertEqual(a_M_le_quedan_hs, 0)
+        self.assertEqual(a_X_le_quedan_hs, 60)
