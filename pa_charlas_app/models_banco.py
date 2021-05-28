@@ -3,6 +3,9 @@ from django.db.models import Sum
 from django.db import transaction
 from django.utils import timezone
 
+from .models_charlas import User
+
+
 class BancoTx(models.Model): # U: Una transaccion de horas entre dos usuarios
 	
 	quien_da= models.ForeignKey('auth.User',related_name="bancotx_da", on_delete=models.CASCADE)
@@ -81,3 +84,11 @@ def banco_registrar(quien_da, quien_recibe, cuanto, que="horas", quien_hace=None
         if horas_recibidas<horas_gastadas:
             raise ValueError(f'saldo insuficiente {horas_recibidas} < {horas_gastadas}')
 
+    return tx1
+    
+def banco_registrar_UI(quien_da, quien_recibe, cuanto, que="horas", quien_hace=None, titulo=None):
+    quien_da_user = User.objects.get(username=quien_da)
+    quien_recibe_user = User.objects.get(username=quien_recibe)
+    quien_hace_user = User.objects.get(username=quien_hace)
+
+    return banco_registrar(quien_da_user, quien_recibe_user, cuanto, que, quien_hace_user, titulo)
