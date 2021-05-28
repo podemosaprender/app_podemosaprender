@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404, redirect
 
+from .models_banco import *
 from .models_extra import * #A: para que agregue otros lookups como like 
 from .util import *
 
@@ -179,6 +180,12 @@ def charla_agregar_texto(charla_titulo, texto, user, orden= None, charla_tipo= N
 
 	return False
 
+def charla_quitar_texto(charla_titulo, texto):
+	CharlaItem.objects.filter(	
+			charla__titulo= charla_titulo,
+			texto= texto
+		).delete() #A: si existe para ese dueño lo borra, sino no dice nada
+
 def link_jitsi_para(texto, charla_titulo):
 	mhash= hashlib.md5(f'{texto.pk} {texto.de_quien.username} {texto.fh_creado}'.encode('utf-8')).hexdigest()
 	#A: un hash para que no se nos metan en la call adivinando PERO que no cambie despues que cree el texto
@@ -202,7 +209,7 @@ def hastagCasual(user):
 	return hashtag
 
 def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charlaitem_pk= None, orden=None):
-	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save
+	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save. Verifica los permisos.
 	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
 
 	#TODO:SEC no dejar modificar textos de otro user
@@ -244,6 +251,8 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 	texto.texto= texto_con_juntada_virtual(texto, hts)
 	#A: si mencionaba #juntada_virtual agregamos link, sino queda igual
 
+def texto_guardar_impl(): #U: privado, solo llamar desde este modulo
+
 	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
 	texto.save() 
 	#A: texto esta grabado, se puede agregar a otros modelos
@@ -259,14 +268,15 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 	for ht in hts:
 		if ht.startswith('#hilo_'): #A: es una respuesta 
 			tch_hilo= charla_tipo_hilo()
-			if not charlaitem_respondido is None:
+			if charlaitem_respondido:
 				charla_agregar_texto(ht, texto_respondido_id, user, charla_tipo= tch_hilo, orden=charlaitem_respondido.orden , nivel= 0) #A: el inicial al que estamos respondiendo
 				charla_agregar_texto(ht, texto, user, charla_tipo= tch_hilo, orden=orden , nivel= nivel) #A: la respuesta
 				#A: charla_agregar_texto garantiza que se agregan una sola vez
 				#A: solo agregamos al hilo si apreto "responder", no si escribe el hashtag
 
 		elif ht == charla_titulo:
-			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema,orden=orden , nivel = nivel)
+			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema,orden=orden , nivel = nivel) 
+			#A: Si estoy respondiendo, en la charla donde respondi tambien quiero que se vean abajo y mas adentro las respuestas
 		else:
 			charla_agregar_texto(ht, texto, user, charla_tipo= tch_tema)
 		#A: charla_agregar_texto usa get_or_create para agregar o actualizar
@@ -370,17 +380,3 @@ def redes_de_usuario(user): #U: Diccionario red -> usr_id
 		provider = re.sub(r'-.*', '', red.provider) #A: google-oatuh -> google
 		r[provider] = red.uid
 	return r
-
-# S: banquito de horas ###########################################################
-
-class BancoTx(models.Model): # U: Una transaccion de horas entre dos usuarios
-	
-	quien_da= models.ForeignKey('auth.User',related_name="bancotx_di", on_delete=models.CASCADE)
-	quien_recibe= models.ForeignKey('auth.User',related_name="bancotx_recibi" ,on_delete=models.CASCADE)
-	fh_creado= models.DateTimeField(default=timezone.now)
-	titulo= models.CharField(max_length=200)
-	cuanto= models.IntegerField()
-	que = models.CharField(max_length=200)
-
-	def __str__(self):
-		return f'{self.fh_creado} {self.quien_da} {self.quien_recibe} {self.titulo} {self.cuanto}'
