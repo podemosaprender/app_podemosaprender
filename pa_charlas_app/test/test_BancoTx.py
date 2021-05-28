@@ -1,9 +1,8 @@
 #INFO: testear el correcto funcionamiento del banquito de horas.
 
 from .util import BaseTextCase
-from pa_charlas_app.models import *
-from django.db.models import Sum
-from django.db import transaction
+from pa_charlas_app.models_banco import *
+from pa_charlas_app.models import User
 
 # Caso1: A anota que le debe 4 horas a M (M lo puede ver, no se puede cambiar. Esas horas solo las puede transferir o gastar M)
 # Caso2: Sabemos cuantas horas A tiene prometidas a otras personas.
@@ -12,76 +11,7 @@ from django.db import transaction
 #   2. que no quede en negativo
 # Caso4: X confirma que A ya no le debe las horas.
 
-# Ejemplo de que: "horas de consultoria de Mauri"
-
-def horas_prometidas_detalle(user): #U: para saber si Alexander prometio varias reencarnaciones (20000000 horas)
-    #TODO: descontar las que ya cumplio
-    #VER: https://docs.djangoproject.com/en/3.2/topics/db/aggregation/#cheat-sheet
-    prometidas = BancoTx.objects.filter(quien_hace=user, quien_da=user).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-    cumplidas = BancoTx.objects.filter(quien_hace=user, quien_recibe=user).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-    #A: cuando alguien cumple las horas, el que las tenia se las transfiere y queda quien_recibe = quien_hace
-    saldo = prometidas - cumplidas
-    return (saldo, prometidas, cumplidas)
-
-def horas_prometidas(user):
-    (saldo, prometidas, cumplidas) = horas_prometidas_detalle(user)
-    return saldo
-
-def horas_recibidas(user, que): #U: OJO! no descuenta las que ya gasto.
-    horas_recibidas = BancoTx.objects.filter(quien_recibe=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-    return horas_recibidas
-
-def horas_que_puede_usar_detalle(user, que):
-    recibidas = horas_recibidas(user, que)
-    #A: contamos las horas que recibio antes, el que ahora las va a dar
-
-    horas_gastadas = BancoTx.objects.filter(quien_da=user, que=que).aggregate(Sum('cuanto'))['cuanto__sum'] or 0
-    #A: tenemos que descontar las que ya entrego
-    saldo = recibidas - horas_gastadas
-
-    return (saldo, recibidas, horas_gastadas)
-
-
-def horas_que_puede_usar(user, que):
-    (saldo, recibidas, horas_gastadas) = horas_que_puede_usar_detalle(user, que)
-    return saldo
-
-#VER: https://docs.djangoproject.com/en/3.2/topics/db/transactions/#controlling-transactions-explicitly
-@transaction.atomic #A: asegurar la consistencia de la operacion. Si lanza excepcion no se guarda nada.
-def banco_registrar(quien_da, quien_recibe, cuanto, que="horas", quien_hace=None, titulo=None):
-    #TODO: Averiguar de una forma segura si son propias
-    #OJO: cuanto no puede ser negativo! 
-    #TODO: quien_da solo debe el usuario activo.
-    #TODO: podria tener fecha de expiracion
-    #TODO: podria tener una condicion ejecutable (url tipo smart contract)
-    #TODO: limite maximo de horas prometidos por usuario
-
-    quien_hace = quien_da if quien_hace is None else quien_hace
-
-    tx1 = BancoTx(
-            quien_da=quien_da, 
-            quien_recibe=quien_recibe, 
-            quien_hace= quien_hace,
-            titulo=titulo, 
-            cuanto=cuanto, 
-            que=que
-        )
-    if(tx1.cuanto<=0):
-        #VER: https://docs.python.org/3/library/exceptions.html#ValueError
-        raise ValueError('Cuanto debe ser positivo')
-    tx1.save()
-
-    if quien_da != quien_hace:   
-        (horas_disponible, horas_recibidas, horas_gastadas) = horas_que_puede_usar_detalle(quien_da, que)
-
-        if horas_recibidas<horas_gastadas:
-            raise ValueError(f'saldo insuficiente {horas_recibidas} < {horas_gastadas}')
-
-
-
 class BancoTxTest(BaseTextCase):
-
-
     def test_crear_transaccion(self):
         userA = User.objects.get(pk=3)
         userM = User.objects.get(pk=1)
@@ -123,7 +53,7 @@ class BancoTxTest(BaseTextCase):
         )
         self.assertEqual(encontrado.exists(), False)
 
-    def test_horas_prometidas(self):
+    def test_hs_prometidas(self):
         userA = User.objects.get(pk=3)
         userM = User.objects.get(pk=1)
         userX = User.objects.get(pk=2)
@@ -144,10 +74,10 @@ class BancoTxTest(BaseTextCase):
                 que="enseñar banda django"
             )  
 
-        horas1 = horas_prometidas(userA) 
+        horas1 = hs_prometidas(userA) 
         print(f'las horas que debe son {horas1}')
 
-        horas2 = horas_prometidas(userM)
+        horas2 = hs_prometidas(userM)
         print(f'las horas que debe son {horas2}')
 
         self.assertEqual(horas1,60)
@@ -169,10 +99,10 @@ class BancoTxTest(BaseTextCase):
             )
         #A: A le transfirio 10+20+30 hs a M
 
-        a_M_le_quedan_hs = horas_que_puede_usar(userM,horas_de_A) 
+        a_M_le_quedan_hs = hs_para_usar(userM,horas_de_A) 
         print(f'las horas que tiene A son {a_M_le_quedan_hs}')
 
-        a_X_le_quedan_hs = horas_que_puede_usar(userX, horas_de_A)
+        a_X_le_quedan_hs = hs_para_usar(userX, horas_de_A)
         print(f'las horas que tiene M son {a_X_le_quedan_hs}')
 
         #TODO: testear tambien con distinto que
@@ -190,10 +120,10 @@ class BancoTxTest(BaseTextCase):
         )
         #A: M las transferiere a X
 
-        a_M_le_quedan_hs = horas_que_puede_usar(userM,horas_de_A) 
+        a_M_le_quedan_hs = hs_para_usar(userM,horas_de_A) 
         print(f'las horas que tiene A son {a_M_le_quedan_hs}')
 
-        a_X_le_quedan_hs = horas_que_puede_usar(userX, horas_de_A)
+        a_X_le_quedan_hs = hs_para_usar(userX, horas_de_A)
         print(f'las horas que tiene M son {a_X_le_quedan_hs}')
 
         #TODO: testear tambien con distinto que
@@ -226,10 +156,10 @@ class BancoTxTest(BaseTextCase):
         )
         #A: M las transferiere a X
 
-        a_M_le_quedan_hs = horas_que_puede_usar(userM,horas_de_A) 
+        a_M_le_quedan_hs = hs_para_usar(userM,horas_de_A) 
         print(f'las horas que tiene A son {a_M_le_quedan_hs}')
 
-        a_X_le_quedan_hs = horas_que_puede_usar(userX, horas_de_A)
+        a_X_le_quedan_hs = hs_para_usar(userX, horas_de_A)
         print(f'las horas que tiene M son {a_X_le_quedan_hs}')
 
         self.assertEqual(a_M_le_quedan_hs, 0)
