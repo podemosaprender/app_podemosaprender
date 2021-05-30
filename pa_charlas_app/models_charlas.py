@@ -192,7 +192,7 @@ def link_jitsi_para(texto, charla_titulo):
 	jitsi_link= f'https://meet.jit.si/pa_{tt}_{mhash}'
 	return jitsi_link
 
-def texto_con_juntada_virtual(texto, hashtags): #U: si texto menciona #juntada_virtual y no hay link, devueve uno con link (no modifica nada, no guarda en la db, solo devuelve texto recomendado)
+def texto_con_juntada_virtual(texto, hashtags, charla_titulo): #U: si texto menciona #juntada_virtual y no hay link, devueve uno con link (no modifica nada, no guarda en la db, solo devuelve texto recomendado)
 	resultado= texto.texto #DFLT
 	if '#juntada_virtual' in hashtags:
 		if 'meet.' in texto.texto or 'zoom.' in texto.texto or 'jit.' in texto.texto:
@@ -208,6 +208,8 @@ def hastagCasual(user):
 	return hashtag
 
 def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charlaitem_pk= None, orden=None):
+	#DBG: print(f'texto_guardar')
+
 	texto= conUserYFecha_guardar(form,user,False) #A: no hago el save. Verifica los permisos.
 	#TODO: OjO! Si hay problema con las charlas, el texto se guarda igual. Que hacemos?
 
@@ -247,10 +249,8 @@ def texto_guardar(form, user, charla_pk=None, charla_titulo=None, responde_charl
 
 	#A: agregamos hashtags al texto Y la lista de hashtags, evitando confundir #idea1 con #idea13
 
-	texto.texto= texto_con_juntada_virtual(texto, hts)
+	texto.texto= texto_con_juntada_virtual(texto, hts, charla_titulo)
 	#A: si mencionaba #juntada_virtual agregamos link, sino queda igual
-
-def texto_guardar_impl(): #U: privado, solo llamar desde este modulo
 
 	logger.info(f'DB TEXTO {user.username} charla={charla_pk} hashtags={hts}')
 	texto.save() 
