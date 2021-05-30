@@ -100,6 +100,18 @@ class CharlaItemNode(DjangoObjectType):
 		}
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
 
+# S: Banco Tx ##########################################################################
+
+class BancoTxNode(DjangoObjectType): 
+	class Meta:
+		model = BancoTx
+		fields = '__all__'
+		filter_fields = {
+			'que':['exact'],
+		}
+		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
+
+
 class Consultas(graphene.ObjectType):
 	hola = graphene.String(default_value='PodemosAprender', description='Devuelve "PodemosAprender"')
 	#U: fetchData('http://127.0.0.1:8000/graphql',{method:'POST', headers: { 'Content-Type': 'application/json'}, body: JSON.stringify({"query":"{ hola }\n\n","variables":null})}, x => console.log(JSON.stringify(x.data,null,1),x))
@@ -118,6 +130,10 @@ class Consultas(graphene.ObjectType):
 	charlaitem = relay.Node.Field(CharlaItemNode)
 	charlaitem_lista = ListaRelayConOrderBy(CharlaItemNode, filterset_class= CharlaItemFilterSet)
 	#U: { charlaitemLista(charla_Titulo_Icontains: "banda") { edges { node { id, charla { titulo }, texto { texto }} }}}
+
+	bancotx = relay.Node.Field(BancoTxNode)
+	bancotx_lista = ListaRelayConOrderBy(BancoTxNode)
+	#TODO: necesitamos un resolve para filtrar los permisos?
 
 	def resolve_hola(self, info, **kwargs): #U: para probar si estamos autenticados
 		return f'Hola {info.context.user.username}! PodemosAprender!\nSon las {datetime.now()}.'
@@ -192,11 +208,35 @@ class CharlaItemModificar(relay.ClientIDMutation):
 		charlaitem.orden= orden
 		return CharlaItemModificar(charlaitem=charlaitem)
 
+class BancoTxModificar(relay.ClientIDMutation):
+	bancotx = graphene.Field(BancoTxNode)
+
+	class Input:
+		quien_recibe = graphene.String(required=True)
+		quien_hace = graphene.String(required=True)
+		que = graphene.String(required=True)
+		cuanto = graphene.Int(required=True)
+		titulo = graphene.String(required=True)
+
+	@classmethod
+	def mutate_and_get_payload(cls, root, info, quien_recibe, quien_hace, que, cuanto, titulo):
+		bancotx = banco_registrar_UI(
+			quien_da = info.context.user.username, #A: toma el user activo
+			quien_recibe = quien_recibe,
+			quien_hace = quien_hace,
+			que = que,
+			cuanto = cuanto,
+			titulo = titulo
+		)
+		return BancoTxModificar(bancotx = bancotx)
+
 class Modificaciones(graphene.ObjectType):
-	texto_modificar = TextoModificar.Field();
+	texto_modificar = TextoModificar.Field()
 	#U: mutation pruebaTexto { textoModificar(input: {texto: "otro va en #bandadjango", id: "VGV4dG9Ob2RlOjcz"}) { clientMutationId texto { id texto fhCreado fhEditado } } }
 
 	charlaitem_crear = CharlaItemModificar.Field()	
 	#U: mutation miMutacion { charlaitemCrear(input: {textoId: "VGV4dG9Ob2RlOjE=", charlaTitulo: "#bandadjango"}) { charlaitem { id, texto { id, texto }, } } }
+
+	bancotx_crear = BancoTxModificar.Field()
 
 schema = graphene.Schema(query=Consultas, mutation=Modificaciones)
