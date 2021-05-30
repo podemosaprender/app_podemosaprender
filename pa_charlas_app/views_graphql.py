@@ -44,7 +44,19 @@ class TextoNode(DjangoObjectType):
 	class Meta:
 		model = Texto
 		fields = '__all__'
+
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
+
+
+class CharlaFilterSet(django_filters.FilterSet): 
+	participa__username= django_filters.CharFilter(method='filter_participa')
+
+	def filter_participa(self, queryset, name, value):
+		return (
+			queryset
+			.filter(charlaitem__texto__de_quien__username=value)
+			.distinct()
+		)
 
 class CharlaNode(DjangoObjectType):
 	class Meta:
@@ -101,7 +113,7 @@ class Consultas(graphene.ObjectType):
 	#VER: https://graphql.org/learn/pagination/
 
 	charla = relay.Node.Field(CharlaNode)
-	charla_lista = ListaRelayConOrderBy(CharlaNode)
+	charla_lista = ListaRelayConOrderBy(CharlaNode, filterset_class= CharlaFilterSet)
 
 	charlaitem = relay.Node.Field(CharlaItemNode)
 	charlaitem_lista = ListaRelayConOrderBy(CharlaItemNode, filterset_class= CharlaItemFilterSet)
