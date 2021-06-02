@@ -101,14 +101,17 @@
 			}
 		).join(" ") //A: unir los parametros en un string
 
-		let result =  `
-		mutation m1 {
-			bancotxCrear(input: {${parametros}}) {
-				clientMutationId,
-				bancotx {id}
-			}
+		let result =  {
+			query:`
+				mutation m1 ($input: BancoTxModificarInput!){
+					bancotxCrear(input: $input) {
+						clientMutationId,
+						bancotx {id}
+					}
+				}
+				`,
+			variables: { input: datos,}
 		}
-		`
 		console.log(result);
 		return result
 	} 
@@ -154,15 +157,7 @@
 				"Accept": "application/json",
 				"Content-Type": "application/json",
 			},
-			"body": JSON.stringify({ query: queryCrearTx(frmData) }),
-			/*
-			TODO3: me sale error: 
-	
-			0: Object { message: "Syntax Error GraphQL (5:16) Expected Name, 
-			found :\n\n4: \t\t\t\tquienHace:,\n5: \t\t\t\tquienRecibe:yo,\n 
-			^\n6: \t\t\t\tcuanto: 1,\n", locations: (1) […] }
-			length: 1
-			*/
+			"body": JSON.stringify (queryCrearTx(frmData)),
 			"method": "POST",
 			"mode": "cors"
 		})
