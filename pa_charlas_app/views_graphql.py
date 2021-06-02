@@ -108,6 +108,9 @@ class BancoTxNode(DjangoObjectType):
 		fields = '__all__'
 		filter_fields = {
 			'que':['exact'],
+			'quien_da__username': ['exact'],
+			'quien_recibe__username': ['exact'],
+			'quien_hace__username': ['exact'],
 		}
 		interfaces = (relay.Node, ) #VER: https://docs.graphene-python.org/projects/django/en/latest/filtering/
 

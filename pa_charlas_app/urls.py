@@ -1,3 +1,4 @@
+from os import name
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.urls import path, re_path, include
@@ -76,6 +77,7 @@ urlpatterns = [
 	path('como/', login_required(views.usuario_plan), name='usuario_plan'), 
 	path('como/<str:username>/', login_required(views.usuario_plan), name='usuario_plan'), 
 
+	path('banco/',login_required(views.banco_list), name='banco_list'),
 	re_path(r't/(?P<un_path>.*)/$', views.CharlaComoPathListView.as_view(), name='charla_como_path'),
 	#A: ej. t/sabado/cada_mes para buscar titulos que digan sabado y cada_mes
 

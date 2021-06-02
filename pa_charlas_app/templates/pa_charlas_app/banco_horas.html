@@ -1,0 +1,213 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+<h1>Banco de horas!</h1>
+
+<!-- Tus transacciones -->
+<div x-data="bancoData()" style="margin: 1em;">
+	<button class="btn btn-primary" @click="traer()"><h3>Tus transacciones:</h3></button>
+
+	<ol
+		x-show="open"
+		
+	>
+		<template x-for="item in items" :key="item">
+			<li><div><span>Tansaccion </span>
+				<div><strong>Titulo: </strong><span x-text="item.node.titulo"></span></div>
+				<div><strong>A quien: </strong><span x-text="item.node.quienRecibe.username"></span></div>
+				<div><strong>Que: </strong><span x-text="item.node.que"></span></div>
+				<div><strong>Cuanto: </strong> <span x-text="item.node.cuanto"></span></div>
+			</div></li>
+		</template>
+	</ol>
+</div>
+<!-- Formulario para crear transaccion -->
+<div x-data="{ open: false }" style="margin: 1em;">
+    <button  class="btn btn-primary" @click="open = !open"><h3>Crear transaccion:</h3></button>
+
+    <ul
+        x-show="open"
+        @click.away="open = false"
+    >
+        
+		<form method="POST" id="formTx">{% csrf_token %}
+			<div><input type="text" placeholder="Quien recibe" name="quien_recibe"></div>
+			<div><input type="number" placeholder="Cuanto" name="cuanto"></div>
+			<div><input type="text" placeholder="Que" name="que"></div>
+			<div><input type="text" placeholder="titulo" name="titulo"></div>
+			<div><input type="button" value="Guardar" onclick="frmSubmit('{{ user.username }}')"></div>
+			
+		</form>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+	var frmData = { //U: inicializo los valores del form que despues voy a usar como parametros
+		quien_recibe: "holaaaaaaaaaaaaa",
+		quien_hace: "",
+		cuanto: 0,
+		que: "",
+		titulo: "",
+	}
+	//VER: https://graphql.org/learn/queries/#variables
+	//TODO: investigar variables en graphQl, no hardcodear admin
+	var traer = `
+	{
+		bancotxLista(quienDa_Username:"admin") {
+			edges {
+				node {
+					id
+					quienDa {
+						username
+					}
+					quienRecibe {
+						username
+					}
+					fhCreado
+					titulo
+					que
+					cuanto
+				}
+			}
+		}
+	}
+	
+	`
+	function queryCrearTx(frmData) {
+		let datos = {//U: nombres de parametros de graphQL y valores del form
+			quienHace: frmData.quien_hace || "admin",
+			//TODO: pasar como variable global en la plantilla
+
+			quienRecibe: frmData.quien_recibe,
+			cuanto: parseInt(frmData.cuanto),
+			que: frmData.que,
+			titulo: frmData.titulo,
+		}
+		//TODO: mover este generador de parametros en graphQL a la libreria
+
+		let parametros = Object.entries(datos).map(//A: devuelve una lista de clave , valor
+			([k, v]) =>{
+				v = typeof(v) == 'string' ? v.trim() : v;
+				if(v != null && v != ""){
+					return k + ":" + JSON.stringify(v)
+				}
+				return "";
+			}
+		).join(" ") //A: unir los parametros en un string
+
+		let result =  `
+		mutation m1 {
+			bancotxCrear(input: {${parametros}}) {
+				clientMutationId,
+				bancotx {id}
+			}
+		}
+		`
+		console.log(result);
+		return result
+	} 
+	
+	function frmSubmit(user){
+		form = document.getElementById('formTx')
+
+		frmData.quien_recibe = form.quien_recibe.value
+		//TODO1: tengo que guardar aca el quien_hace! pero no se como obtener ese dato
+		frmData.cuanto = form.cuanto.value
+		frmData.que = form.que.value
+		frmData.titulo = form.titulo.value
+		
+
+		console.log('quien recibe: ',frmData.quien_recibe);
+		console.log('cuanto: ',frmData.cuanto);
+		console.log('que: ',frmData.que);
+		console.log('titulo: ',frmData.titulo);
+
+		bancoData().crear(frmData);
+	}
+	function bancoTraer(user) {
+		//TODO2: traer solo las transacciones de ese usuario
+
+		return fetch("/graphql/", {
+			"credentials": "include",
+			"headers": {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			},
+			"body": JSON.stringify({ query: traer }),
+			"method": "POST",
+			"mode": "cors"
+		})
+			.then(x => x.json()) //A: leer el cuerpo de la respuesta. que lo lea como json
+
+	}
+
+	function bancoCrear(frmData){
+		return fetch("/graphql/", {
+			"credentials": "include",
+			"headers": {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			},
+			"body": JSON.stringify({ query: queryCrearTx(frmData) }),
+			/*
+			TODO3: me sale error: 
+	
+			0: Object { message: "Syntax Error GraphQL (5:16) Expected Name, 
+			found :\n\n4: \t\t\t\tquienHace:,\n5: \t\t\t\tquienRecibe:yo,\n 
+			^\n6: \t\t\t\tcuanto: 1,\n", locations: (1) […] }
+			length: 1
+			*/
+			"method": "POST",
+			"mode": "cors"
+		})
+			.then(x => x.json()) //A: leer el cuerpo de la respuesta. que lo lea como json
+
+	}
+
+	function bancoData() {
+
+		return {
+			open: false,
+			items: [],
+			traer(user) {
+				this.open = ! this.open;
+
+				if(this.open){
+					bancoTraer(user).then(items => {
+						this.items = items.data.bancotxLista.edges;
+						console.log(items);
+					});
+					
+
+				}
+
+				
+			},
+			crear(){
+				try {
+					bancoCrear(frmData).then(res=>{
+						console.log('Respuesta: ',res)
+	
+						if(res.data.bancotxCrear.bancotx.id){
+							alert('transferencia de horas creada!')
+						}else{
+							console.error('Ocurrio un Error!')
+							alert('Error al procesar la transferencia :(')
+							//TODO4: por que nunca se ejecuta esta condicion, incluso cuando da error?
+						}
+					});
+				} catch (error) {
+					alert('Error al procesar la transferencia :(\nError: '+error)
+					//TODO4: por que nunca se ejecuta esta condicion, incluso cuando da error?
+				}
+			}
+		}
+	}
+</script>
+{% endblock %}

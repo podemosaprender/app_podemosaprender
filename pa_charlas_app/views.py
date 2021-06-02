@@ -479,3 +479,7 @@ def evento_list_ical(request): #U: idem evento_list pero en formato icalendar pa
 
 	return HttpResponse( cal.to_ical(), content_type='text/calendar')
 
+# S: Banco de horas #################################################################
+
+def banco_list(request):
+	return render(request,'pa_charlas_app/banco_horas.html',{'user':request.user})
