@@ -24,23 +24,24 @@
 	</ol>
 </div>
 <!-- Formulario para crear transaccion -->
-<div x-data="{ open: false }" style="margin: 1em;">
+<div x-data="bancoData()" style="margin: 1em;">
     <button  class="btn btn-primary" @click="open = !open"><h3>Crear transaccion:</h3></button>
 
-    <ul
+    <div
         x-show="open"
         @click.away="open = false"
     >
         
 		<form method="POST" id="formTx">{% csrf_token %}
-			<div><input type="text" placeholder="Quien recibe" name="quien_recibe"></div>
-			<div><input type="number" placeholder="Cuanto" name="cuanto"></div>
-			<div><input type="text" placeholder="Que" name="que"></div>
-			<div><input type="text" placeholder="titulo" name="titulo"></div>
-			<div><input type="button" value="Guardar" onclick="frmSubmit('{{ user.username }}')"></div>
+			<div><input type="text" placeholder="Quien recibe" x-model="datos.quien_recibe"></div>
+			<div><input type="number" placeholder="Cuanto" x-model="datos.cuanto"></div>
+			<div><input type="text" placeholder="Que" x-model="datos.que"></div>
+			<div><input type="text" placeholder="titulo" x-model="datos.titulo"></div>
+			<div><input type="button" value="Guardar" @click="crear()"></div>
 			
 		</form>
-    </ul>
+		<div x-text="errores || '' " x-show="errores"></div>
+    </div>
 </div>
 {% endblock %}
 
@@ -116,23 +117,7 @@
 		return result
 	} 
 	
-	function frmSubmit(user){
-		form = document.getElementById('formTx')
 
-		frmData.quien_recibe = form.quien_recibe.value
-		//TODO1: tengo que guardar aca el quien_hace! pero no se como obtener ese dato
-		frmData.cuanto = form.cuanto.value
-		frmData.que = form.que.value
-		frmData.titulo = form.titulo.value
-		
-
-		console.log('quien recibe: ',frmData.quien_recibe);
-		console.log('cuanto: ',frmData.cuanto);
-		console.log('que: ',frmData.que);
-		console.log('titulo: ',frmData.titulo);
-
-		bancoData().crear(frmData);
-	}
 	function bancoTraer(user) {
 		//TODO2: traer solo las transacciones de ese usuario
 
@@ -165,11 +150,20 @@
 
 	}
 
+	const Username = '{{user.username}}';
+	
 	function bancoData() {
 
 		return {
+			errores:null,
 			open: false,
 			items: [],
+			datos: {
+				quien_recibe: "",
+				que: "",
+				cuanto: "",
+				titulo: "",
+			},
 			traer(user) {
 				this.open = ! this.open;
 
@@ -185,21 +179,31 @@
 				
 			},
 			crear(){
+				let frmData = this.datos; //TODO: elegir y limpiar solo los valores que van.
+				frmData.quien_da = Username;
+
 				try {
 					bancoCrear(frmData).then(res=>{
 						console.log('Respuesta: ',res)
-	
-						if(res.data.bancotxCrear.bancotx.id){
-							alert('transferencia de horas creada!')
-						}else{
-							console.error('Ocurrio un Error!')
-							alert('Error al procesar la transferencia :(')
-							//TODO4: por que nunca se ejecuta esta condicion, incluso cuando da error?
+						try{
+							if(res?.data?.bancotxCrear?.bancotx?.id){
+								alert('transferencia de horas creada!')
+							}else{
+								let error = res?.errors && res.errors[0].message
+								console.error('Ocurrio un Error!')
+								this.errores= 'Error al procesar la transferencia :(\nError: '+error
+								
+							}
+
+						} catch (error) {
+							this.errores = 'Error al procesar la transferencia :(\nError: '+error
 						}
+									
 					});
+
 				} catch (error) {
 					alert('Error al procesar la transferencia :(\nError: '+error)
-					//TODO4: por que nunca se ejecuta esta condicion, incluso cuando da error?
+					
 				}
 			}
 		}
