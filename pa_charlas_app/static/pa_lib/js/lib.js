@@ -280,7 +280,7 @@ function markdownTransformarHTML(src, el_id) { //U: convierte "nuestro" markdown
 	t.txt_con_video = t.txt_con_usuarios.replace(/https:\/\/www.youtube.com\/watch\S+/g, youtubeUrlAEmbed);
 	t.txt_con_diagramas = t.txt_con_video.replace(PLANTUML_REGEX, plantumlImgHtmlPara);
 	t.limpiar_indent= limpiar_indent(t.txt_con_diagramas)
-	t.markedHtml= marked(t.limpiar_indent); //A: convierto markdown a html
+	t.markedHtml= marked.parse(t.limpiar_indent); //A: convierto markdown a html
 	return t;
 }
 
