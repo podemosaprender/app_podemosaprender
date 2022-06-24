@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import render, get_object_or_404, redirect
 
 from .models_extra import * #A: para que agregue otros lookups como like 
-from .util import *
+from pa_charlas_app.util import *
 
 import datetime as dt
 import re
@@ -96,7 +96,7 @@ class Visita(models.Model): #U: cuando vio por ultima vez cada charla una usuari
 		return f'{self.de_quien.username} {self.charla.titulo} {self.fh_visita}'
 
 # S: funciones comodas ######################################
-from .hashtags import hashtags_en
+from pa_charlas_app.hashtags import hashtags_en
 def charla_tipo_tema(): #U: por comodidad
 	return TipoCharla.objects.get(titulo='Tema')
 
