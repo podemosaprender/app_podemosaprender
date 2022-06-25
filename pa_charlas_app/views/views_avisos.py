@@ -26,10 +26,24 @@ class AvisoListView(ListView):
     }
     def get_queryset(self):
         queryset = super().get_queryset()
-        autor_id = self.request.GET.get('autor')
-        if autor_id: # A: el usuario estar buscando avisos por autor
-            return queryset.filter(autor_id=autor_id)
+        autor = self.request.GET.get('autor')
+        if autor: # A: el usuario esta buscando avisos por autor
+            return queryset.filter(autor__username=autor)
         return queryset
+
+class AvisoMiosListView(AvisoListView):
+    """Igual a AvisoListView pero solo muestra los avisos del usuario logueado"""
+
+    template_name= 'pa_charlas_app/avisos/aviso_user_list.html'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(autor=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = 'Mis avisos'
+        return context
 
 class AvisoDetailView(DetailView):
     model = AvisoModel
@@ -59,4 +73,4 @@ class AvisoUpdateView(UpdateView):
             form.save()
             self.success_url = f'/aviso/{form.instance.pk}'
             return super().form_valid(form)
-        return redirect('/aviso/') #TODO: mostrar mensaje de error: no tenes permisos
+        return redirect('/aviso/') #TODO: mostrar mensaje de error: 'No tenes permisos'
