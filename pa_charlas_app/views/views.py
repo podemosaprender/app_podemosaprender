@@ -19,15 +19,15 @@ import re
 import os
 import datetime as dt
 
-from .models import (
+from ..models import (
 	Imagen,
 	Texto, texto_guardar, textos_de_usuario,
 	Charla, TipoCharla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
 	usuario_para, redes_de_usuario,
 	charlas_calendario
 )
-from .forms import ImagenForm, TextoForm
-from .util import *
+from ..forms import ImagenForm, TextoForm
+from ..util import *
 
 import json
 import base64

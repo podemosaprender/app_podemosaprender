@@ -1,0 +1,13 @@
+{% extends 'pa_charlas_app/base_list.html' %}
+
+{% load bootstrap4 %}
+
+{% block item_titulo %}
+	<a href="{% url 'aviso_detail' item.pk %}#nuevo">{{ item.titulo }}</a>
+{% endblock %}
+
+{% block item_cuerpo %}
+{% endblock %}
+
+{% block item_links %}
+{% endblock %}

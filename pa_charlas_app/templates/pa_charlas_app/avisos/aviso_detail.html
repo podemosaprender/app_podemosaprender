@@ -1,0 +1,47 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% load bootstrap4 %}
+{% load pa_charlas_app_extras %}
+
+
+{% block meta %}
+	<meta property="fb:app_id" content="741688646199607" />
+	<meta property="og:title" content="{{ object.fh_creado }} por {{ object.de_quien }} en PodemosAprender"/>
+	<meta property="og:description" content="{{ object.description }}"/>
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="{{ permalink }}" />
+	<meta property="og:image" content="{% url_full 'texto_img' pk=object.pk %}" />
+	<link rel="canonical" href="{{ permalink }}" />
+{% endblock %}
+
+{% block content %}
+	{% url_full 'aviso_detail' pk=object.pk as permalink %}
+	<div class="texto_item">
+		<p>
+			Compartir en {{ permalink }}
+			{% include 'pa_charlas_app/p_compartir_botones.html' with permalink=permalink texto=object.titulo texto_element_id="#aviso_"|addstr:object.pk %}
+		</p>
+
+		<div id="texto">
+			<p>
+			<a href="{% url 'aviso_detail' pk=object.pk %}">{{object.titulo}}</a>
+			<i>ofrecido por</i>
+			{{ object.autor }}
+			</p>
+            <p>Creado: {{object.fh_creado}}</p>
+			<div class="markdown">
+Descripcion: {{ object.detalle }}
+			</div>
+            <p>Precio: ${{object.precio}}</p>
+		</div>
+        <p>
+            {% if user == object.autor or user.is_staff%}
+                {% url 'aviso_edit' pk=object.pk as aviso_edit_url %}
+                {% bootstrap_button 'Editar' href=aviso_edit_url  %}
+            {% endif %}
+            {% bootstrap_button 'Volver' href=return_url  %}
+        
+        </p>
+	</div>
+{% endblock %}
+
