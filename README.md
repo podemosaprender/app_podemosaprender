@@ -58,7 +58,7 @@ docker build -t pa_app .
 
 Después lo ejecutás con
 ~~~
-docker run -it --rm -v "$(pwd)":/pa_app/ -p 8000:8000 pa_app bash 
+docker run -it --rm -v "$(pwd)":/pa_app/ pa_app bash
 ~~~
 
 Para ejecutar el servidor

@@ -20,6 +20,7 @@
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-link-footer.css' %}">
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-nav.css' %}">
 		<link rel="stylesheet" href="{% static 'pa_lib/css/estilos-markdown.css' %}">
+		<script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.min.js" defer></script>
 		{% block extra_css %}{% endblock extra_css %}
 		<title>PodemosAprender</title>
 
@@ -41,6 +42,9 @@
 						<ul class="navbar-nav mr-auto">
 						</ul>
 						<ul class="navbar-nav px-3">
+							<li class="nav-item text-nowrap">
+								<a href="{% url 'aviso_list' %}" class="nav-link" >Avisos</a>
+							</li>
 							<li class="nav-item text-nowrap">
 								<a href="/charla/incubadora_de_carreras" class="nav-link" >Incubadora</a>
 							</li>

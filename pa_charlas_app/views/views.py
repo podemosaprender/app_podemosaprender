@@ -19,15 +19,15 @@ import re
 import os
 import datetime as dt
 
-from .models import (
+from ..models import (
 	Imagen,
 	Texto, texto_guardar, textos_de_usuario,
 	Charla, TipoCharla, Visita, charla_participantes, charlas_que_sigo, charlas_y_ultimo,
 	usuario_para, redes_de_usuario,
 	charlas_calendario
 )
-from .forms import ImagenForm, TextoForm
-from .util import *
+from ..forms import ImagenForm, TextoForm
+from ..util import *
 
 import json
 import base64
@@ -479,3 +479,7 @@ def evento_list_ical(request): #U: idem evento_list pero en formato icalendar pa
 
 	return HttpResponse( cal.to_ical(), content_type='text/calendar')
 
+# S: Banco de horas #################################################################
+
+def banco_list(request):
+	return render(request,'pa_charlas_app/banco_horas.html',{'user':request.user})

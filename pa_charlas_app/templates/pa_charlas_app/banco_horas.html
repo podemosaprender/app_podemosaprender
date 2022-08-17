@@ -1,0 +1,212 @@
+{% extends 'pa_charlas_app/base.html' %}
+
+{% load bootstrap4 %}
+
+{% block content %}
+<h1>Banco de horas!</h1>
+
+<!-- Tus transacciones -->
+<div x-data="bancoData()" style="margin: 1em;">
+	<button class="btn btn-primary" @click="traer()"><h3>Tus transacciones:</h3></button>
+
+	<ol
+		x-show="open"
+		
+	>
+		<template x-for="item in items" :key="item">
+			<li><div><span>Tansaccion </span>
+				<div><strong>Titulo: </strong><span x-text="item.node.titulo"></span></div>
+				<div><strong>A quien: </strong><span x-text="item.node.quienRecibe.username"></span></div>
+				<div><strong>Que: </strong><span x-text="item.node.que"></span></div>
+				<div><strong>Cuanto: </strong> <span x-text="item.node.cuanto"></span></div>
+			</div></li>
+		</template>
+	</ol>
+</div>
+<!-- Formulario para crear transaccion -->
+<div x-data="bancoData()" style="margin: 1em;">
+    <button  class="btn btn-primary" @click="open = !open"><h3>Crear transaccion:</h3></button>
+
+    <div
+        x-show="open"
+        @click.away="open = false"
+    >
+        
+		<form method="POST" id="formTx">{% csrf_token %}
+			<div><input type="text" placeholder="Quien recibe" x-model="datos.quien_recibe"></div>
+			<div><input type="number" placeholder="Cuanto" x-model="datos.cuanto"></div>
+			<div><input type="text" placeholder="Que" x-model="datos.que"></div>
+			<div><input type="text" placeholder="titulo" x-model="datos.titulo"></div>
+			<div><input type="button" value="Guardar" @click="crear()"></div>
+			
+		</form>
+		<div x-text="errores || '' " x-show="errores"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+
+	var frmData = { //U: inicializo los valores del form que despues voy a usar como parametros
+		quien_recibe: "holaaaaaaaaaaaaa",
+		quien_hace: "",
+		cuanto: 0,
+		que: "",
+		titulo: "",
+	}
+	//VER: https://graphql.org/learn/queries/#variables
+	//TODO: investigar variables en graphQl, no hardcodear admin
+	var traer = `
+	{
+		bancotxLista(quienDa_Username:"admin") {
+			edges {
+				node {
+					id
+					quienDa {
+						username
+					}
+					quienRecibe {
+						username
+					}
+					fhCreado
+					titulo
+					que
+					cuanto
+				}
+			}
+		}
+	}
+	
+	`
+	function queryCrearTx(frmData) {
+		let datos = {//U: nombres de parametros de graphQL y valores del form
+			quienHace: frmData.quien_hace || "admin",
+			//TODO: pasar como variable global en la plantilla
+
+			quienRecibe: frmData.quien_recibe,
+			cuanto: parseInt(frmData.cuanto),
+			que: frmData.que,
+			titulo: frmData.titulo,
+		}
+		//TODO: mover este generador de parametros en graphQL a la libreria
+
+		let parametros = Object.entries(datos).map(//A: devuelve una lista de clave , valor
+			([k, v]) =>{
+				v = typeof(v) == 'string' ? v.trim() : v;
+				if(v != null && v != ""){
+					return k + ":" + JSON.stringify(v)
+				}
+				return "";
+			}
+		).join(" ") //A: unir los parametros en un string
+
+		let result =  {
+			query:`
+				mutation m1 ($input: BancoTxModificarInput!){
+					bancotxCrear(input: $input) {
+						clientMutationId,
+						bancotx {id}
+					}
+				}
+				`,
+			variables: { input: datos,}
+		}
+		console.log(result);
+		return result
+	} 
+	
+
+	function bancoTraer(user) {
+		//TODO2: traer solo las transacciones de ese usuario
+
+		return fetch("/graphql/", {
+			"credentials": "include",
+			"headers": {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			},
+			"body": JSON.stringify({ query: traer }),
+			"method": "POST",
+			"mode": "cors"
+		})
+			.then(x => x.json()) //A: leer el cuerpo de la respuesta. que lo lea como json
+
+	}
+
+	function bancoCrear(frmData){
+		return fetch("/graphql/", {
+			"credentials": "include",
+			"headers": {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			},
+			"body": JSON.stringify (queryCrearTx(frmData)),
+			"method": "POST",
+			"mode": "cors"
+		})
+			.then(x => x.json()) //A: leer el cuerpo de la respuesta. que lo lea como json
+
+	}
+
+	const Username = '{{user.username}}';
+	
+	function bancoData() {
+
+		return {
+			errores:null,
+			open: false,
+			items: [],
+			datos: {
+				quien_recibe: "",
+				que: "",
+				cuanto: "",
+				titulo: "",
+			},
+			traer(user) {
+				this.open = ! this.open;
+
+				if(this.open){
+					bancoTraer(user).then(items => {
+						this.items = items.data.bancotxLista.edges;
+						console.log(items);
+					});
+					
+
+				}
+
+				
+			},
+			crear(){
+				let frmData = this.datos; //TODO: elegir y limpiar solo los valores que van.
+				frmData.quien_da = Username;
+
+				try {
+					bancoCrear(frmData).then(res=>{
+						console.log('Respuesta: ',res)
+						try{
+							if(res?.data?.bancotxCrear?.bancotx?.id){
+								alert('transferencia de horas creada!')
+							}else{
+								let error = res?.errors && res.errors[0].message
+								console.error('Ocurrio un Error!')
+								this.errores= 'Error al procesar la transferencia :(\nError: '+error
+								
+							}
+
+						} catch (error) {
+							this.errores = 'Error al procesar la transferencia :(\nError: '+error
+						}
+									
+					});
+
+				} catch (error) {
+					alert('Error al procesar la transferencia :(\nError: '+error)
+					
+				}
+			}
+		}
+	}
+</script>
+{% endblock %}

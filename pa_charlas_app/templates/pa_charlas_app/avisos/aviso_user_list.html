@@ -1,0 +1,22 @@
+{% extends 'pa_charlas_app/base_list.html' %}
+
+{% load bootstrap4 %}
+
+{% block item_titulo %}
+	<a href="{% url 'aviso_detail' item.pk %}#nuevo">{{ item.titulo }}</a>
+{% endblock %}
+
+{% block item_cuerpo %}
+{% endblock %}
+
+{% block item_links %}
+{% endblock %}
+
+{% block acciones_sin_item %}
+{% with cartel="Crear "|add:type_name %}
+{% bootstrap_button cartel  href=create_url  %}
+{% endwith %}
+
+
+<a class="btn btn-primary" href="{% url 'aviso_list' %}"  role="button">Todos los avisos</a>
+{% endblock %}
